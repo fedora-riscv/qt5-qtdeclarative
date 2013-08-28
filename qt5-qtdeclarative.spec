@@ -3,13 +3,13 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.0.2
-Release: 4%{?dist}
+Version: 5.1.1
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://releases.qt-project.org/qt5/%{version}%{?pre:-%{pre}}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+Source0: http://download.qt-project.org/official_releases/qt/5.1/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 
 # qt5-qtjsbackend supports only ix86, x86_64 and arm , and so do we here
 ExclusiveArch: %{ix86} x86_64 %{arm}
@@ -113,6 +113,9 @@ popd
 
 
 %changelog
+* Wed Aug 28 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-1
+- 5.1.1
+
 * Tue Aug 20 2013 Rex Dieter <rdieter@fedoraproject.org> 5.0.2-4
 - qt5-qtjsbackend only supports ix86, x86_64 and arm
 
