@@ -1,21 +1,31 @@
 
 %global qt_module qtdeclarative
+%define pre alpha
+
+# define to build docs, need to undef this for bootstrapping
+# where qt5-qttools builds are not yet available
+%define docs 1
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.1.1
-Release: 1%{?dist}
+Version: 5.2.0
+Release: 0.1.%{pre}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
-Source0: http://download.qt-project.org/official_releases/qt/5.1/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+%if 0%{?pre:1}
+Source0: http://download.qt-project.org/development_releases/qt/5.2/%{version}-%{pre}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
+%else
+Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+%endif
 
-# qt5-qtjsbackend supports only ix86, x86_64 and arm , and so do we here
-ExclusiveArch: %{ix86} x86_64 %{arm}
+# http://bugzilla.redhat.com/1005482
+ExcludeArch: ppc64 ppc
+
+Obsoletes: qt5-qtjsbackend < 5.2.0
 
 BuildRequires: qt5-qtbase-devel >= %{version}
-BuildRequires: qt5-qtjsbackend-devel >= %{version}
 
 %{?_qt5_version:Requires: qt5-qtbase%{?_isa} >= %{_qt5_version}}
 
@@ -24,6 +34,7 @@ BuildRequires: qt5-qtjsbackend-devel >= %{version}
 
 %package devel
 Summary: Development files for %{name}
+Obsoletes: qt5-qtjsbackend-devel < 5.2.0
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: qt5-qtbase-devel%{?_isa}
 %description devel
@@ -35,6 +46,17 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 %description static
 %{summary}.
 
+%if 0%{?docs}
+%package doc
+Summary: API documentation for %{name}
+Requires: %{name} = %{version}-%{release}
+# for qhelpgenerator
+BuildRequires: qt5-qttools-devel
+BuildArch: noarch
+%description doc
+%{summary}.
+%endif
+
 
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
@@ -45,24 +67,29 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 
 make %{?_smp_mflags}
 
+%if 0%{?docs}
+make %{?_smp_mflags} docs
+%endif
+
 
 %install
-
 make install INSTALL_ROOT=%{buildroot}
 
-# put non-conflicting binaries with -qt5 postfix in %{_bindir}
+%if 0%{?docs}
+make install_docs INSTALL_ROOT=%{buildroot}
+%endif
+
+# hardlink files to %{_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
 pushd %{buildroot}%{_qt5_bindir}
 for i in * ; do
   case "${i}" in
     qmlplugindump|qmlprofiler)
-      mv $i ../../../bin/${i}-qt5
-      ln -s ../../../bin/${i}-qt5 .
-      ln -s ../../../bin/${i}-qt5 $i
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt5
+      ln -sv ${i} ${i}-qt5
       ;;
-   *)
-      mv $i ../../../bin/
-      ln -s ../../../bin/$i .
+    *)
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}
       ;;
   esac
 done
@@ -87,6 +114,8 @@ popd
 %files
 %doc LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt
 %doc dist/changes*
+%{_bindir}/v4
+%{_qt5_bindir}/v4
 %{_qt5_libdir}/libQt5Qml.so.5*
 %{_qt5_libdir}/libQt5Quick.so.5*
 %{_qt5_libdir}/libQt5QuickParticles.so.5*
@@ -111,8 +140,23 @@ popd
 %{_qt5_libdir}/libQt5QmlDevTools.*a
 %{_qt5_libdir}/libQt5QmlDevTools.prl
 
+%if 0%{?docs}
+%files doc
+%{_qt5_docdir}/qtqml.qch
+%{_qt5_docdir}/qtqml/
+%{_qt5_docdir}/qtquick.qch
+%{_qt5_docdir}/qtquick/
+%{_qt5_docdir}/qtquickdialogs.qch
+%{_qt5_docdir}/qtquickdialogs/
+%endif
+
 
 %changelog
+* Tue Oct 01 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.1.alpha
+- 5.2.0-alpha
+- Obsoletes: qt5-qtjsbackend
+- -doc subpkg
+
 * Wed Aug 28 2013 Rex Dieter <rdieter@fedoraproject.org> 5.1.1-1
 - 5.1.1
 
