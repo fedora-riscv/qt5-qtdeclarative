@@ -4,12 +4,12 @@
 
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
-%define docs 1
+#define docs 1
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.2.0
-Release: 0.1.%{pre}%{?dist}
+Release: 0.2.%{pre}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -19,9 +19,6 @@ Source0: http://download.qt-project.org/development_releases/qt/5.2/%{version}-%
 %else
 Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 %endif
-
-# http://bugzilla.redhat.com/1005482
-ExcludeArch: ppc64 ppc
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -153,6 +150,9 @@ popd
 
 
 %changelog
+* Wed Oct 16 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.2.alpha
+- bootstrap ppc
+
 * Tue Oct 01 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.1.alpha
 - 5.2.0-alpha
 - Obsoletes: qt5-qtjsbackend
