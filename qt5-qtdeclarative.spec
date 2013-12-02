@@ -115,8 +115,6 @@ popd
 %files
 %doc LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt
 %doc dist/changes*
-%{_bindir}/v4
-%{_qt5_bindir}/v4
 %{_qt5_libdir}/libQt5Qml.so.5*
 %{_qt5_libdir}/libQt5Quick.so.5*
 %{_qt5_libdir}/libQt5QuickParticles.so.5*
