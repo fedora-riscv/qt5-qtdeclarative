@@ -12,7 +12,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.2.0
-Release: 0.10.%{pre}%{?dist}
+Release: 0.11.%{pre}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -22,6 +22,9 @@ Source0: http://download.qt-project.org/development_releases/qt/5.2/%{version}-%
 %else
 Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 %endif
+
+# fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them
+Patch1: qtdeclarative-opensource-src-5.2.0-fedora_i686_flags.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -61,6 +64,8 @@ BuildArch: noarch
 
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
+
+%patch1 -p1 -b .fedora_i686_flags
 
 
 %build
@@ -151,6 +156,9 @@ popd
 
 
 %changelog
+* Thu Dec 05 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.11.rc1
+- %%ix86: cannot assume sse2 (and related support) or the JIT that requires it...  disable.
+
 * Mon Dec 02 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.10.rc1
 - 5.2.0-rc1
 
