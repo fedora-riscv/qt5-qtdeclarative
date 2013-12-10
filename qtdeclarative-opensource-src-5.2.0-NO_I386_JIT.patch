@@ -1,0 +1,29 @@
+diff -up qtdeclarative-opensource-src-5.2.0-rc1/src/qml/jsruntime/jsruntime.pri.fedora_i686_flags qtdeclarative-opensource-src-5.2.0-rc1/src/qml/jsruntime/jsruntime.pri
+--- qtdeclarative-opensource-src-5.2.0-rc1/src/qml/jsruntime/jsruntime.pri.fedora_i686_flags	2013-11-26 19:02:16.000000000 -0600
++++ qtdeclarative-opensource-src-5.2.0-rc1/src/qml/jsruntime/jsruntime.pri	2013-12-10 10:27:16.082852640 -0600
+@@ -92,9 +92,12 @@ HEADERS += \
+ # Use SSE2 floating point math on 32 bit instead of the default
+ # 387 to make test results pass on 32 and on 64 bit builds.
+ linux-g++*:isEqual(QT_ARCH,i386) {
++CONFIG(NO_I386_JIT) {
++    DEFINES += NO_I386_JIT
++} else {
+     QMAKE_CFLAGS += -march=pentium4 -msse2 -mfpmath=sse
+     QMAKE_CXXFLAGS += -march=pentium4 -msse2 -mfpmath=sse
+-}
++}}
+ 
+ valgrind {
+     DEFINES += V4_USE_VALGRIND
+diff -up qtdeclarative-opensource-src-5.2.0-rc1/src/qml/jsruntime/qv4global_p.h.fedora_i686_flags qtdeclarative-opensource-src-5.2.0-rc1/src/qml/jsruntime/qv4global_p.h
+--- qtdeclarative-opensource-src-5.2.0-rc1/src/qml/jsruntime/qv4global_p.h.fedora_i686_flags	2013-11-26 19:02:16.000000000 -0600
++++ qtdeclarative-opensource-src-5.2.0-rc1/src/qml/jsruntime/qv4global_p.h	2013-12-10 10:02:14.360839311 -0600
+@@ -84,7 +84,7 @@ inline double trunc(double d) { return d
+ 
+ // Black list some platforms
+ #if defined(V4_ENABLE_JIT)
+-#if defined(Q_OS_IOS) || defined(Q_OS_WIN64) || defined(Q_OS_WINRT)
++#if defined(Q_OS_IOS) || defined(Q_OS_WIN64) || defined(Q_OS_WINRT) || defined(NO_I386_JIT)
+ #    undef V4_ENABLE_JIT
+ #endif
+ #endif

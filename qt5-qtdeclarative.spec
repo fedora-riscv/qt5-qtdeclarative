@@ -12,7 +12,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.2.0
-Release: 0.11.%{pre}%{?dist}
+Release: 0.12.%{pre}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -23,8 +23,8 @@ Source0: http://download.qt-project.org/development_releases/qt/5.2/%{version}-%
 Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 %endif
 
-# fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them
-Patch1: qtdeclarative-opensource-src-5.2.0-fedora_i686_flags.patch
+# support NO_I386_JIT CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
+Patch1: qtdeclarative-opensource-src-5.2.0-NO_I386_JIT.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -65,24 +65,44 @@ BuildArch: noarch
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
 
-%patch1 -p1 -b .fedora_i686_flags
+%patch1 -p1 -b .NO_I386_JIT
 
 
 %build
-%{_qt5_qmake}
+mkdir -p %{_target_platform}
+pushd %{_target_platform}
+%{_qt5_qmake} ..
+popd
 
-make %{?_smp_mflags}
+make %{?_smp_mflags} -C %{_target_platform}
+
+%ifarch %{ix86}
+# build libQt5Qml with NO_I386_JIT
+mkdir -p %{_target_platform}-nojit
+pushd    %{_target_platform}-nojit
+%{_qt5_qmake} CONFIG+=NO_I386_JIT ..
+popd
+
+make sub-src-clean   -C %{_target_platform}-nojit/
+make %{?_smp_mflags} -C %{_target_platform}-nojit/src/qml
+%endif
 
 %if 0%{?docs}
-make %{?_smp_mflags} docs
+make %{?_smp_mflags} docs -C %{_target_platform}
 %endif
 
 
 %install
-make install INSTALL_ROOT=%{buildroot}
+make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
+
+%ifarch %{ix86}
+mkdir -p %{buildroot}%{_qt5_libdir}/sse2
+mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
+make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-nojit/src/qml
+%endif
 
 %if 0%{?docs}
-make install_docs INSTALL_ROOT=%{buildroot}
+make install_docs INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 %endif
 
 # hardlink files to %{_bindir}, add -qt5 postfix to not conflict
@@ -121,6 +141,9 @@ popd
 %doc LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt
 %doc dist/changes*
 %{_qt5_libdir}/libQt5Qml.so.5*
+%ifarch %{ix86}
+%{_qt5_libdir}/sse2/libQt5Qml.so.5*
+%endif
 %{_qt5_libdir}/libQt5Quick.so.5*
 %{_qt5_libdir}/libQt5QuickParticles.so.5*
 %{_qt5_libdir}/libQt5QuickTest.so.5*
@@ -156,6 +179,10 @@ popd
 
 
 %changelog
+* Tue Dec 10 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-0.12.rc1
+- support out-of-src-tree builds
+- %%ix86: install sse2/jit version to %%_qt5_libdir/sse2/
+
 * Thu Dec 05 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.11.rc1
 - %%ix86: cannot assume sse2 (and related support) or the JIT that requires it...  disable.
 
