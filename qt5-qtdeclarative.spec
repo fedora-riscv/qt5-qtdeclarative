@@ -11,7 +11,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.2.0
-Release: 1%{pre}%{?dist}
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -22,8 +22,9 @@ Source0: http://download.qt-project.org/development_releases/qt/5.2/%{version}-%
 Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 %endif
 
-# support NO_I386_JIT CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
-Patch1: qtdeclarative-opensource-src-5.2.0-NO_I386_JIT.patch
+# support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
+# https://codereview.qt-project.org/#change,73710
+Patch1: qtdeclarative-opensource-src-5.2.0-no_sse2.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -64,7 +65,7 @@ BuildArch: noarch
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
 
-%patch1 -p1 -b .NO_I386_JIT
+%patch1 -p1 -b .no_sse2
 
 
 %build
@@ -75,19 +76,18 @@ popd
 
 make %{?_smp_mflags} -C %{_target_platform}
 
-%ifarch %{ix86}
-# build libQt5Qml with NO_I386_JIT
-mkdir -p %{_target_platform}-nojit
-pushd    %{_target_platform}-nojit
-%{_qt5_qmake} CONFIG+=NO_I386_JIT ..
-popd
-
-make sub-src-clean   -C %{_target_platform}-nojit/
-make %{?_smp_mflags} -C %{_target_platform}-nojit/src/qml
+%if 0%{?docs}
+make %{?_smp_mflags} docs %{_target_platform}
 %endif
 
-%if 0%{?docs}
-make %{?_smp_mflags} docs -C %{_target_platform}
+%ifarch %{ix86}
+# build libQt5Qml with no_sse2
+mkdir -p %{_target_platform}-no_sse2
+pushd    %{_target_platform}-no_sse2
+%{_qt5_qmake} -config no_sse2 ..
+make sub-src-clean
+make %{?_smp_mflags} -C src/qml
+popd
 %endif
 
 
@@ -97,7 +97,7 @@ make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 %ifarch %{ix86}
 mkdir -p %{buildroot}%{_qt5_libdir}/sse2
 mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
-make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-nojit/src/qml
+make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
 %endif
 
 %if 0%{?docs}
