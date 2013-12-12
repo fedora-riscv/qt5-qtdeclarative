@@ -1,6 +1,5 @@
 
 %global qt_module qtdeclarative
-%define pre rc1
 
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
@@ -12,7 +11,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.2.0
-Release: 0.12.%{pre}%{?dist}
+Release: 1%{pre}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
