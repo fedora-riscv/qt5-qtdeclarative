@@ -18,7 +18,7 @@ diff -up qtdeclarative-opensource-src-5.2.0/src/qml/jsruntime/qv4global_p.h.no_s
  #include <QString>
  #include <qtqmlglobal.h>
 +// To get __SSE2__ defined when building with MSVC
-+#include <private/qsimd_p.h>
++//#include <private/qsimd_p.h>
  
  #if defined(Q_CC_MSVC)
  #include <float.h>
