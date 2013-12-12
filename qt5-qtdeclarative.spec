@@ -178,6 +178,9 @@ popd
 
 
 %changelog
+* Thu Dec 12 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-1
+- 5.2.0
+
 * Tue Dec 10 2013 Rex Dieter <rdieter@fedoraproject.org> - 5.2.0-0.12.rc1
 - support out-of-src-tree builds
 - %%ix86: install sse2/jit version to %%_qt5_libdir/sse2/
