@@ -76,10 +76,6 @@ popd
 
 make %{?_smp_mflags} -C %{_target_platform}
 
-%if 0%{?docs}
-make %{?_smp_mflags} docs %{_target_platform}
-%endif
-
 %ifarch %{ix86}
 # build libQt5Qml with no_sse2
 mkdir -p %{_target_platform}-no_sse2
@@ -88,6 +84,10 @@ pushd    %{_target_platform}-no_sse2
 make sub-src-clean
 make %{?_smp_mflags} -C src/qml
 popd
+%endif
+
+%if 0%{?docs}
+make %{?_smp_mflags} docs -C %{_target_platform}
 %endif
 
 
