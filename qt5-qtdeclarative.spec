@@ -1,10 +1,15 @@
 
 %global qt_module qtdeclarative
 
+%if 0%{?rhel} > 6
+%global bootstrap 1
+%endif
+
+
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
-%if 0%{?rhel} < 7
+%if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
 %define docs 1
 %endif
@@ -31,7 +36,9 @@ Patch1: qtdeclarative-opensource-src-5.2.0-no_sse2.patch
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
 BuildRequires: qt5-qtbase-devel >= %{version}
+%if ! 0%{?bootstrap}
 BuildRequires: pkgconfig(Qt5XmlPatterns)
+%endif
 BuildRequires: python
 
 %{?_qt5_version:Requires: qt5-qtbase%{?_isa} >= %{_qt5_version}}
