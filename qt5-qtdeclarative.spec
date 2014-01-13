@@ -4,8 +4,10 @@
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
+%if 0%{?rhel} < 7
 %ifarch %{arm} %{ix86} x86_64
 %define docs 1
+%endif
 %endif
 
 Summary: Qt5 - QtDeclarative component
