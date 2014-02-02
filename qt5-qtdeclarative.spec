@@ -13,7 +13,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.2.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -27,6 +27,11 @@ Source0: http://download.qt-project.org/official_releases/qt/5.2/%{version}/subm
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
 Patch1: qtdeclarative-opensource-src-5.2.0-no_sse2.patch
+
+# two upstream/upstream fixes from https://code.google.com/p/double-conversion/issues/detail?id=33
+# Qt uses old version of double-conversion code
+Patch2: 0001-Add-ARM-64-support.patch
+Patch3: 0002-Fix-build-on-ARMv8-64bit.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -77,6 +82,8 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
 
 %patch1 -p1 -b .no_sse2
+%patch2 -p1 -b .0001
+%patch3 -p1 -b .0002
 
 
 %build
@@ -194,6 +201,9 @@ popd
 
 
 %changelog
+* Sun Feb 02 2014 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> 5.2.0-6
+- Add AArch64 support (RHBUG: 1040452, QTBUG-35528)
+
 * Mon Jan 27 2014 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-5
 - build -examples only if supported
 
