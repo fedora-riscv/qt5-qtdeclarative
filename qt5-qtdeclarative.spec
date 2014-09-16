@@ -130,6 +130,7 @@ for i in * ; do
       ln -v  ${i} %{buildroot}%{_bindir}/${i}
       ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt5
       ln -sv ${i} ${i}-qt5
+      ;;
     *)
       ln -v  ${i} %{buildroot}%{_bindir}/${i}
       ;;
