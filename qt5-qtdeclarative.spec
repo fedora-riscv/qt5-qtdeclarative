@@ -13,7 +13,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.3.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -120,10 +120,16 @@ mkdir %{buildroot}%{_bindir}
 pushd %{buildroot}%{_qt5_bindir}
 for i in * ; do
   case "${i}" in
+    # qt4 conflicts
     qmlplugindump|qmlprofiler)
       ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt5
       ln -sv ${i} ${i}-qt5
       ;;
+    # qtchooser stuff
+    qml|qmlbundle|qmlmin|qmlscene)
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt5
+      ln -sv ${i} ${i}-qt5
     *)
       ln -v  ${i} %{buildroot}%{_bindir}/${i}
       ;;
@@ -194,6 +200,9 @@ popd
 
 
 %changelog
+* Tue Sep 16 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.1-3
+- -qt5 wrappers for qml qmlbundle qmlmin qmlscene
+
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.3.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
