@@ -110,7 +110,8 @@ make %{?_smp_mflags} docs -C %{_target_platform}
 %install
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 
-%ifarch %{ix86}
+#ifarch %{ix86}
+%if 0
 mkdir -p %{buildroot}%{_qt5_libdir}/sse2
 mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
