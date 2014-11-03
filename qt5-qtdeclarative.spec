@@ -15,7 +15,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.4.0
-Release: 0.1.%{pre}%{?dist}
+Release: 0.2.%{pre}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -86,7 +86,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %build
 mkdir -p %{_target_platform}
 pushd %{_target_platform}
-%{_qt5_qmake} ..
+%{qmake_qt5} ..
 popd
 
 make %{?_smp_mflags} -C %{_target_platform}
@@ -209,6 +209,9 @@ popd
 
 
 %changelog
+* Mon Nov 03 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.2.beta
+- use new %%qmake_qt5 macro
+
 * Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta
 - 5.4.0-beta
 - %%ix84: drop sse2-optimized bits, need to rethink if/how to support it now
