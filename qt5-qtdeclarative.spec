@@ -13,7 +13,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.3.2
-Release: 2%{?dist}
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -27,9 +27,6 @@ Source0: http://download.qt-project.org/official_releases/qt/5.3/%{version}/subm
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
 Patch1: qtdeclarative-opensource-src-5.2.0-no_sse2.patch
-
-# upstream patches
-Patch100: qtdeclarative-cleaup-image-and-shadereffectsource-properly.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -81,7 +78,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %patch1 -p1 -b .no_sse2
 
-%patch100 -p1 -b .qtdeclarative-cleaup-image-and-shadereffectsource-properly
 
 %build
 mkdir -p %{_target_platform}
@@ -205,10 +201,6 @@ popd
 
 
 %changelog
-* Wed Oct 29 2014 Jan Grulich <jgrulich@redhat.com> - 5.3.2-2
-- Clean up Image and ShaderEffectSource properly.
-  QTBUG-39336
-
 * Tue Sep 16 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-1
 - 5.3.2
 
