@@ -81,7 +81,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %patch1 -p1 -b .no_sse2
 
-# %patch100 -p1 -b .qtdeclarative-cleaup-image-and-shadereffectsource-properly
+%patch100 -p1 -b .qtdeclarative-cleaup-image-and-shadereffectsource-properly
 
 %build
 mkdir -p %{_target_platform}
