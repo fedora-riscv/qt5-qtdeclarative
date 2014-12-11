@@ -12,18 +12,19 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.3.2
+Version: 5.4.0
 Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url: http://qt-project.org/
 %if 0%{?pre:1}
-Source0: http://download.qt-project.org/development_releases/qt/5.3/%{version}-%{pre}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
+Source0: http://download.qt-project.org/development_releases/qt/5.4/%{version}-%{pre}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
 %else
-Source0: http://download.qt-project.org/official_releases/qt/5.3/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+Source0: http://download.qt-project.org/official_releases/qt/5.4/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 %endif
 
+# FIXME?  now bases on whether qtbase supports sse2 (or not)
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
 Patch1: qtdeclarative-opensource-src-5.2.0-no_sse2.patch
@@ -39,7 +40,7 @@ BuildRequires: python
 %{?_qt5_version:Requires: qt5-qtbase%{?_isa} >= %{_qt5_version}}
 
 %description
-%{summary}
+%{summary}.
 
 %package devel
 Summary: Development files for %{name}
@@ -58,6 +59,7 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 %if 0%{?docs}
 %package doc
 Summary: API documentation for %{name}
+License: GFDL
 Requires: %{name} = %{version}-%{release}
 # for qhelpgenerator
 BuildRequires: qt5-qttools-devel
@@ -76,18 +78,19 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
 
-%patch1 -p1 -b .no_sse2
+#patch1 -p1 -b .no_sse2
 
 
 %build
 mkdir -p %{_target_platform}
 pushd %{_target_platform}
-%{_qt5_qmake} ..
+%{qmake_qt5} ..
 popd
 
 make %{?_smp_mflags} -C %{_target_platform}
 
-%ifarch %{ix86}
+#ifarch %{ix86}
+%if 0
 # build libQt5Qml with no_sse2
 mkdir -p %{_target_platform}-no_sse2
 pushd    %{_target_platform}-no_sse2
@@ -105,7 +108,8 @@ make %{?_smp_mflags} docs -C %{_target_platform}
 %install
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 
-%ifarch %{ix86}
+#ifarch %{ix86}
+%if 0
 mkdir -p %{buildroot}%{_qt5_libdir}/sse2
 mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
@@ -155,19 +159,21 @@ popd
 %postun -p /sbin/ldconfig
 
 %files
-%doc LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt
+%doc LICENSE.GPL* LICENSE.LGPL* LGPL_EXCEPTION.txt
 %doc dist/changes*
 %{_qt5_libdir}/libQt5Qml.so.5*
-%ifarch %{ix86}
+#ifarch %{ix86}
+%if 0
 %{_qt5_libdir}/sse2/libQt5Qml.so.5*
 %endif
 %{_qt5_libdir}/libQt5Quick.so.5*
 %{_qt5_libdir}/libQt5QuickWidgets.so.5*
 %{_qt5_libdir}/libQt5QuickParticles.so.5*
 %{_qt5_libdir}/libQt5QuickTest.so.5*
-%{_qt5_plugindir}/accessible/libqtaccessiblequick.so
 %{_qt5_plugindir}/qmltooling/
 %{_qt5_archdatadir}/qml/
+%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_QTcpServerConnection.cmake
+%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_QtQuick2Plugin.cmake
 
 %files devel
 %{_bindir}/qml*
@@ -178,7 +184,7 @@ popd
 %{_qt5_libdir}/libQt5Quick*.so
 %{_qt5_libdir}/libQt5QuickWidgets.so.5
 %{_qt5_libdir}/libQt5Quick*.prl
-%{_qt5_libdir}/cmake/Qt5*/
+%{_qt5_libdir}/cmake/Qt5*/Qt5*Config*.cmake
 %{_qt5_libdir}/pkgconfig/Qt5*.pc
 %{_qt5_archdatadir}/mkspecs/modules/*.pri
 
@@ -201,6 +207,19 @@ popd
 
 
 %changelog
+* Wed Dec 10 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-1
+- 5.4.0 (final)
+
+* Fri Nov 28 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.3.rc
+- 5.4.0-rc
+
+* Mon Nov 03 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.2.beta
+- use new %%qmake_qt5 macro
+
+* Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta
+- 5.4.0-beta
+- %%ix84: drop sse2-optimized bits, need to rethink if/how to support it now
+
 * Tue Sep 16 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-1
 - 5.3.2
 
