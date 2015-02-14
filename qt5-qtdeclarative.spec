@@ -13,7 +13,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.4.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -172,6 +172,7 @@ popd
 %{_qt5_libdir}/libQt5QuickTest.so.5*
 %{_qt5_plugindir}/qmltooling/
 %{_qt5_archdatadir}/qml/
+%dir %{_qt5_libdir}/cmake/Qt5Qml/
 %{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_QTcpServerConnection.cmake
 %{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_QtQuick2Plugin.cmake
 
@@ -184,6 +185,7 @@ popd
 %{_qt5_libdir}/libQt5Quick*.so
 %{_qt5_libdir}/libQt5QuickWidgets.so.5
 %{_qt5_libdir}/libQt5Quick*.prl
+%dir %{_qt5_libdir}/cmake/Qt5Quick*/
 %{_qt5_libdir}/cmake/Qt5*/Qt5*Config*.cmake
 %{_qt5_libdir}/pkgconfig/Qt5*.pc
 %{_qt5_archdatadir}/mkspecs/modules/*.pri
@@ -207,6 +209,9 @@ popd
 
 
 %changelog
+* Sat Feb 14 2015 Ville Skyttä <ville.skytta@iki.fi> - 5.4.0-2
+- Fix cmake dir ownerhips
+
 * Wed Dec 10 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-1
 - 5.4.0 (final)
 
