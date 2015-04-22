@@ -92,7 +92,7 @@ make %{?_smp_mflags} -C %{_target_platform}
 # build libQt5Qml with no_sse2
 mkdir -p %{_target_platform}-no_sse2
 pushd    %{_target_platform}-no_sse2
-%{_qt5_qmake} -config no_sse2 ..
+%{qmake_qt5} -config no_sse2 ..
 make sub-src-clean
 make %{?_smp_mflags} -C src/qml
 popd
