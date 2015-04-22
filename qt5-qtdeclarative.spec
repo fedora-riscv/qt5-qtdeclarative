@@ -13,7 +13,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.4.1
-Release: 1%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -24,10 +24,9 @@ Source0: http://download.qt-project.org/development_releases/qt/5.4/%{version}-%
 Source0: http://download.qt-project.org/official_releases/qt/5.4/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 %endif
 
-# FIXME?  now bases on whether qtbase supports sse2 (or not)
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
-Patch1: qtdeclarative-opensource-src-5.2.0-no_sse2.patch
+Patch1: qtdeclarative-opensource-src-5.4.1-no_sse2.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -78,7 +77,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
 
-#patch1 -p1 -b .no_sse2
+%patch1 -p1 -b .no_sse2
 
 
 %build
@@ -89,12 +88,11 @@ popd
 
 make %{?_smp_mflags} -C %{_target_platform}
 
-#ifarch %{ix86}
-%if 0
+%ifarch %{ix86}
 # build libQt5Qml with no_sse2
 mkdir -p %{_target_platform}-no_sse2
 pushd    %{_target_platform}-no_sse2
-%{_qt5_qmake} -config no_sse2 ..
+%{qmake_qt5} -config no_sse2 ..
 make sub-src-clean
 make %{?_smp_mflags} -C src/qml
 popd
@@ -108,8 +106,7 @@ make %{?_smp_mflags} docs -C %{_target_platform}
 %install
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 
-#ifarch %{ix86}
-%if 0
+%ifarch %{ix86}
 mkdir -p %{buildroot}%{_qt5_libdir}/sse2
 mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
@@ -162,8 +159,7 @@ popd
 %doc LICENSE.GPL* LICENSE.LGPL* LGPL_EXCEPTION.txt
 %doc dist/changes*
 %{_qt5_libdir}/libQt5Qml.so.5*
-#ifarch %{ix86}
-%if 0
+%ifarch %{ix86}
 %{_qt5_libdir}/sse2/libQt5Qml.so.5*
 %endif
 %{_qt5_libdir}/libQt5Quick.so.5*
@@ -209,6 +205,12 @@ popd
 
 
 %changelog
+* Wed Apr 22 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 5.4.1-3
+- fix non-sse2 support (kde#346244) and optimize sse2 binaries
+
+* Fri Feb 27 2015 Rex Dieter <rdieter@fedoraproject.org> - 5.4.1-2
+- rebuild (gcc5)
+
 * Tue Feb 24 2015 Jan Grulich <jgrulich@redhat.com> 5.4.1-1
 - 5.4.1
 
