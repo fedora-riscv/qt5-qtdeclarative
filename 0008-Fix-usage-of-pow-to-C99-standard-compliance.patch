@@ -1,0 +1,28 @@
+From 6b3ac8e2e0944fb6025371c2ff37db350fef69fd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pasi=20Pet=C3=A4j=C3=A4j=C3=A4rvi?=
+ <pasi.petajajarvi@theqtcompany.com>
+Date: Wed, 21 Jan 2015 16:02:17 +0200
+Subject: [PATCH 08/68] Fix usage of pow to C99 standard compliance
+
+Change-Id: I37c25b848dd3f53afff360d81a3a685cbd8e5d26
+Reviewed-by: Simon Hausmann <simon.hausmann@digia.com>
+---
+ src/qml/jsruntime/qv4globalobject.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/qml/jsruntime/qv4globalobject.cpp b/src/qml/jsruntime/qv4globalobject.cpp
+index 9a9de8b..77bc9f5 100644
+--- a/src/qml/jsruntime/qv4globalobject.cpp
++++ b/src/qml/jsruntime/qv4globalobject.cpp
+@@ -502,7 +502,7 @@ ReturnedValue GlobalFunctions::method_parseInt(CallContext *ctx)
+     }
+ 
+     if (overflow) {
+-        double result = (double) v_overflow * pow(R, overflow_digit_count);
++        double result = (double) v_overflow * pow(static_cast<double>(R), static_cast<double>(overflow_digit_count));
+         result += v;
+         return Encode(sign * result);
+     } else {
+-- 
+2.3.7
+

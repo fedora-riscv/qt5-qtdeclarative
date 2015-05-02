@@ -1,0 +1,39 @@
+From d43a963e49956ba772644e9f3448dc3672147f77 Mon Sep 17 00:00:00 2001
+From: Daiwei Li <daiweili@suitabletech.com>
+Date: Mon, 2 Feb 2015 16:34:27 -0800
+Subject: [PATCH 41/68] Fix crash in overdraw and change visualizers
+
+It appears to be possible for node->element()->batch to be NULL
+
+Task-number: QTBUG-43129
+Change-Id: If6e4e265a02ee305bf3aa9cad387b7a73648367a
+Reviewed-by: Gunnar Sletta <gunnar@sletta.org>
+---
+ src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp b/src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp
+index dbea0fa..b926697 100644
+--- a/src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp
++++ b/src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp
+@@ -2815,7 +2815,7 @@ void Renderer::visualizeChangesPrepare(Node *n, uint parentChanges)
+ void Renderer::visualizeChanges(Node *n)
+ {
+ 
+-    if (n->type() == QSGNode::GeometryNodeType && m_visualizeChanceSet.contains(n)) {
++    if (n->type() == QSGNode::GeometryNodeType && n->element()->batch && m_visualizeChanceSet.contains(n)) {
+         uint dirty = m_visualizeChanceSet.value(n);
+         bool tinted = (dirty & QSGNODE_DIRTY_PARENT) != 0;
+ 
+@@ -2852,7 +2852,7 @@ void Renderer::visualizeChanges(Node *n)
+ 
+ void Renderer::visualizeOverdraw_helper(Node *node)
+ {
+-    if (node->type() == QSGNode::GeometryNodeType) {
++    if (node->type() == QSGNode::GeometryNodeType && node->element()->batch) {
+         VisualizeShader *shader = static_cast<VisualizeShader *>(m_shaderManager->visualizeProgram);
+         QSGGeometryNode *gn = static_cast<QSGGeometryNode *>(node->sgNode);
+ 
+-- 
+2.3.7
+

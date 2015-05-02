@@ -1,0 +1,41 @@
+From 47c089d15f79cd678e0c9de5c7fb5b5e2488a9f5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pasi=20Pet=C3=A4j=C3=A4j=C3=A4rvi?=
+ <pasi.petajajarvi@theqtcompany.com>
+Date: Wed, 21 Jan 2015 12:35:38 +0200
+Subject: [PATCH 11/68] V4: include alloca private header as alloca is used
+ unconditionally.
+
+Change-Id: Ic94a7ec3980ca9e2629620ef83c93b179d75162b
+Reviewed-by: Simon Hausmann <simon.hausmann@digia.com>
+---
+ src/qml/jit/qv4regalloc.cpp           | 1 +
+ src/qml/jsruntime/qv4stringobject.cpp | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/qml/jit/qv4regalloc.cpp b/src/qml/jit/qv4regalloc.cpp
+index e695224..f9f494c 100644
+--- a/src/qml/jit/qv4regalloc.cpp
++++ b/src/qml/jit/qv4regalloc.cpp
+@@ -32,6 +32,7 @@
+ ****************************************************************************/
+ 
+ #include "qv4regalloc_p.h"
++#include "qv4alloca_p.h"
+ #include <private/qv4value_inl_p.h>
+ 
+ #include <algorithm>
+diff --git a/src/qml/jsruntime/qv4stringobject.cpp b/src/qml/jsruntime/qv4stringobject.cpp
+index 397a6ef..8bf9a09 100644
+--- a/src/qml/jsruntime/qv4stringobject.cpp
++++ b/src/qml/jsruntime/qv4stringobject.cpp
+@@ -37,6 +37,7 @@
+ #include "qv4objectproto_p.h"
+ #include "qv4mm_p.h"
+ #include "qv4scopedvalue_p.h"
++#include "qv4alloca_p.h"
+ #include <QtCore/qnumeric.h>
+ #include <QtCore/qmath.h>
+ #include <QtCore/QDateTime>
+-- 
+2.3.7
+

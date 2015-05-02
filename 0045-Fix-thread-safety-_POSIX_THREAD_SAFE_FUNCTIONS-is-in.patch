@@ -1,0 +1,29 @@
+From ea70dd579522667e1ba2ffa7f6a39faa13857a72 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Mon, 16 Feb 2015 16:17:21 -0800
+Subject: [PATCH 45/68] Fix thread-safety: _POSIX_THREAD_SAFE_FUNCTIONS is in
+ <unistd.h>
+
+If you don't include it, it isn't defined...
+
+Change-Id: I1a800c709d3543699131ffff13c388ba652761fc
+Reviewed-by: Simon Hausmann <simon.hausmann@theqtcompany.com>
+---
+ src/qml/jsruntime/qv4dateobject.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/qml/jsruntime/qv4dateobject.cpp b/src/qml/jsruntime/qv4dateobject.cpp
+index b3c340c..0aa53c4 100644
+--- a/src/qml/jsruntime/qv4dateobject.cpp
++++ b/src/qml/jsruntime/qv4dateobject.cpp
+@@ -57,6 +57,7 @@
+ #  else
+ #    include "qplatformdefs.h"
+ #  endif
++#  include <unistd.h> // for _POSIX_THREAD_SAFE_FUNCTIONS
+ #endif
+ 
+ using namespace QV4;
+-- 
+2.3.7
+

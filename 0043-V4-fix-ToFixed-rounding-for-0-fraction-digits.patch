@@ -1,0 +1,73 @@
+From c3effc6cd3a66b6c02048d8ad85c7ed3bb3c1463 Mon Sep 17 00:00:00 2001
+From: Erik Verbruggen <erik.verbruggen@digia.com>
+Date: Wed, 28 Jan 2015 09:34:10 +0100
+Subject: [PATCH 43/68] V4: fix ToFixed rounding for 0 fraction digits.
+
+(12.5).toFixed() should return 13, not 12.
+
+Task-number: QTBUG-43885
+Task-number: QTBUG-44039
+Change-Id: Id2b19641e8c12dd5755d8447508b74567e4a2b9b
+Reviewed-by: Simon Hausmann <simon.hausmann@theqtcompany.com>
+---
+ src/qml/jsruntime/qv4numberobject.cpp      | 12 +++++++++---
+ tests/auto/qml/qjsengine/tst_qjsengine.cpp | 13 +++++++++++++
+ 2 files changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/src/qml/jsruntime/qv4numberobject.cpp b/src/qml/jsruntime/qv4numberobject.cpp
+index 227ff14..236091b 100644
+--- a/src/qml/jsruntime/qv4numberobject.cpp
++++ b/src/qml/jsruntime/qv4numberobject.cpp
+@@ -202,9 +202,15 @@ ReturnedValue NumberPrototype::method_toFixed(CallContext *ctx)
+         str = QString::fromLatin1("NaN");
+     else if (qIsInf(v))
+         str = QString::fromLatin1(v < 0 ? "-Infinity" : "Infinity");
+-    else if (v < 1.e21)
+-        str = QString::number(v, 'f', int (fdigits));
+-    else
++    else if (v < 1.e21) {
++        char buf[100];
++        double_conversion::StringBuilder builder(buf, sizeof(buf));
++        double_conversion::DoubleToStringConverter::EcmaScriptConverter().ToFixed(v, fdigits, &builder);
++        str = QString::fromLatin1(builder.Finalize());
++        // At some point, the 3rd party double-conversion code should be moved to qtcore.
++        // When that's done, we can use:
++//        str = QString::number(v, 'f', int (fdigits));
++    } else
+         return RuntimeHelpers::stringFromNumber(ctx, v)->asReturnedValue();
+     return ctx->d()->engine->newString(str)->asReturnedValue();
+ }
+diff --git a/tests/auto/qml/qjsengine/tst_qjsengine.cpp b/tests/auto/qml/qjsengine/tst_qjsengine.cpp
+index 158ee15..2b7b1fc 100644
+--- a/tests/auto/qml/qjsengine/tst_qjsengine.cpp
++++ b/tests/auto/qml/qjsengine/tst_qjsengine.cpp
+@@ -174,6 +174,7 @@ private slots:
+     void privateMethods();
+ 
+     void intConversion_QTBUG43309();
++    void toFixed();
+ 
+ signals:
+     void testSignal();
+@@ -3615,6 +3616,18 @@ void tst_QJSEngine::intConversion_QTBUG43309()
+     QCOMPARE(result.toNumber(), 25.0);
+ }
+ 
++// QTBUG-44039 and QTBUG-43885:
++void tst_QJSEngine::toFixed()
++{
++    QJSEngine engine;
++    QJSValue result = engine.evaluate(QStringLiteral("(12.5).toFixed()"));
++    QVERIFY(result.isString());
++    QCOMPARE(result.toString(), QStringLiteral("13"));
++    result = engine.evaluate(QStringLiteral("(12.05).toFixed(1)"));
++    QVERIFY(result.isString());
++    QCOMPARE(result.toString(), QStringLiteral("12.1"));
++}
++
+ QTEST_MAIN(tst_QJSEngine)
+ 
+ #include "tst_qjsengine.moc"
+-- 
+2.3.7
+
