@@ -12,8 +12,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.4.1
-Release: 4%{?dist}
+Version: 5.4.2
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -25,14 +25,6 @@ Source0: http://download.qt-project.org/official_releases/qt/5.4/%{version}/subm
 %endif
 
 ## upstream patches
-Patch08: 0008-Fix-usage-of-pow-to-C99-standard-compliance.patch
-Patch11: 0011-V4-include-alloca-private-header-as-alloca-is-used-u.patch
-Patch32: 0032-Update-C-11-warning-logic-from-QtWebKit.patch
-Patch41: 0041-Fix-crash-in-overdraw-and-change-visualizers.patch
-Patch43: 0043-V4-fix-ToFixed-rounding-for-0-fraction-digits.patch
-Patch45: 0045-Fix-thread-safety-_POSIX_THREAD_SAFE_FUNCTIONS-is-in.patch
-Patch58: 0058-V4-JIT-fix-typo-in-Binop-int32Binop.patch
-Patch67: 0067-Avoid-calling-potentially-pure-virtual-method.patch
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
@@ -215,6 +207,9 @@ popd
 
 
 %changelog
+* Wed Jun 03 2015 Jan Grulich <jgrulich@redhat.com> 5.4.2-1
+- 5.4.2
+
 * Sat May 02 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.1-4
 - pull in some upstream fixes, for QTBUG-45753/kde-345544 in particular
 
