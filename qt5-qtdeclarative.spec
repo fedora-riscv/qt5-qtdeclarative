@@ -158,7 +158,7 @@ popd
 %postun -p /sbin/ldconfig
 
 %files
-%doc LICENSE.GPL* LICENSE.LGPL* LGPL_EXCEPTION.txt
+%doc LICENSE.LGPL* LGPL_EXCEPTION.txt
 %doc dist/changes*
 %{_qt5_libdir}/libQt5Qml.so.5*
 %ifarch %{ix86}
