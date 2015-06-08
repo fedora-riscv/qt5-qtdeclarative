@@ -13,7 +13,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.4.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -24,11 +24,12 @@ Source0: http://download.qt-project.org/development_releases/qt/5.4/%{version}-%
 Source0: http://download.qt-project.org/official_releases/qt/5.4/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 %endif
 
-## upstream patches
-
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
 Patch1: qtdeclarative-opensource-src-5.4.1-no_sse2.patch
+
+# QTBUG-45753/kde-345544, can drop when 5.5.0 lands
+Patch2: Avoid-calling-potentially-pure-virtual-method.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -79,11 +80,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %prep
 %autosetup -p1 -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
 
-#patch1 -p1 -b .no_sse2
-
 
 %build
-mkdir -p %{_target_platform}
+mkdir %{_target_platform}
 pushd %{_target_platform}
 %{qmake_qt5} ..
 popd
@@ -207,6 +206,9 @@ popd
 
 
 %changelog
+* Mon Jun 08 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.2-2
+- restore fix for QTBUG-45753/kde-345544 lost in 5.4.2 rebase
+
 * Wed Jun 03 2015 Jan Grulich <jgrulich@redhat.com> 5.4.2-1
 - 5.4.2
 
