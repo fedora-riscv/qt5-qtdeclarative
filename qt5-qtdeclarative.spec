@@ -78,7 +78,10 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %prep
-%autosetup -p1 -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
+%setup -q -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
+
+%patch1 -p1 -b .no_sse2
+%patch2 -p1 -b .QTBUG-45753
 
 
 %build
