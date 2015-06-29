@@ -4,32 +4,29 @@
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
+%global bootstrap 0
+
 %if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
 %define docs 1
 %endif
 %endif
 
+%define prerelease rc
+
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.4.2
-Release: 3%{?dist}
+Version: 5.5.0
+Release: 0.3.rc%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
-Url: http://qt-project.org/
-%if 0%{?pre:1}
-Source0: http://download.qt-project.org/development_releases/qt/5.4/%{version}-%{pre}/submodules/%{qt_module}-opensource-src-%{version}-%{pre}.tar.xz
-%else
-Source0: http://download.qt-project.org/official_releases/qt/5.4/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
-%endif
+Url:     http://www.qt.io
+Source0: http://download.qt.io/development_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
 Patch1: qtdeclarative-opensource-src-5.4.1-no_sse2.patch
-
-# QTBUG-45753/kde-345544, can drop when 5.5.0 lands
-Patch2: Avoid-calling-potentially-pure-virtual-method.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -78,11 +75,8 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %prep
-%setup -q -n %{qt_module}-opensource-src-%{version}%{?pre:-%{pre}}
-
+%setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 %patch1 -p1 -b .no_sse2
-%patch2 -p1 -b .QTBUG-45753
-
 
 %build
 mkdir %{_target_platform}
@@ -105,7 +99,6 @@ popd
 %if 0%{?docs}
 make %{?_smp_mflags} docs -C %{_target_platform}
 %endif
-
 
 %install
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
@@ -155,13 +148,11 @@ for prl_file in libQt5*.prl ; do
 done
 popd
 
-
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %doc LICENSE.LGPL* LGPL_EXCEPTION.txt
-%doc dist/changes*
 %{_qt5_libdir}/libQt5Qml.so.5*
 %ifarch %{ix86}
 %{_qt5_libdir}/sse2/libQt5Qml.so.5*
@@ -209,8 +200,11 @@ popd
 
 
 %changelog
-* Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.4.2-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+* Sat Jun 27 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.3.rc
+- Disable bootstrap
+
+* Wed Jun 24 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.2.rc
+- Update for official RC1 released packages
 
 * Mon Jun 08 2015 Rex Dieter <rdieter@fedoraproject.org> 5.4.2-2
 - restore fix for QTBUG-45753/kde-345544 lost in 5.4.2 rebase
