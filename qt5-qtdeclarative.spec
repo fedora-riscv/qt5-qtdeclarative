@@ -4,7 +4,7 @@
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
-%global bootstrap 0
+#global bootstrap 1
 
 %if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
@@ -17,7 +17,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.5.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -36,7 +36,7 @@ BuildRequires: pkgconfig(Qt5XmlPatterns)
 %endif
 BuildRequires: python
 
-%{?_qt5_version:Requires: qt5-qtbase%{?_isa} >= %{_qt5_version}}
+%{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
 %description
 %{summary}.
@@ -78,6 +78,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 %patch1 -p1 -b .no_sse2
 
+
 %build
 mkdir %{_target_platform}
 pushd %{_target_platform}
@@ -99,6 +100,7 @@ popd
 %if 0%{?docs}
 make %{?_smp_mflags} docs -C %{_target_platform}
 %endif
+
 
 %install
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
@@ -147,6 +149,7 @@ for prl_file in libQt5*.prl ; do
   fi
 done
 popd
+
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -200,6 +203,12 @@ popd
 
 
 %changelog
+- Thu Jul 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-2
+- tighten qtbase dep (#1233829), .spec cosmetics
+
+* Wed Jul 1 2015 Helio Chissini de Castro <helio@kde.org> 5.5.0-1
+- New final upstream release Qt 5.5.0
+
 * Mon Jun 29 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.0-0.4.rc
 - Second round of builds now with bootstrap enabled due new qttools
 
