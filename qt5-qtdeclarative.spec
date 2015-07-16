@@ -203,7 +203,7 @@ popd
 
 
 %changelog
-- Thu Jul 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-2
+* Thu Jul 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-2
 - tighten qtbase dep (#1233829), .spec cosmetics
 
 * Wed Jul 1 2015 Helio Chissini de Castro <helio@kde.org> 5.5.0-1
