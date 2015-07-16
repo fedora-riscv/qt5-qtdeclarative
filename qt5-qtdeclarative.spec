@@ -26,7 +26,7 @@ Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
-Patch1: qtdeclarative-opensource-src-5.4.1-no_sse2.patch
+Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
