@@ -17,7 +17,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.5.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -60,8 +60,7 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
-# for qhelpgenerator
-BuildRequires: qt5-qttools-devel
+BuildRequires: qt5-qhelpgenerator
 BuildArch: noarch
 %description doc
 %{summary}.
@@ -203,6 +202,9 @@ popd
 
 
 %changelog
+* Wed Jul 29 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-3
+- -docs: BuildRequires: qt5-qhelpgenerator
+
 * Thu Jul 16 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-2
 - tighten qtbase dep (#1233829), .spec cosmetics
 
