@@ -12,12 +12,12 @@
 %endif
 %endif
 
-#define prerelease rc
+%define prerelease rc1
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.5.0
-Release: 3%{?dist}
+Version: 5.5.1
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -202,6 +202,9 @@ popd
 
 
 %changelog
+* Tue Sep 29 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-1
+- Update to Qt 5.5.1 RC1
+
 * Wed Jul 29 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.0-3
 - -docs: BuildRequires: qt5-qhelpgenerator
 
