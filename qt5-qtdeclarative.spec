@@ -17,7 +17,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.5.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -202,6 +202,9 @@ popd
 
 
 %changelog
+* Thu Oct 15 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-2
+- Update to final release 5.5.1
+
 * Tue Sep 29 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-1
 - Update to Qt 5.5.1 RC1
 
