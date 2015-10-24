@@ -17,7 +17,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.5.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -27,6 +27,11 @@ Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
 Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
+
+# workaround for possible deadlock condition in QQuickShaderEffectSource
+# https://bugzilla.redhat.com/show_bug.cgi?id=1237269
+# https://bugs.kde.org/show_bug.cgi?id=348385
+Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -76,6 +81,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 %patch1 -p1 -b .no_sse2
+%patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 
 
 %build
@@ -202,6 +208,9 @@ popd
 
 
 %changelog
+* Sat Oct 24 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-3
+- workaround QQuickShaderEffectSource::updatePaintNode deadlock (#1237269, kde#348385)
+
 * Thu Oct 15 2015 Helio Chissini de Castro <helio@kde.org> - 5.5.1-2
 - Update to final release 5.5.1
 

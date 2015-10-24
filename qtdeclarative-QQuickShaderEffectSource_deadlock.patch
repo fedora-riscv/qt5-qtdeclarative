@@ -1,0 +1,15 @@
+--- qtdeclarative-opensource-src-5.4.2/src/quick/items/qquickshadereffectsource.cpp	2015-06-30 07:30:51.938794778 +0200
++++ qtdeclarative-opensource-src-5.4.2/src/quick/items/qquickshadereffectsource.cpp.orig	2015-06-30 07:29:47.019163937 +0200
+@@ -632,8 +632,12 @@ 
+ 
+     const QSize minTextureSize = d->sceneGraphContext()->minimumFBOSize();
+     // Keep power-of-two by doubling the size.
++    if (textureSize.width() < 1)
++       textureSize.rwidth() = 1;
+     while (textureSize.width() < minTextureSize.width())
+         textureSize.rwidth() *= 2;
++    if (textureSize.height() < 1)
++       textureSize.rheight() = 1;
+     while (textureSize.height() < minTextureSize.height())
+         textureSize.rheight() *= 2;
+ 
