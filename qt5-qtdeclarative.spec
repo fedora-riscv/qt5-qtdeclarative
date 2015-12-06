@@ -179,8 +179,7 @@ popd
 %{_qt5_plugindir}/qmltooling/
 %{_qt5_archdatadir}/qml/
 %dir %{_qt5_libdir}/cmake/Qt5Qml/
-%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_QTcpServerConnection.cmake
-%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_QtQuick2Plugin.cmake
+%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_*Factory.cmake
 
 %files devel
 %{_bindir}/qml*
@@ -206,9 +205,9 @@ popd
 %{_qt5_docdir}/qtqml/
 %{_qt5_docdir}/qtquick.qch
 %{_qt5_docdir}/qtquick/
-%endif
 
-%if 0%{?_qt5_examplesdir:1}
+# including examples in doc/bootstrap mode for now,
+# but I think they've gone missing for some other reason -- rex
 %files examples
 %{_qt5_examplesdir}/
 %endif
