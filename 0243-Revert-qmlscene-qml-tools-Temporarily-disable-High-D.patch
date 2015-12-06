@@ -1,42 +1,83 @@
-diff -up qtdeclarative-opensource-src-5.6.0-beta1/tools/qml/main.cpp.highdpiscaling qtdeclarative-opensource-src-5.6.0-beta1/tools/qml/main.cpp
---- qtdeclarative-opensource-src-5.6.0-beta1/tools/qml/main.cpp.highdpiscaling	2015-10-30 04:55:09.000000000 -0500
-+++ qtdeclarative-opensource-src-5.6.0-beta1/tools/qml/main.cpp	2015-12-05 19:04:51.225945491 -0600
-@@ -332,7 +332,7 @@ void printUsage()
+From 0b51b08fcdaa37611488a6c765f6801726f127d0 Mon Sep 17 00:00:00 2001
+From: Friedemann Kleint <Friedemann.Kleint@theqtcompany.com>
+Date: Thu, 5 Nov 2015 15:42:01 +0100
+Subject: [PATCH 243/256] Revert "qmlscene/qml tools: Temporarily disable High
+ DPI options."
+
+Re-enable the options after the attributes have their final names.
+Add options for enabling scaling.
+
+This reverts commit 051684f125bbc31bd882c4cd313c3482bcd145a0.
+
+Task-number: QTBUG-46615
+Task-number: QTBUG-48379
+Change-Id: If862061c688f9febff3b9511a4f19649b07d2011
+Reviewed-by: J-P Nurmi <jpnurmi@theqtcompany.com>
+---
+ tools/qml/main.cpp      | 11 +++++------
+ tools/qmlscene/main.cpp | 11 +++++------
+ 2 files changed, 10 insertions(+), 12 deletions(-)
+
+diff --git a/tools/qml/main.cpp b/tools/qml/main.cpp
+index 240ddde..ff559e7 100644
+--- a/tools/qml/main.cpp
++++ b/tools/qml/main.cpp
+@@ -332,9 +332,8 @@ void printUsage()
      printf("\t-desktop.......................Force use of desktop GL (AA_UseDesktopOpenGL)\n");
      printf("\t-gles..........................Force use of GLES (AA_UseOpenGLES)\n");
      printf("\t-software......................Force use of software rendering (AA_UseOpenGLES)\n");
+-#if 0 // FIXME: 5.6: Re-enable once attribute naming is final (QTBUG-46615)
 -    printf("\t-no-scaling....................Disable High DPI scaling (AA_NoHighDpiScaling)\n");
+-#endif
++    printf("\t-scaling.......................Enable High DPI scaling (AA_EnableHighDpiScaling)\n");
 +    printf("\t-no-scaling....................Disable High DPI scaling (AA_DisableHighDpiScaling)\n");
      printf("\tDebugging options:\n");
      printf("\t-verbose ..................... Print information about what qml is doing, like specific file urls being loaded.\n");
      printf("\t-translation [file] .......... Load the given file as the translations file.\n");
-@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
+@@ -506,10 +505,10 @@ int main(int argc, char *argv[])
+             QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
          } else if (arg == QLatin1String("-desktop")) {
              QCoreApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+-#if 0 // FIXME: 5.6: Re-enable once attribute naming is final (QTBUG-46615)
++        } else if (arg == QLatin1String("-scaling")) {
++            QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
          } else if (arg == QLatin1String("-no-scaling")) {
 -            QCoreApplication::setAttribute(Qt::AA_NoHighDpiScaling);
+-#endif
 +            QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
          } else {
              files << arg;
          }
-diff -up qtdeclarative-opensource-src-5.6.0-beta1/tools/qmlscene/main.cpp.highdpiscaling qtdeclarative-opensource-src-5.6.0-beta1/tools/qmlscene/main.cpp
---- qtdeclarative-opensource-src-5.6.0-beta1/tools/qmlscene/main.cpp.highdpiscaling	2015-10-30 04:55:09.000000000 -0500
-+++ qtdeclarative-opensource-src-5.6.0-beta1/tools/qmlscene/main.cpp	2015-12-05 19:05:28.617255664 -0600
-@@ -356,7 +356,7 @@ static void usage()
+diff --git a/tools/qmlscene/main.cpp b/tools/qmlscene/main.cpp
+index 53bd0bf..fc4fc3e 100644
+--- a/tools/qmlscene/main.cpp
++++ b/tools/qmlscene/main.cpp
+@@ -356,9 +356,8 @@ static void usage()
      puts("  --desktop..........................Force use of desktop GL (AA_UseDesktopOpenGL)");
      puts("  --gles.............................Force use of GLES (AA_UseOpenGLES)");
      puts("  --software.........................Force use of software rendering (AA_UseOpenGLES)");
+-#if 0 // FIXME: 5.6: Re-enable once attribute naming is final (QTBUG-46615)
 -    puts("  --no-scaling.......................Disable High DPI scaling (AA_NoHighDpiScaling)");
+-#endif
++    puts("  --scaling..........................Enable High DPI scaling (AA_EnableHighDpiScaling)");
 +    puts("  --no-scaling.......................Disable High DPI scaling (AA_DisableHighDpiScaling)");
      puts("  --verbose..........................Print version and graphical diagnostics for the run-time");
      puts("  -I <path> ........................ Add <path> to the list of import paths");
      puts("  -P <path> ........................ Add <path> to the list of plugin paths");
-@@ -452,7 +452,7 @@ int main(int argc, char ** argv)
+@@ -453,10 +452,10 @@ int main(int argc, char ** argv)
+             options.applicationAttributes.append(Qt::AA_UseSoftwareOpenGL);
          else if (!qstrcmp(arg, "--desktop"))
              options.applicationAttributes.append(Qt::AA_UseDesktopOpenGL);
+-#if 0 // FIXME: 5.6: Re-enable once attribute naming is final (QTBUG-46615)
++        else if (!qstrcmp(arg, "--scaling"))
++            options.applicationAttributes.append(Qt::AA_EnableHighDpiScaling);
          else if (!qstrcmp(arg, "--no-scaling"))
 -            options.applicationAttributes.append(Qt::AA_NoHighDpiScaling);
+-#endif
 +            options.applicationAttributes.append(Qt::AA_DisableHighDpiScaling);
      }
  
      foreach (Qt::ApplicationAttribute a, options.applicationAttributes)
+-- 
+2.5.0
+
