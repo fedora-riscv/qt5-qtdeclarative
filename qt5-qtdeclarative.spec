@@ -206,9 +206,10 @@ popd
 %{_qt5_docdir}/qtqml/
 %{_qt5_docdir}/qtquick.qch
 %{_qt5_docdir}/qtquick/
+%endif
 
-# including examples in doc/bootstrap mode for now,
-# but I think they've gone missing for some other reason -- rex
+# examples went awol in 5.6.0 ?  -- rex
+%if 0
 %files examples
 %{_qt5_examplesdir}/
 %endif
