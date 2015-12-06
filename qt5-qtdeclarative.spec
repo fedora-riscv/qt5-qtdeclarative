@@ -41,9 +41,9 @@ Patch243: 0243-Revert-qmlscene-qml-tools-Temporarily-disable-High-D.patch
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
 BuildRequires: qt5-qtbase-devel >= %{version}
-%if ! 0%{?bootstrap}
+#if ! 0%{?bootstrap}
 BuildRequires: pkgconfig(Qt5XmlPatterns)
-%endif
+#endif
 BuildRequires: python
 
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
