@@ -70,6 +70,7 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
+BuildRequires: qt5-qdoc
 BuildRequires: qt5-qhelpgenerator
 BuildArch: noarch
 %description doc
