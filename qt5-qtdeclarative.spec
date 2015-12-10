@@ -198,11 +198,8 @@ popd
 %{_qt5_docdir}/qtquick/
 %endif
 
-# examples went awol in 5.6.0 ?  -- rex
-%if 0
 %files examples
 %{_qt5_examplesdir}/
-%endif
 
 
 %changelog
