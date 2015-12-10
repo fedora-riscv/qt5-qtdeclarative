@@ -33,17 +33,10 @@ Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
 # https://bugs.kde.org/show_bug.cgi?id=348385
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
-## upstream highdpiscaling build fixes
-Patch220: 0220-qmlscene-qml-tools-Temporarily-disable-High-DPI-opti.patch
-Patch243: 0243-Revert-qmlscene-qml-tools-Temporarily-disable-High-D.patch
-
-
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
 BuildRequires: qt5-qtbase-devel >= %{version}
-#if ! 0%{?bootstrap}
 BuildRequires: pkgconfig(Qt5XmlPatterns)
-#endif
 BuildRequires: python
 
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
@@ -88,9 +81,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 %patch1 -p1 -b .no_sse2
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
-%patch220 -p1 -b .0220
-%patch243 -p1 -b .0243
-
 
 %build
 mkdir %{_target_platform}
