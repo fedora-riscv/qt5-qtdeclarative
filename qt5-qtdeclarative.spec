@@ -17,7 +17,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 0.5.%{prerelease}%{?dist}
+Release: 0.6.%{prerelease}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -162,7 +162,8 @@ popd
 %postun -p /sbin/ldconfig
 
 %files
-%doc LICENSE.LGPL* LGPL_EXCEPTION.txt
+%{!?_licensedir:%global license %%doc}
+%license LICENSE.LGPL* LGPL_EXCEPTION.txt
 %{_qt5_libdir}/libQt5Qml.so.5*
 %ifarch %{ix86}
 %{_qt5_libdir}/sse2/libQt5Qml.so.5*
@@ -196,6 +197,7 @@ popd
 
 %if 0%{?docs}
 %files doc
+%license LICENSE.FDL
 %{_qt5_docdir}/qtqml.qch
 %{_qt5_docdir}/qtqml/
 %{_qt5_docdir}/qtquick.qch
@@ -207,6 +209,9 @@ popd
 
 
 %changelog
+* Sun Jan 17 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.6.beta
+- use %%license
+
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.5.beta
 - fix Source URL, Release: tag
 
