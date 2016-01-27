@@ -17,12 +17,16 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.5.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
 Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+
+## upstream
+# memory leak/regression, http://bugreports.qt.io/browse/QTBUG-48799
+Patch100: qtdeclarative-QTBUG-48799.patch
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
@@ -80,6 +84,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
+%patch100 -p1 -b .QTBUG-48799
 %patch1 -p1 -b .no_sse2
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 
@@ -208,6 +213,9 @@ popd
 
 
 %changelog
+* Wed Jan 27 2016 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-4
+- Memory leak in QSGBatchRenderer::Renderer::map() (QTBUG-48799)
+
 * Sat Oct 24 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-3
 - workaround QQuickShaderEffectSource::updatePaintNode deadlock (#1237269, kde#348385)
 
