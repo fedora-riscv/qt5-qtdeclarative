@@ -1,0 +1,66 @@
+From 187a5b0c6e74e0109e4ec257104428a3c87fb52f Mon Sep 17 00:00:00 2001
+From: Marco Benelli <marco.benelli@theqtcompany.com>
+Date: Wed, 27 Jan 2016 09:18:02 +0100
+Subject: [PATCH] qmlimportscanner: do not use local predicates.
+
+Some (?) pre C++11 compilers are not able to resolve template arguments
+for std::find_if when the predicates are local to the function.
+
+Change-Id: I1e5c4adc3409bd32081ddedff158ab9dcc2eaa9a
+Reviewed-by: Simon Hausmann <simon.hausmann@theqtcompany.com>
+---
+ tools/qmlimportscanner/main.cpp | 31 ++++++++++++++++++-------------
+ 1 file changed, 18 insertions(+), 13 deletions(-)
+
+diff --git a/tools/qmlimportscanner/main.cpp b/tools/qmlimportscanner/main.cpp
+index b16253a..189459f 100644
+--- a/tools/qmlimportscanner/main.cpp
++++ b/tools/qmlimportscanner/main.cpp
+@@ -344,6 +344,24 @@ QVariantList mergeImports(const QVariantList &a, const QVariantList &b)
+     return merged;
+ }
+ 
++// Predicates needed by findQmlImportsInDirectory.
++
++struct isMetainfo {
++    bool operator() (const QFileInfo &x) const {
++        return x.suffix() == QLatin1String("metainfo");
++    }
++};
++
++struct pathStartsWith {
++    pathStartsWith(const QString &path) : _path(path) {}
++    bool operator() (const QString &x) const {
++        return _path.startsWith(x);
++    }
++    const QString _path;
++};
++
++
++
+ // Scan all qml files in directory for import statements
+ QVariantList findQmlImportsInDirectory(const QString &qmlDir)
+ {
+@@ -353,19 +371,6 @@ QVariantList findQmlImportsInDirectory(const QString &qmlDir)
+ 
+     QDirIterator iterator(qmlDir, QDir::AllDirs | QDir::NoDotDot, QDirIterator::Subdirectories);
+     QStringList blacklist;
+-    struct isMetainfo {
+-        bool operator() (const QFileInfo &x) const {
+-            return x.suffix() == QLatin1String("metainfo");
+-        }
+-    };
+-    struct pathStartsWith {
+-        pathStartsWith(const QString &path) : _path(path) {}
+-        bool operator() (const QString &x) const {
+-            return _path.startsWith(x);
+-        }
+-        const QString _path;
+-    };
+-
+ 
+     while (iterator.hasNext()) {
+         iterator.next();
+-- 
+1.9.3
+
