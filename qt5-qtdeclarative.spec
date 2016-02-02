@@ -17,7 +17,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 0.7.%{prerelease}%{?dist}
+Release: 0.8.%{prerelease}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -92,6 +92,13 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %build
+
+# build with -fno-delete-null-pointer-checks to workaround
+# https://bugzilla.redhat.com/show_bug.cgi?id=1303643
+CFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks"
+CXXFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks"
+export CFLAGS CXXFLAGS
+
 mkdir %{_target_platform}
 pushd %{_target_platform}
 %{qmake_qt5} ..
@@ -214,6 +221,9 @@ popd
 
 
 %changelog
+* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8.beta
+- build with -fno-delete-null-pointer-checks to workaround gcc6-related runtime crashes (#1303643)
+
 * Thu Jan 28 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.7.beta
 - backport fix for older compilers (aka rhel6)
 
