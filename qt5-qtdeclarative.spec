@@ -12,20 +12,20 @@
 %endif
 %endif
 
-%define prerelease beta
+%define prerelease rc
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 0.8.%{prerelease}%{?dist}
+Release: 0.9.%{prerelease}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
 %if 0%{?prerelease:1}
-Source0: http://download.qt.io/development_releases/qt/5.6/%{version}-%{prerelease}/submodules/%{qt_module}-opensource-src-%{version}-%{prerelease}.tar.gz
+Source0: http://download.qt.io/development_releases/qt/5.6/%{version}-%{prerelease}/submodules/%{qt_module}-opensource-src-%{version}-%{prerelease}.tar.xz
 %else
-Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.gz
+Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 %endif
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
@@ -36,9 +36,6 @@ Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1237269
 # https://bugs.kde.org/show_bug.cgi?id=348385
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
-
-# backport fix for older compilers (aka rhel6)
-Patch3: qtdeclarative-c++11.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -88,7 +85,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 %patch1 -p1 -b .no_sse2
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
-%patch3 -p1 -b .c++11
 
 
 %build
@@ -221,6 +217,9 @@ popd
 
 
 %changelog
+* Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.9
+- Update RC release
+
 * Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8.beta
 - build with -fno-delete-null-pointer-checks to workaround gcc6-related runtime crashes (#1303643)
 
