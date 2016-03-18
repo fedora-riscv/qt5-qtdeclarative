@@ -36,7 +36,9 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
 BuildRequires: qt5-qtbase-devel >= %{version}
+%if ! 0%{?bootstrap}
 BuildRequires: pkgconfig(Qt5XmlPatterns)
+%endif
 BuildRequires: python
 
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
