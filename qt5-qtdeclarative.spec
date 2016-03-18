@@ -4,7 +4,7 @@
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
-#global bootstrap 1
+%global bootstrap 1
 
 %if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
@@ -12,17 +12,17 @@
 %endif
 %endif
 
-## define prerelease rc1
+#define prerelease
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.5.1
-Release: 3%{?dist}
+Version: 5.6.0
+Release: 0.1%{?prerelease:.%{prerelease}}%{?dist}.bootstrap
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
-Source0: http://download.qt.io/official_releases/qt/5.5/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+Source0: http://download.qt.io/snapshots/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
@@ -36,9 +36,7 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
 BuildRequires: qt5-qtbase-devel >= %{version}
-%if ! 0%{?bootstrap}
 BuildRequires: pkgconfig(Qt5XmlPatterns)
-%endif
 BuildRequires: python
 
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
@@ -65,6 +63,7 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 Summary: API documentation for %{name}
 License: GFDL
 Requires: %{name} = %{version}-%{release}
+BuildRequires: qt5-qdoc
 BuildRequires: qt5-qhelpgenerator
 BuildArch: noarch
 %description doc
@@ -85,6 +84,13 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %build
+
+# build with -fno-delete-null-pointer-checks to workaround
+# https://bugzilla.redhat.com/show_bug.cgi?id=1303643
+CFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks"
+CXXFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks"
+export CFLAGS CXXFLAGS
+
 mkdir %{_target_platform}
 pushd %{_target_platform}
 %{qmake_qt5} ..
@@ -160,7 +166,8 @@ popd
 %postun -p /sbin/ldconfig
 
 %files
-%doc LICENSE.LGPL* LGPL_EXCEPTION.txt
+%{!?_licensedir:%global license %%doc}
+%license LICENSE.LGPL* LGPL_EXCEPTION.txt
 %{_qt5_libdir}/libQt5Qml.so.5*
 %ifarch %{ix86}
 %{_qt5_libdir}/sse2/libQt5Qml.so.5*
@@ -172,8 +179,7 @@ popd
 %{_qt5_plugindir}/qmltooling/
 %{_qt5_archdatadir}/qml/
 %dir %{_qt5_libdir}/cmake/Qt5Qml/
-%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_QTcpServerConnection.cmake
-%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_QtQuick2Plugin.cmake
+%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_*Factory.cmake
 
 %files devel
 %{_bindir}/qml*
@@ -195,19 +201,54 @@ popd
 
 %if 0%{?docs}
 %files doc
+%license LICENSE.FDL
 %{_qt5_docdir}/qtqml.qch
 %{_qt5_docdir}/qtqml/
 %{_qt5_docdir}/qtquick.qch
 %{_qt5_docdir}/qtquick/
 %endif
 
-%if 0%{?_qt5_examplesdir:1}
 %files examples
 %{_qt5_examplesdir}/
-%endif
 
 
 %changelog
+* Mon Mar 14 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-1
+- 5.6.0 final release
+
+* Tue Feb 23 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.11.rc
+- Update to final RC
+
+* Mon Feb 22 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.10
+- Update RC tarball from git
+
+* Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.9
+- Update RC release
+
+* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8.beta
+- build with -fno-delete-null-pointer-checks to workaround gcc6-related runtime crashes (#1303643)
+
+* Thu Jan 28 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.7.beta
+- backport fix for older compilers (aka rhel6)
+
+* Sun Jan 17 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.6.beta
+- use %%license
+
+* Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.5.beta
+- fix Source URL, Release: tag
+
+* Mon Dec 21 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.4
+- Update to final beta release
+
+* Thu Dec 10 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.3
+- Official beta release
+
+* Sun Dec 06 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.2
+- de-bootstrap
+
+* Tue Nov 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.1
+- Start to implement 5.6.0 beta, bootstrap
+
 * Sat Oct 24 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-3
 - workaround QQuickShaderEffectSource::updatePaintNode deadlock (#1237269, kde#348385)
 
