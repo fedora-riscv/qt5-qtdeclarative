@@ -1,0 +1,30 @@
+From e01bed44bca9bd0919f70dfc14f8297415d61bd9 Mon Sep 17 00:00:00 2001
+From: Gunnar Sletta <gunnar@sletta.org>
+Date: Mon, 15 Feb 2016 08:02:50 +0100
+Subject: [PATCH 29/61] Avoid div-by-zero when nothing is rendered.
+
+Change-Id: I3eb57baf1812f831335429cc7d2b4424f3cfa785
+Task-number: QTBUG-50929
+Reviewed-by: Laszlo Agocs <laszlo.agocs@theqtcompany.com>
+---
+ src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp b/src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp
+index b1792d2..dd1ff14 100644
+--- a/src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp
++++ b/src/quick/scenegraph/coreapi/qsgbatchrenderer.cpp
+@@ -2654,7 +2654,9 @@ void Renderer::render()
+         if (m_alphaBatches.size())
+             std::sort(&m_alphaBatches.first(), &m_alphaBatches.last() + 1, qsg_sort_batch_increasing_order);
+ 
+-        m_zRange = 1.0 / (m_nextRenderOrder);
++        m_zRange = m_nextRenderOrder != 0
++                 ? 1.0 / (m_nextRenderOrder)
++                 : 0;
+     }
+ 
+     if (Q_UNLIKELY(debug_render())) timeSorting = timer.restart();
+-- 
+1.9.3
+
