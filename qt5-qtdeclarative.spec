@@ -17,7 +17,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 3%{?prerelease:.%{prerelease}}%{?dist}
+Release: 4%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -32,6 +32,15 @@ Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1237269
 # https://bugs.kde.org/show_bug.cgi?id=348385
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
+
+## upstream patches
+Patch8: 0008-Fix-crash-when-Canvas-has-negative-width-or-height.patch
+Patch19: 0019-Revert-Fix-crash-on-QQmlEngine-destruction.patch
+Patch29: 0029-Avoid-div-by-zero-when-nothing-is-rendered.patch
+
+## upstream patches under review
+# Check-for-NULL-from-glGetStrin
+Patch500: Check-for-NULL-from-glGetString.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -84,6 +93,12 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
 %patch1 -p1 -b .no_sse2
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
+
+%patch8 -p1 -b .0008
+%patch19 -p1 -b .0019
+%patch29 -p1 -b .0029
+
+%patch500 -p1 -b .Check-for-NULL-from-glGetString
 
 
 %build
@@ -216,6 +231,10 @@ popd
 
 
 %changelog
+* Fri Mar 25 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-4
+- backport upstream fixes
+- drop -fno-delete-null-pointer-checks hack (included in qt5-rpm-macros as needed now)
+
 * Sat Mar 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-3
 - BR: cmake (cmake autoprovides)
 
