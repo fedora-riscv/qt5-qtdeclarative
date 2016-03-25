@@ -1,0 +1,60 @@
+From 427ca15418c05e628bae3451c263be198e721ba9 Mon Sep 17 00:00:00 2001
+From: Robin Burchell <robin.burchell@viroteck.net>
+Date: Wed, 17 Feb 2016 01:35:29 +0100
+Subject: [PATCH 19/61] Revert "Fix crash on QQmlEngine destruction."
+
+This reverts commit 2e75be5f64fb21cbbdff3353dbd507c2ca26946a.
+
+This patch was originally written by Andrew den Exter in
+222e06bf4ed509e72c1533cbe1d4859ca96933f3, externally from the main Qt tree. I
+upstreamed this as part of our porting efforts.
+
+Some time later, this was accidentally reverted in
+2e75be5f64fb21cbbdff3353dbd507c2ca26946a: we can't go back in time to examine
+exactly what happened, but presumably Andrew didn't notice that I had upstreamed
+this, attempted to apply the patch and ignored the "already applied" warning by
+accident - and continued on dutifully with the patch accidentally reverted.
+
+This change is correct, though, and is thus reinstated.
+
+Change-Id: Idfe6ab39ad011f0401de25fe056aa3eb3fb8b424
+Reviewed-by: Andrew den Exter <andrew.den.exter@qinetic.com.au>
+Reviewed-by: Simon Hausmann <simon.hausmann@theqtcompany.com>
+---
+ src/qml/qml/qqmlengine.cpp | 4 ++--
+ src/qml/qml/qqmlengine_p.h | 3 +--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/src/qml/qml/qqmlengine.cpp b/src/qml/qml/qqmlengine.cpp
+index 109cfac..2cfe468 100644
+--- a/src/qml/qml/qqmlengine.cpp
++++ b/src/qml/qml/qqmlengine.cpp
+@@ -598,8 +598,8 @@ QQmlEnginePrivate::QQmlEnginePrivate(QQmlEngine *e)
+   workerScriptEngine(0),
+   activeObjectCreator(0),
+   networkAccessManager(0), networkAccessManagerFactory(0), urlInterceptor(0),
+-  scarceResourcesRefCount(0), typeLoader(e), importDatabase(e), uniqueId(1),
+-  incubatorCount(0), incubationController(0)
++  scarceResourcesRefCount(0), importDatabase(e), typeLoader(e),
++  uniqueId(1), incubatorCount(0), incubationController(0)
+ {
+ }
+ 
+diff --git a/src/qml/qml/qqmlengine_p.h b/src/qml/qml/qqmlengine_p.h
+index 26ee3bd..072a6c4 100644
+--- a/src/qml/qml/qqmlengine_p.h
++++ b/src/qml/qml/qqmlengine_p.h
+@@ -166,9 +166,8 @@ public:
+     void referenceScarceResources();
+     void dereferenceScarceResources();
+ 
+-    QQmlTypeLoader typeLoader;
+     QQmlImportDatabase importDatabase;
+-
++    QQmlTypeLoader typeLoader;
+ 
+     QString offlineStoragePath;
+ 
+-- 
+1.9.3
+
