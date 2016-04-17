@@ -59,6 +59,7 @@ BuildRequires: python
 %package devel
 Summary: Development files for %{name}
 Obsoletes: qt5-qtjsbackend-devel < 5.2.0
+Provides:  %{name}-private-devel = %{version}-%{release}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: qt5-qtbase-devel%{?_isa}
 %description devel
@@ -232,7 +233,7 @@ popd
 
 %changelog
 * Sun Apr 17 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-5
-- BR: qt5-qtbase-private-devel
+- BR: qt5-qtbase-private-devel, -devel: Provides: -private-devel
 
 * Fri Mar 25 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-4
 - backport upstream fixes
