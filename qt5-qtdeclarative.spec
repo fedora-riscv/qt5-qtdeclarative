@@ -17,7 +17,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 4%{?prerelease:.%{prerelease}}%{?dist}
+Release: 5%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -46,12 +46,12 @@ Obsoletes: qt5-qtjsbackend < 5.2.0
 
 BuildRequires: cmake
 BuildRequires: qt5-qtbase-devel >= %{version}
+BuildRequires: qt5-qtbase-private-devel
+%{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 %if ! 0%{?bootstrap}
 BuildRequires: pkgconfig(Qt5XmlPatterns)
 %endif
 BuildRequires: python
-
-%{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
 %description
 %{summary}.
@@ -59,6 +59,7 @@ BuildRequires: python
 %package devel
 Summary: Development files for %{name}
 Obsoletes: qt5-qtjsbackend-devel < 5.2.0
+Provides:  %{name}-private-devel = %{version}-%{release}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: qt5-qtbase-devel%{?_isa}
 %description devel
@@ -231,6 +232,9 @@ popd
 
 
 %changelog
+* Sun Apr 17 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-5
+- BR: qt5-qtbase-private-devel, -devel: Provides: -private-devel
+
 * Fri Mar 25 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-4
 - backport upstream fixes
 - drop -fno-delete-null-pointer-checks hack (included in qt5-rpm-macros as needed now)
