@@ -8,7 +8,8 @@
 
 %if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
-%define docs 1
+%global docs 1
+%global tests 1
 %endif
 %endif
 
@@ -17,7 +18,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 5%{?prerelease:.%{prerelease}}%{?dist}
+Release: 6%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -52,6 +53,13 @@ BuildRequires: qt5-qtbase-private-devel
 BuildRequires: pkgconfig(Qt5XmlPatterns)
 %endif
 BuildRequires: python
+
+%if 0%{?tests}
+BuildRequires: dbus-x11
+BuildRequires: time
+BuildRequires: xorg-x11-server-Xvfb
+%endif
+
 
 %description
 %{summary}.
@@ -103,13 +111,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %build
-
-# build with -fno-delete-null-pointer-checks to workaround
-# https://bugzilla.redhat.com/show_bug.cgi?id=1303643
-CFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks"
-CXXFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks"
-export CFLAGS CXXFLAGS
-
 mkdir %{_target_platform}
 pushd %{_target_platform}
 %{qmake_qt5} ..
@@ -181,6 +182,19 @@ done
 popd
 
 
+%check
+%if 0%{?tests}
+export CTEST_OUTPUT_ON_FAILURE=1
+export PATH=%{buildroot}%{_qt5_bindir}:$PATH
+export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
+make sub-tests-all %{?_smp_mflags} -C %{_target_platform}
+xvfb-run -a \
+dbus-launch --exit-with-session \
+time \
+make check -k -C %{_target_platform}/tests ||:
+%endif
+
+
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -232,6 +246,10 @@ popd
 
 
 %changelog
+* Thu May 05 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-6
+- drop local -fno-delete-null-pointer-checks hack, used in all Qt5 builds now
+- add %%check
+
 * Sun Apr 17 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-5
 - BR: qt5-qtbase-private-devel, -devel: Provides: -private-devel
 
