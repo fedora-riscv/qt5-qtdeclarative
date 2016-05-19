@@ -18,7 +18,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 7%{?prerelease:.%{prerelease}}%{?dist}
+Release: 8%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -222,7 +222,6 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_libdir}/libQt5Qml.so
 %{_qt5_libdir}/libQt5Qml.prl
 %{_qt5_libdir}/libQt5Quick*.so
-%{_qt5_libdir}/libQt5QuickWidgets.so.5
 %{_qt5_libdir}/libQt5Quick*.prl
 %dir %{_qt5_libdir}/cmake/Qt5Quick*/
 %{_qt5_libdir}/cmake/Qt5*/Qt5*Config*.cmake
@@ -247,6 +246,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Thu May 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-8
+- -devel: don't own libQt5QuickWidgets.so.5 (#1337621)
+
 * Thu May 05 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-7
 - BR: mesa-dri-drivers (tests)
 
