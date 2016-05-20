@@ -18,7 +18,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 8%{?prerelease:.%{prerelease}}%{?dist}
+Release: 9%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -38,6 +38,14 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 Patch8: 0008-Fix-crash-when-Canvas-has-negative-width-or-height.patch
 Patch19: 0019-Revert-Fix-crash-on-QQmlEngine-destruction.patch
 Patch29: 0029-Avoid-div-by-zero-when-nothing-is-rendered.patch
+
+## upstreamable patches
+# use system double-conversation
+%if 0%{?fedora} || 0%{?rhel} > 6
+%global system_doubleconv 1
+BuildRequires: double-conversion-devel
+%endif
+Patch100: qtdeclarative-system_doubleconv.patch
 
 ## upstream patches under review
 # Check-for-NULL-from-glGetStrin
@@ -107,6 +115,11 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch8 -p1 -b .0008
 %patch19 -p1 -b .0019
 %patch29 -p1 -b .0029
+
+%if 0%{?system_doubleconv}
+%patch100 -p1 -b .system_doubleconv
+rm -rfv src/3rdparty/double-conversion
+%endif
 
 %patch500 -p1 -b .Check-for-NULL-from-glGetString
 
@@ -246,6 +259,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Fri May 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-9
+- Use system double-converstion (#1078524)
+
 * Thu May 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-8
 - -devel: don't own libQt5QuickWidgets.so.5 (#1337621)
 
