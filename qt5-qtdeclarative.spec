@@ -260,7 +260,7 @@ make check -k -C %{_target_platform}/tests ||:
 
 %changelog
 * Fri May 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-9
-- Use system double-converstion (#1078524)
+- Use system double-conversion (#1078524)
 
 * Thu May 19 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-8
 - -devel: don't own libQt5QuickWidgets.so.5 (#1337621)
