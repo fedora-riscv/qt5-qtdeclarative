@@ -9,8 +9,12 @@
 %if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
 %global docs 1
-%global tests 1
+#global tests 1
 %endif
+%endif
+
+%ifarch %{ix86}
+%global nosse2_hack 1
 %endif
 
 #define prerelease
@@ -18,7 +22,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 9%{?prerelease:.%{prerelease}}%{?dist}
+Release: 10%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -109,7 +113,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
+%if 0%{?nosse2_hack}
 %patch1 -p1 -b .no_sse2
+%endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 
 %patch8 -p1 -b .0008
@@ -125,6 +131,16 @@ rm -rfv src/3rdparty/double-conversion
 
 
 %build
+%if 0%{?fedora} > 23
+# build with -fno-delete-null-pointer-checks to workaround
+# https://bugzilla.redhat.com/show_bug.cgi?id=1303643
+# build with -fno-lifetime-dse to workaround
+# https://bugzilla.redhat.com/1331593
+CFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks -fno-lifetime-dse"
+CXXFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks -fno-lifetime-dse"
+export CFLAGS CXXFLAGS
+%endif
+
 mkdir %{_target_platform}
 pushd %{_target_platform}
 %{qmake_qt5} ..
@@ -132,7 +148,7 @@ popd
 
 make %{?_smp_mflags} -C %{_target_platform}
 
-%ifarch %{ix86}
+%if 0%{?nosse2_hack}
 # build libQt5Qml with no_sse2
 mkdir -p %{_target_platform}-no_sse2
 pushd    %{_target_platform}-no_sse2
@@ -150,7 +166,7 @@ make %{?_smp_mflags} docs -C %{_target_platform}
 %install
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 
-%ifarch %{ix86}
+%if 0%{?nosse2_hack}
 mkdir -p %{buildroot}%{_qt5_libdir}/sse2
 mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
@@ -216,7 +232,7 @@ make check -k -C %{_target_platform}/tests ||:
 %{!?_licensedir:%global license %%doc}
 %license LICENSE.LGPL* LGPL_EXCEPTION.txt
 %{_qt5_libdir}/libQt5Qml.so.5*
-%ifarch %{ix86}
+%if 0%{?nosse2_hack}
 %{_qt5_libdir}/sse2/libQt5Qml.so.5*
 %endif
 %{_qt5_libdir}/libQt5Quick.so.5*
@@ -259,6 +275,12 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Sat May 28 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-10
+- macro'ize no_sse2 hack (to make it easier to enable/disable)
+- re-introduce -fno-delete-null-pointer-checks here (following upstream)
+- add -fno-lifetime-dse too, helps fix i686/qml crasher (#1331593)
+- disable tests (for now, not useful yet)
+
 * Fri May 20 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-9
 - Use system double-conversion (#1078524)
 
