@@ -1,0 +1,22 @@
+diff -up qtdeclarative-opensource-src-5.6.0/src/qml/jsruntime/jsruntime.pri.system_doubleconv qtdeclarative-opensource-src-5.6.0/src/qml/jsruntime/jsruntime.pri
+--- qtdeclarative-opensource-src-5.6.0/src/qml/jsruntime/jsruntime.pri.system_doubleconv	2016-05-20 08:25:07.986878324 -0500
++++ qtdeclarative-opensource-src-5.6.0/src/qml/jsruntime/jsruntime.pri	2016-05-20 11:21:05.059471545 -0500
+@@ -118,4 +118,5 @@ valgrind {
+ 
+ ios: DEFINES += ENABLE_ASSEMBLER_WX_EXCLUSIVE=1
+ 
+-include(../../3rdparty/double-conversion/double-conversion.pri)
++INCLUDEPATH += /usr/include/double-conversion
++LIBS += -ldouble-conversion
+diff -up qtdeclarative-opensource-src-5.6.0/src/qml/jsruntime/qv4runtime.cpp.system_doubleconv qtdeclarative-opensource-src-5.6.0/src/qml/jsruntime/qv4runtime.cpp
+--- qtdeclarative-opensource-src-5.6.0/src/qml/jsruntime/qv4runtime.cpp.system_doubleconv	2016-02-26 03:34:34.000000000 -0600
++++ qtdeclarative-opensource-src-5.6.0/src/qml/jsruntime/qv4runtime.cpp	2016-05-20 11:22:00.603641534 -0500
+@@ -60,7 +60,7 @@
+ 
+ #include <wtf/MathExtras.h>
+ 
+-#include "../../3rdparty/double-conversion/double-conversion.h"
++#include <double-conversion.h>
+ 
+ #ifdef QV4_COUNT_RUNTIME_FUNCTIONS
+ #  include <QtCore/QBuffer>
