@@ -22,7 +22,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 10%{?prerelease:.%{prerelease}}%{?dist}
+Release: 11%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -50,6 +50,8 @@ Patch29: 0029-Avoid-div-by-zero-when-nothing-is-rendered.patch
 BuildRequires: double-conversion-devel
 %endif
 Patch100: qtdeclarative-system_doubleconv.patch
+# https://bugs.kde.org/show_bug.cgi?id=346118#c108
+Patch101: qtdeclarative-kdebug346118.patch
 
 ## upstream patches under review
 # Check-for-NULL-from-glGetStrin
@@ -126,6 +128,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch100 -p1 -b .system_doubleconv
 rm -rfv src/3rdparty/double-conversion
 %endif
+%patch101 -p0 -b .kdebug346118
 
 %patch500 -p1 -b .Check-for-NULL-from-glGetString
 
@@ -275,6 +278,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Tue May 31 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-11
+- include crasher workaround (#1259472,kde#346118)
+
 * Sat May 28 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-10
 - macro'ize no_sse2 hack (to make it easier to enable/disable)
 - re-introduce -fno-delete-null-pointer-checks here (following upstream)
