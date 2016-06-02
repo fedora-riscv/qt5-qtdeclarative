@@ -1,0 +1,38 @@
+From 18e77550f149722e0554f24ddfa326e03a9fef10 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Thu, 19 May 2016 15:56:10 -0700
+Subject: [PATCH 135/149] Workaround for crashes in QtQml code relating to null
+ this pointers
+
+When compiled in release mode with GCC 6, QtQml crashes. This option
+gets works around the issue by instructing the compiler not to delete
+null pointer checks for pointers that the standard says cannot be null,
+yet apparently are.
+
+This is a temporary workaround until a proper solution is found.
+
+Change-Id: Id3aab65533904562a6cbfffd14501a185fc91179
+Reviewed-by: Lars Knoll <lars.knoll@theqtcompany.com>
+---
+ src/qml/qml.pro | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/qml/qml.pro b/src/qml/qml.pro
+index e30c39c..f4862a1 100644
+--- a/src/qml/qml.pro
++++ b/src/qml/qml.pro
+@@ -16,6 +16,11 @@ exists("qqml_enable_gcov") {
+     LIBS_PRIVATE += -lgcov
+ }
+ 
++greaterThan(QT_GCC_MAJOR_VERSION, 5) {
++    # Our code is bad. Temporary workaround.
++    QMAKE_CXXFLAGS += -fno-delete-null-pointer-checks
++}
++
+ QMAKE_DOCS = $$PWD/doc/qtqml.qdocconf
+ 
+ # 2415: variable "xx" of static storage duration was declared but never referenced
+-- 
+1.9.3
+
