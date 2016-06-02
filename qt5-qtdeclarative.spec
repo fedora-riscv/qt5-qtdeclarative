@@ -22,7 +22,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.0
-Release: 11%{?prerelease:.%{prerelease}}%{?dist}
+Release: 12%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -42,6 +42,7 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 Patch8: 0008-Fix-crash-when-Canvas-has-negative-width-or-height.patch
 Patch19: 0019-Revert-Fix-crash-on-QQmlEngine-destruction.patch
 Patch29: 0029-Avoid-div-by-zero-when-nothing-is-rendered.patch
+Patch135: 0135-Workaround-for-crashes-in-QtQml-code-relating-to-nul.patch
 
 ## upstreamable patches
 # use system double-conversation
@@ -49,9 +50,11 @@ Patch29: 0029-Avoid-div-by-zero-when-nothing-is-rendered.patch
 %global system_doubleconv 1
 BuildRequires: double-conversion-devel
 %endif
-Patch100: qtdeclarative-system_doubleconv.patch
+Patch200: qtdeclarative-system_doubleconv.patch
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
-Patch101: qtdeclarative-kdebug346118.patch
+Patch201: qtdeclarative-kdebug346118.patch
+# additional i686/qml workaround (on top of existing patch135),  https://bugzilla.redhat.com/1331593
+Patch235: qtdeclarative-opensource-src-5.6.0-qml_no-lifetime-dse.patch
 
 ## upstream patches under review
 # Check-for-NULL-from-glGetStrin
@@ -123,27 +126,19 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch8 -p1 -b .0008
 %patch19 -p1 -b .0019
 %patch29 -p1 -b .0029
+%patch135 -p1 -b .0135
 
 %if 0%{?system_doubleconv}
-%patch100 -p1 -b .system_doubleconv
+%patch200 -p1 -b .system_doubleconv
 rm -rfv src/3rdparty/double-conversion
 %endif
-%patch101 -p0 -b .kdebug346118
+%patch201 -p0 -b .kdebug346118
+%patch235 -p1 -b .qml_no-lifetime-dse
 
 %patch500 -p1 -b .Check-for-NULL-from-glGetString
 
 
 %build
-%if 0%{?fedora} > 23
-# build with -fno-delete-null-pointer-checks to workaround
-# https://bugzilla.redhat.com/show_bug.cgi?id=1303643
-# build with -fno-lifetime-dse to workaround
-# https://bugzilla.redhat.com/1331593
-CFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks -fno-lifetime-dse"
-CXXFLAGS="$RPM_OPT_FLAGS -fno-delete-null-pointer-checks -fno-lifetime-dse"
-export CFLAGS CXXFLAGS
-%endif
-
 mkdir %{_target_platform}
 pushd %{_target_platform}
 %{qmake_qt5} ..
@@ -278,6 +273,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Thu Jun 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-12
+- pull in upstream qml/jsruntime workaround (ie, apply compiler workarounds only for src/qml/)
+
 * Tue May 31 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-11
 - include crasher workaround (#1259472,kde#346118)
 
