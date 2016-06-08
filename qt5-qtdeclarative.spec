@@ -15,6 +15,9 @@
 
 %ifarch %{ix86}
 %global nosse2_hack 1
+## TODO:
+# * consider debian's approach of runtime detection instead:
+#   https://codereview.qt-project.org/#/c/127354/
 %endif
 
 #define prerelease
