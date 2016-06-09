@@ -24,8 +24,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.6.0
-Release: 12%{?prerelease:.%{prerelease}}%{?dist}
+Version: 5.6.1
+Release: 1%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -42,10 +42,6 @@ Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
 ## upstream patches
-Patch8: 0008-Fix-crash-when-Canvas-has-negative-width-or-height.patch
-Patch19: 0019-Revert-Fix-crash-on-QQmlEngine-destruction.patch
-Patch29: 0029-Avoid-div-by-zero-when-nothing-is-rendered.patch
-Patch135: 0135-Workaround-for-crashes-in-QtQml-code-relating-to-nul.patch
 
 ## upstreamable patches
 # use system double-conversation
@@ -125,11 +121,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch1 -p1 -b .no_sse2
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
-
-%patch8 -p1 -b .0008
-%patch19 -p1 -b .0019
-%patch29 -p1 -b .0029
-%patch135 -p1 -b .0135
 
 %if 0%{?system_doubleconv}
 %patch200 -p1 -b .system_doubleconv
@@ -276,7 +267,10 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
-* Thu Jun 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-12
+* Thu Jun 09 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-1
+- Update to 5.6.1
+
+* Thu Jun 02 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-12
 - pull in upstream qml/jsruntime workaround (ie, apply compiler workarounds only for src/qml/)
 
 * Tue May 31 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.0-11
