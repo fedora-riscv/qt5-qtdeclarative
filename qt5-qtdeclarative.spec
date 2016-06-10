@@ -212,6 +212,7 @@ popd
 
 
 %check
+test -z "$(grep double-conversion %{buildroot}%{_qt5_libdir}/*.{la,prl})"
 %if 0%{?tests}
 export CTEST_OUTPUT_ON_FAILURE=1
 export PATH=%{buildroot}%{_qt5_bindir}:$PATH
