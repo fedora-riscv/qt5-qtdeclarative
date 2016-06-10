@@ -25,7 +25,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.1
-Release: 1%{?prerelease:.%{prerelease}}%{?dist}
+Release: 2%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -195,10 +195,17 @@ popd
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs
 pushd %{buildroot}%{_qt5_libdir}
 for prl_file in libQt5*.prl ; do
-  sed -i -e "/^QMAKE_PRL_BUILD_DIR/d" ${prl_file}
+  sed -i \
+    -e "/^QMAKE_PRL_BUILD_DIR/d" \
+    -e "/-ldouble-conversion/d" \
+    ${prl_file}
   if [ -f "$(basename ${prl_file} .prl).so" ]; then
     rm -fv "$(basename ${prl_file} .prl).la"
-    sed -i -e "/^QMAKE_PRL_LIBS/d" ${prl_file}
+  else
+    sed -i \
+       -e "/^QMAKE_PRL_LIBS/d" \
+       -e "/-ldouble-conversion/d" \
+       $(basename ${prl_file} .prl).la
   fi
 done
 popd
@@ -267,6 +274,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Fri Jun 10 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-2
+- strip double-conversion references from .la/.prl files
+
 * Thu Jun 09 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-1
 - Update to 5.6.1
 
