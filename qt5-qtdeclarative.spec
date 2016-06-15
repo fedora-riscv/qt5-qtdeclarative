@@ -13,19 +13,17 @@
 %endif
 %endif
 
-%ifarch %{ix86}
 %global nosse2_hack 1
 ## TODO:
 # * consider debian's approach of runtime detection instead:
 #   https://codereview.qt-project.org/#/c/127354/
-%endif
 
 #define prerelease
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.1
-Release: 2%{?prerelease:.%{prerelease}}%{?dist}
+Release: 3%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -275,6 +273,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Wed Jun 15 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-3
+- Apply no_sse2 hack to all architecturs to make qt5-qtdeclarative-devel multilib-clean
+
 * Fri Jun 10 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-2
 - strip double-conversion references from .la/.prl files
 
