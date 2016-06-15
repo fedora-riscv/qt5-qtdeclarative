@@ -23,7 +23,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.1
-Release: 3%{?prerelease:.%{prerelease}}%{?dist}
+Release: 4%{?prerelease:.%{prerelease}}%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -64,7 +64,7 @@ BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 %if ! 0%{?bootstrap}
-BuildRequires: pkgconfig(Qt5XmlPatterns)
+BuildRequires: qt5-qtxmlpatterns-devel
 %endif
 BuildRequires: python
 
@@ -273,6 +273,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Wed Jun 15 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-4
+- drop pkgconfig-style Qt5 deps
+
 * Wed Jun 15 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-3
 - Apply no_sse2 hack to all architecturs to make qt5-qtdeclarative-devel multilib-clean
 
