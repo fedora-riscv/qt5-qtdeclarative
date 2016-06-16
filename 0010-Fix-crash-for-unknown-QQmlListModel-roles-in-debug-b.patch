@@ -1,0 +1,67 @@
+From 82b0b31fe47a6a54c500f2cbea45b37fc28f3bee Mon Sep 17 00:00:00 2001
+From: Filipe Azevedo <filipe.azevedo@kdab.com>
+Date: Mon, 2 May 2016 13:11:26 +0200
+Subject: [PATCH 10/40] Fix crash for unknown QQmlListModel roles in debug
+ builds
+
+If a role is unknown, trying to access it will crash in getExistingRole.
+Fixed that and now return QVariant() for unknown roles.
+
+Change-Id: Iad5c1292a4faee893fbc5a69984cf776aca85d70
+Reviewed-by: Shawn Rutledge <shawn.rutledge@theqtcompany.com>
+Reviewed-by: Robin Burchell <robin.burchell@viroteck.net>
+---
+ src/qml/types/qqmllistmodel.cpp                    |  2 ++
+ tests/auto/qml/qqmllistmodel/tst_qqmllistmodel.cpp | 16 ++++++++++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/src/qml/types/qqmllistmodel.cpp b/src/qml/types/qqmllistmodel.cpp
+index 4b0aa47..3d71621 100644
+--- a/src/qml/types/qqmllistmodel.cpp
++++ b/src/qml/types/qqmllistmodel.cpp
+@@ -392,6 +392,8 @@ void ListModel::updateCacheIndices()
+ 
+ QVariant ListModel::getProperty(int elementIndex, int roleIndex, const QQmlListModel *owner, QV4::ExecutionEngine *eng)
+ {
++    if (roleIndex >= m_layout->roleCount())
++        return QVariant();
+     ListElement *e = elements[elementIndex];
+     const ListLayout::Role &r = m_layout->getExistingRole(roleIndex);
+     return e->getProperty(r, owner, eng);
+diff --git a/tests/auto/qml/qqmllistmodel/tst_qqmllistmodel.cpp b/tests/auto/qml/qqmllistmodel/tst_qqmllistmodel.cpp
+index d26c1c5..6b1dece 100644
+--- a/tests/auto/qml/qqmllistmodel/tst_qqmllistmodel.cpp
++++ b/tests/auto/qml/qqmllistmodel/tst_qqmllistmodel.cpp
+@@ -110,6 +110,7 @@ private slots:
+     void get_nested();
+     void get_nested_data();
+     void crash_model_with_multiple_roles();
++    void crash_model_with_unknown_roles();
+     void set_model_cache();
+     void property_changes();
+     void property_changes_data();
+@@ -968,6 +969,21 @@ void tst_qqmllistmodel::crash_model_with_multiple_roles()
+     delete rootItem;
+ }
+ 
++void tst_qqmllistmodel::crash_model_with_unknown_roles()
++{
++    QQmlEngine eng;
++    QQmlComponent component(&eng, testFileUrl("multipleroles.qml"));
++    QScopedPointer<QObject> rootItem(component.create());
++    QVERIFY(component.errorString().isEmpty());
++    QVERIFY(rootItem != 0);
++    QQmlListModel *model = rootItem->findChild<QQmlListModel*>("listModel");
++    QVERIFY(model != 0);
++
++    // used to cause a crash in debug builds
++    model->index(0, 0, QModelIndex()).data(Qt::DisplayRole);
++    model->index(0, 0, QModelIndex()).data(Qt::UserRole);
++}
++
+ //QTBUG-15190
+ void tst_qqmllistmodel::set_model_cache()
+ {
+-- 
+1.9.3
+

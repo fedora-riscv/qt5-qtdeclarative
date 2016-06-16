@@ -1,0 +1,141 @@
+From 7039db4885a143f8f1d363c9b71665e9160d3d55 Mon Sep 17 00:00:00 2001
+From: Filippo Cucchetto <filippocucchetto@gmail.com>
+Date: Thu, 2 Jun 2016 21:49:37 +0200
+Subject: [PATCH 24/40] Revert removal of "Fixed MouseArea threshold with
+ preventStealing"
+
+This reverts commit 9c8dab537819f0d999e680490c2d125b8836cbbb
+where commit e1400b5b4d8311769ad3b9f631479ee2b0271197 was removed
+due to the breakage of QtLocation tests.
+
+After some hours of debugging it seems that the problem in QtLocation
+was due to filtering of mouse move events in QDeclarativeGeoMapItemBase.
+See QTBUG-52075
+
+Task-number: QTBUG-52534
+Change-Id: I00f002c1d6f60f74a148b5a6ac2b9f63e93718a9
+Reviewed-by: Paolo Angelelli <paolo.angelelli@theqtcompany.com>
+Reviewed-by: Michal Klocek <michal.klocek@theqtcompany.com>
+---
+ src/quick/items/qquickmousearea.cpp                 | 21 +++++++++++++--------
+ src/quick/items/qquickmousearea_p_p.h               |  1 +
+ .../quick/qquickmousearea/tst_qquickmousearea.cpp   | 11 +++++++++++
+ 3 files changed, 25 insertions(+), 8 deletions(-)
+
+diff --git a/src/quick/items/qquickmousearea.cpp b/src/quick/items/qquickmousearea.cpp
+index ef053ab..d66e55a 100644
+--- a/src/quick/items/qquickmousearea.cpp
++++ b/src/quick/items/qquickmousearea.cpp
+@@ -52,7 +52,7 @@ DEFINE_BOOL_CONFIG_OPTION(qmlVisualTouchDebugging, QML_VISUAL_TOUCH_DEBUGGING)
+ QQuickMouseAreaPrivate::QQuickMouseAreaPrivate()
+ : enabled(true), scrollGestureEnabled(true), hovered(false), longPress(false),
+   moved(false), stealMouse(false), doubleClick(false), preventStealing(false),
+-  propagateComposedEvents(false), pressed(0)
++  propagateComposedEvents(false), overThreshold(false), pressed(0)
+ #ifndef QT_NO_DRAGANDDROP
+   , drag(0)
+ #endif
+@@ -715,7 +715,7 @@ void QQuickMouseArea::mouseMoveEvent(QMouseEvent *event)
+             curLocalPos = event->windowPos();
+         }
+ 
+-        if (keepMouseGrab() && d->stealMouse && !d->drag->active())
++        if (keepMouseGrab() && d->stealMouse && d->overThreshold && !d->drag->active())
+             d->drag->setActive(true);
+ 
+         QPointF startPos = d->drag->target()->parentItem()
+@@ -741,16 +741,19 @@ void QQuickMouseArea::mouseMoveEvent(QMouseEvent *event)
+         if (d->drag->active())
+             d->drag->target()->setPosition(dragPos);
+ 
+-        if (!keepMouseGrab()
+-                && (QQuickWindowPrivate::dragOverThreshold(dragPos.x() - startPos.x(), Qt::XAxis, event, d->drag->threshold())
+-                || QQuickWindowPrivate::dragOverThreshold(dragPos.y() - startPos.y(), Qt::YAxis, event, d->drag->threshold()))) {
+-            setKeepMouseGrab(true);
+-            d->stealMouse = true;
+-
++        if (!d->overThreshold && (QQuickWindowPrivate::dragOverThreshold(dragPos.x() - startPos.x(), Qt::XAxis, event, d->drag->threshold())
++                                  || QQuickWindowPrivate::dragOverThreshold(dragPos.y() - startPos.y(), Qt::YAxis, event, d->drag->threshold())))
++        {
++            d->overThreshold = true;
+             if (d->drag->smoothed())
+                 d->startScene = event->windowPos();
+         }
+ 
++        if (!keepMouseGrab() && d->overThreshold) {
++            setKeepMouseGrab(true);
++            d->stealMouse = true;
++        }
++
+         d->moved = true;
+     }
+ #endif
+@@ -767,6 +770,7 @@ void QQuickMouseArea::mouseReleaseEvent(QMouseEvent *event)
+ {
+     Q_D(QQuickMouseArea);
+     d->stealMouse = false;
++    d->overThreshold = false;
+     if (!d->enabled && !d->pressed) {
+         QQuickItem::mouseReleaseEvent(event);
+     } else {
+@@ -875,6 +879,7 @@ void QQuickMouseArea::ungrabMouse()
+         d->pressed = 0;
+         d->stealMouse = false;
+         d->doubleClick = false;
++        d->overThreshold = false;
+         setKeepMouseGrab(false);
+ 
+ #ifndef QT_NO_DRAGANDDROP
+diff --git a/src/quick/items/qquickmousearea_p_p.h b/src/quick/items/qquickmousearea_p_p.h
+index 014729b..f63c5f6 100644
+--- a/src/quick/items/qquickmousearea_p_p.h
++++ b/src/quick/items/qquickmousearea_p_p.h
+@@ -86,6 +86,7 @@ public:
+     bool doubleClick : 1;
+     bool preventStealing : 1;
+     bool propagateComposedEvents : 1;
++    bool overThreshold : 1;
+     Qt::MouseButtons pressed;
+ #ifndef QT_NO_DRAGANDDROP
+     QQuickDrag *drag;
+diff --git a/tests/auto/quick/qquickmousearea/tst_qquickmousearea.cpp b/tests/auto/quick/qquickmousearea/tst_qquickmousearea.cpp
+index 82c053d..9cdfd21 100644
+--- a/tests/auto/quick/qquickmousearea/tst_qquickmousearea.cpp
++++ b/tests/auto/quick/qquickmousearea/tst_qquickmousearea.cpp
+@@ -79,6 +79,7 @@ private slots:
+     void dragging_data() { acceptedButton_data(); }
+     void dragging();
+     void dragSmoothed();
++    void dragThreshold_data();
+     void dragThreshold();
+     void invalidDrag_data() { rejectedButton_data(); }
+     void invalidDrag();
+@@ -375,8 +376,17 @@ void tst_QQuickMouseArea::dragSmoothed()
+     QTest::mouseRelease(&window, Qt::LeftButton, 0, QPoint(100, 122));
+ }
+ 
++void tst_QQuickMouseArea::dragThreshold_data()
++{
++    QTest::addColumn<bool>("preventStealing");
++    QTest::newRow("without preventStealing") << false;
++    QTest::newRow("with preventStealing") << true;
++}
++
+ void tst_QQuickMouseArea::dragThreshold()
+ {
++    QFETCH(bool, preventStealing);
++
+     QQuickView window;
+     QByteArray errorMessage;
+     QVERIFY2(initView(window, testFileUrl("dragging.qml"), true, &errorMessage), errorMessage.constData());
+@@ -386,6 +396,7 @@ void tst_QQuickMouseArea::dragThreshold()
+     QVERIFY(window.rootObject() != 0);
+ 
+     QQuickMouseArea *mouseRegion = window.rootObject()->findChild<QQuickMouseArea*>("mouseregion");
++    mouseRegion->setPreventStealing(preventStealing);
+     QQuickDrag *drag = mouseRegion->drag();
+ 
+     drag->setThreshold(5);
+-- 
+1.9.3
+
