@@ -13,22 +13,24 @@
 %endif
 %endif
 
+%ifarch %{ix86}
 %global nosse2_hack 1
 ## TODO:
 # * consider debian's approach of runtime detection instead:
 #   https://codereview.qt-project.org/#/c/127354/
+%endif
 
 #define prerelease
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.6.1
-Release: 5%{?prerelease:.%{prerelease}}%{?dist}
+Version: 5.7.0
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
-Source0: http://download.qt.io/official_releases/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+Source0: http://download.qt.io/snapshots/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
@@ -40,29 +42,13 @@ Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
 ## upstream patches
-Patch7: 0007-Revert-Remove-this-piece-of-code.patch
-Patch10: 0010-Fix-crash-for-unknown-QQmlListModel-roles-in-debug-b.patch
-Patch11: 0011-Avoid-Canvas-crashes-with-qtquickcompiler.patch
-Patch16: 0016-Fix-crash-with-SignalTransition.patch
-Patch24: 0024-Revert-removal-of-Fixed-MouseArea-threshold-with-pre.patch
-Patch27: 0027-Fix-crash-when-using-with-statement-with-an-expressi.patch
-Patch33: 0033-QML-Only-release-types-if-they-aren-t-referenced-any.patch
 
 ## upstreamable patches
 # use system double-conversation
-%if 0%{?fedora} || 0%{?rhel} > 6
-%global system_doubleconv 1
-BuildRequires: double-conversion-devel
-%endif
-Patch200: qtdeclarative-system_doubleconv.patch
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
 Patch201: qtdeclarative-kdebug346118.patch
 # additional i686/qml workaround (on top of existing patch135),  https://bugzilla.redhat.com/1331593
 Patch235: qtdeclarative-opensource-src-5.6.0-qml_no-lifetime-dse.patch
-
-## upstream patches under review
-# Check-for-NULL-from-glGetStrin
-Patch500: Check-for-NULL-from-glGetString.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -71,7 +57,7 @@ BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 %if ! 0%{?bootstrap}
-BuildRequires: qt5-qtxmlpatterns-devel
+BuildRequires: pkgconfig(Qt5XmlPatterns)
 %endif
 BuildRequires: python
 
@@ -126,23 +112,8 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch1 -p1 -b .no_sse2
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
-
-%patch7 -p1 -b .0007
-%patch10 -p1 -b .0010
-%patch11 -p1 -b .0011
-%patch16 -p1 -b .0016
-%patch24 -p1 -b .0024
-%patch27 -p1 -b .0027
-%patch33 -p1 -b .0033
-
-%if 0%{?system_doubleconv}
-%patch200 -p1 -b .system_doubleconv
-rm -rfv src/3rdparty/double-conversion
-%endif
 %patch201 -p0 -b .kdebug346118
 %patch235 -p1 -b .qml_no-lifetime-dse
-
-%patch500 -p1 -b .Check-for-NULL-from-glGetString
 
 
 %build
@@ -208,24 +179,14 @@ popd
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs
 pushd %{buildroot}%{_qt5_libdir}
 for prl_file in libQt5*.prl ; do
-  sed -i \
-    -e "/^QMAKE_PRL_BUILD_DIR/d" \
-    -e "/-ldouble-conversion/d" \
-    ${prl_file}
-  if [ -f "$(basename ${prl_file} .prl).so" ]; then
-    rm -fv "$(basename ${prl_file} .prl).la"
-  else
-    sed -i \
-       -e "/^QMAKE_PRL_LIBS/d" \
-       -e "/-ldouble-conversion/d" \
-       $(basename ${prl_file} .prl).la
-  fi
+  sed -i -e "/^QMAKE_PRL_BUILD_DIR/d" ${prl_file}
+  rm -fv "$(basename ${prl_file} .prl).la"
+  sed -i -e "/^QMAKE_PRL_LIBS/d" ${prl_file}
 done
 popd
 
 
 %check
-test -z "$(grep double-conversion %{buildroot}%{_qt5_libdir}/*.{la,prl})"
 %if 0%{?tests}
 export CTEST_OUTPUT_ON_FAILURE=1
 export PATH=%{buildroot}%{_qt5_bindir}:$PATH
@@ -254,8 +215,8 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_libdir}/libQt5QuickTest.so.5*
 %{_qt5_plugindir}/qmltooling/
 %{_qt5_archdatadir}/qml/
-%dir %{_qt5_libdir}/cmake/Qt5Qml/
-%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_*Factory.cmake
+
+
 
 %files devel
 %{_bindir}/qml*
@@ -269,10 +230,16 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_libdir}/cmake/Qt5*/Qt5*Config*.cmake
 %{_qt5_libdir}/pkgconfig/Qt5*.pc
 %{_qt5_archdatadir}/mkspecs/modules/*.pri
+%dir %{_qt5_libdir}/cmake/Qt5Qml/
+%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_*Factory.cmake
 
 %files static
-%{_qt5_libdir}/libQt5QmlDevTools.*a
+%{_qt5_libdir}/libQt5QmlDevTools.a
 %{_qt5_libdir}/libQt5QmlDevTools.prl
+%{_qt5_libdir}/libQt5PacketProtocol.a
+%{_qt5_libdir}/libQt5PacketProtocol.prl
+%{_qt5_libdir}/libQt5QmlDebug.a
+%{_qt5_libdir}/libQt5QmlDebug.prl
 
 %if 0%{?docs}
 %files doc
@@ -288,17 +255,14 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
-* Thu Jun 16 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.1-5
-- backport 5.6 branch fixes
+* Mon Jul 04 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.0-2
+- Compiled with gcc
 
-* Wed Jun 15 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-4
-- drop pkgconfig-style Qt5 deps
+* Tue Jun 14 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.0-1
+- Qt 5.7.0 release
 
-* Wed Jun 15 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-3
-- Apply no_sse2 hack to all architecturs to make qt5-qtdeclarative-devel multilib-clean
-
-* Fri Jun 10 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.1-2
-- strip double-conversion references from .la/.prl files
+* Thu Jun 09 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.0-0.1
+- Prepare for 5.7.0
 
 * Thu Jun 09 2016 Jan Grulich <jgrulich@redhat.com> - 5.6.1-1
 - Update to 5.6.1
