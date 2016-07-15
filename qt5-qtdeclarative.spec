@@ -34,7 +34,7 @@ Source0: http://download.qt.io/snapshots/qt/5.6/%{version}%{?prerelease:-%{prere
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
-Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
+Patch1: qtdeclarative-opensource-src-5.7.0-no_sse2.patch
 
 # workaround for possible deadlock condition in QQuickShaderEffectSource
 # https://bugzilla.redhat.com/show_bug.cgi?id=1237269
