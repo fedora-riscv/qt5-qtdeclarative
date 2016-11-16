@@ -22,8 +22,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.6.1
-Release: 5%{?prerelease:.%{prerelease}}%{?dist}
+Version: 5.6.2
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -40,13 +40,6 @@ Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
 ## upstream patches
-Patch7: 0007-Revert-Remove-this-piece-of-code.patch
-Patch10: 0010-Fix-crash-for-unknown-QQmlListModel-roles-in-debug-b.patch
-Patch11: 0011-Avoid-Canvas-crashes-with-qtquickcompiler.patch
-Patch16: 0016-Fix-crash-with-SignalTransition.patch
-Patch24: 0024-Revert-removal-of-Fixed-MouseArea-threshold-with-pre.patch
-Patch27: 0027-Fix-crash-when-using-with-statement-with-an-expressi.patch
-Patch33: 0033-QML-Only-release-types-if-they-aren-t-referenced-any.patch
 
 ## upstreamable patches
 # use system double-conversation
@@ -57,8 +50,6 @@ BuildRequires: double-conversion-devel
 Patch200: qtdeclarative-system_doubleconv.patch
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
 Patch201: qtdeclarative-kdebug346118.patch
-# additional i686/qml workaround (on top of existing patch135),  https://bugzilla.redhat.com/1331593
-Patch235: qtdeclarative-opensource-src-5.6.0-qml_no-lifetime-dse.patch
 
 ## upstream patches under review
 # Check-for-NULL-from-glGetStrin
@@ -66,7 +57,6 @@ Patch500: Check-for-NULL-from-glGetString.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
-BuildRequires: cmake
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
@@ -127,20 +117,11 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 
-%patch7 -p1 -b .0007
-%patch10 -p1 -b .0010
-%patch11 -p1 -b .0011
-%patch16 -p1 -b .0016
-%patch24 -p1 -b .0024
-%patch27 -p1 -b .0027
-%patch33 -p1 -b .0033
-
 %if 0%{?system_doubleconv}
 %patch200 -p1 -b .system_doubleconv
 rm -rfv src/3rdparty/double-conversion
 %endif
 %patch201 -p0 -b .kdebug346118
-%patch235 -p1 -b .qml_no-lifetime-dse
 
 %patch500 -p1 -b .Check-for-NULL-from-glGetString
 
@@ -288,6 +269,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Wed Nov 02 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-1
+- 5.6.2
+
 * Thu Jun 16 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.1-5
 - backport 5.6 branch fixes
 
