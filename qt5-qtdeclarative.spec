@@ -1,17 +1,4 @@
-
 %global qt_module qtdeclarative
-
-# define to build docs, need to undef this for bootstrapping
-# where qt5-qttools builds are not yet available
-# only primary archs (for now), allow secondary to bootstrap
-#global bootstrap 1
-
-%if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64
-%global docs 1
-#global tests 1
-%endif
-%endif
 
 %ifarch %{ix86}
 %global nosse2_hack 1
@@ -20,17 +7,15 @@
 #   https://codereview.qt-project.org/#/c/127354/
 %endif
 
-#define prerelease
-
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.7.0
-Release: 2%{?dist}
+Version: 5.7.1
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
-Source0: http://download.qt.io/snapshots/qt/5.6/%{version}%{?prerelease:-%{prerelease}}/submodules/%{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}.tar.xz
+Source0: http://download.qt.io/snapshots/qt/5.7/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
@@ -47,8 +32,6 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 # use system double-conversation
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
 Patch201: qtdeclarative-kdebug346118.patch
-# additional i686/qml workaround (on top of existing patch135),  https://bugzilla.redhat.com/1331593
-Patch235: qtdeclarative-opensource-src-5.6.0-qml_no-lifetime-dse.patch
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -107,13 +90,12 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %prep
-%setup -q -n %{qt_module}-opensource-src-%{version}%{?prerelease:-%{prerelease}}
+%setup -q -n %{qt_module}-opensource-src-%{version}
 %if 0%{?nosse2_hack}
 %patch1 -p1 -b .no_sse2
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 %patch201 -p0 -b .kdebug346118
-%patch235 -p1 -b .qml_no-lifetime-dse
 
 
 %build
@@ -255,6 +237,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Wed Nov 09 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.1-1
+- New upstream version
+
 * Mon Jul 04 2016 Helio Chissini de Castro <helio@kde.org> - 5.7.0-2
 - Compiled with gcc
 
