@@ -1,5 +1,17 @@
 %global qt_module qtdeclarative
 
+# define to build docs, need to undef this for bootstrapping
+# where qt5-qttools builds are not yet available
+# only primary archs (for now), allow secondary to bootstrap
+#global bootstrap 1
+
+%if ! 0%{?bootstrap}
+%ifarch %{arm} %{ix86} x86_64
+%global docs 1
+#global tests 1
+%endif
+%endif
+
 %ifarch %{ix86}
 %global nosse2_hack 1
 ## TODO:
@@ -10,7 +22,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.7.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -39,7 +51,7 @@ BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 %if ! 0%{?bootstrap}
-BuildRequires: pkgconfig(Qt5XmlPatterns)
+BuildRequires: qt5-qtxmlpatterns-devel
 %endif
 BuildRequires: python
 
@@ -236,6 +248,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Sat Dec 17 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-5
+- restore bootstrap/doc macros, drop pkgconfig-style deps (for now)
+
 * Sat Dec 10 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-4
 - drop BR: cmake (handled by qt5-rpm-macros now)
 
