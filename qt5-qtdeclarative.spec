@@ -22,7 +22,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.7.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -44,6 +44,9 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 # use system double-conversation
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
 Patch201: qtdeclarative-kdebug346118.patch
+
+# filter qml provides
+%global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
 
@@ -209,8 +212,6 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_plugindir}/qmltooling/
 %{_qt5_archdatadir}/qml/
 
-
-
 %files devel
 %{_bindir}/qml*
 %{_qt5_bindir}/qml*
@@ -248,6 +249,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Mon Jan 02 2017 Rex Dieter <rdieter@math.unl.edu> - 5.7.1-6
+- filter qml provides
+
 * Sat Dec 17 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-5
 - restore bootstrap/doc macros, drop pkgconfig-style deps (for now)
 
