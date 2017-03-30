@@ -3,7 +3,7 @@
 # define to build docs, need to undef this for bootstrapping
 # where qt5-qttools builds are not yet available
 # only primary archs (for now), allow secondary to bootstrap
-%global bootstrap 1
+#global bootstrap 1
 
 %if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
@@ -22,7 +22,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.8.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -249,6 +249,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Thu Mar 30 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-2
+- de-bootstrap
+
 * Fri Jan 27 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-1
 - New upstream version
 - bootstrap
