@@ -1,8 +1,15 @@
 %global qt_module qtdeclarative
 
-# To build without qttools doctools package, just undefine docs
+# define to build docs, need to undef this for bootstrapping
+# where qt5-qttools builds are not yet available
+# only primary archs (for now), allow secondary to bootstrap
+%global bootstrap 1
+
+%if ! 0%{?bootstrap}
 %ifarch %{arm} %{ix86} x86_64
 %global docs 1
+#global tests 1
+%endif
 %endif
 
 %ifarch %{ix86}
@@ -45,7 +52,10 @@ Obsoletes: qt5-qtjsbackend < 5.2.0
 
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
+%{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
+%if ! 0%{?bootstrap}
 BuildRequires: qt5-qtxmlpatterns-devel
+%endif
 BuildRequires: python
 
 %if 0%{?tests}
@@ -74,6 +84,7 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 %description static
 %{summary}.
 
+%if 0%{?docs}
 %package doc
 Summary: API documentation for %{name}
 License: GFDL
@@ -83,6 +94,7 @@ BuildRequires: qt5-qtbase-doc
 BuildArch: noarch
 %description doc
 %{summary}.
+%endif
 
 %package examples
 Summary: Programming examples for %{name}
@@ -239,6 +251,7 @@ make check -k -C %{_target_platform}/tests ||:
 %changelog
 * Fri Jan 27 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-1
 - New upstream version
+- bootstrap
 
 * Mon Jan 02 2017 Rex Dieter <rdieter@math.unl.edu> - 5.7.1-6
 - filter qml provides
