@@ -6,7 +6,7 @@
 #global bootstrap 1
 
 %if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64
+%ifarch %{arm} %{ix86} x86_64 %{power64} s390 s390x aarch64
 %global docs 1
 #global tests 1
 %endif
