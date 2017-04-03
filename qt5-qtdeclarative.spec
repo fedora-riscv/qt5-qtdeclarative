@@ -6,10 +6,8 @@
 #global bootstrap 1
 
 %if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64 %{power64} s390 s390x aarch64
 %global docs 1
 #global tests 1
-%endif
 %endif
 
 %ifarch %{ix86}
@@ -22,7 +20,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.8.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -249,6 +247,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Mon Apr 03 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-3
+- build -doc on all archs
+
 * Thu Mar 30 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-2
 - de-bootstrap
 
