@@ -23,7 +23,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.6.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -40,6 +40,9 @@ Patch1: qtdeclarative-opensource-src-5.5.0-no_sse2.patch
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
 ## upstream patches
+# https://bugreports.qt.io/browse/QTBUG-46263
+# http://code.qt.io/cgit/qt/qtdeclarative.git/commit/?id=4d375f3f2b95bfcb322402df3525db6cc7a723ce
+Patch26: 0026-QML-Clear-weak-references-on-Object-destruction-for-.patch
 
 ## upstreamable patches
 # use system double-conversation
@@ -269,6 +272,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Tue Apr 11 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-2
+- pull in upstream crash fix (QTBUG-46263)
+
 * Wed Nov 02 2016 Rex Dieter <rdieter@fedoraproject.org> - 5.6.2-1
 - 5.6.2
 
