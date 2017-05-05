@@ -41,9 +41,7 @@ Obsoletes: qt5-qtjsbackend < 5.2.0
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
-%if ! 0%{?bootstrap}
-BuildRequires: qt5-qtxmlpatterns-devel
-%endif
+BuildRequires: qt5-qtxmlpatterns-devel >= %{version}
 BuildRequires: python
 
 %if 0%{?tests}
