@@ -1,15 +1,5 @@
 %global qt_module qtdeclarative
 
-# define to build docs, need to undef this for bootstrapping
-# where qt5-qttools builds are not yet available
-# only primary archs (for now), allow secondary to bootstrap
-#global bootstrap 1
-
-%if ! 0%{?bootstrap}
-%global docs 1
-#global tests 1
-%endif
-
 %ifarch %{ix86}
 %global nosse2_hack 1
 ## TODO:
@@ -19,13 +9,13 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.8.0
-Release: 3%{?dist}
+Version: 5.9.0
+Release: 0.beta.3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
-Source0: http://download.qt.io/official_releases/qt/5.7/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-beta3/submodules/%{qt_module}-opensource-src-%{version}-beta3.tar.xz
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
@@ -82,18 +72,6 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 %description static
 %{summary}.
 
-%if 0%{?docs}
-%package doc
-Summary: API documentation for %{name}
-License: GFDL
-Requires: %{name} = %{version}-%{release}
-BuildRequires: qt5-doctools
-BuildRequires: qt5-qtbase-doc
-BuildArch: noarch
-%description doc
-%{summary}.
-%endif
-
 %package examples
 Summary: Programming examples for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -102,7 +80,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %prep
-%setup -q -n %{qt_module}-opensource-src-%{version}
+%setup -q -n %{qt_module}-opensource-src-%{version}-beta3
 %if 0%{?nosse2_hack}
 %patch1 -p1 -b .no_sse2
 %endif
@@ -128,10 +106,6 @@ make %{?_smp_mflags} -C src/qml
 popd
 %endif
 
-%if 0%{?docs}
-make %{?_smp_mflags} docs -C %{_target_platform}
-%endif
-
 
 %install
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
@@ -140,10 +114,6 @@ make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 mkdir -p %{buildroot}%{_qt5_libdir}/sse2
 mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
-%endif
-
-%if 0%{?docs}
-make install_docs INSTALL_ROOT=%{buildroot} -C %{_target_platform}
 %endif
 
 # hardlink files to %{_bindir}, add -qt5 postfix to not conflict
@@ -222,6 +192,7 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_libdir}/cmake/Qt5*/Qt5*Config*.cmake
 %{_qt5_libdir}/pkgconfig/Qt5*.pc
 %{_qt5_archdatadir}/mkspecs/modules/*.pri
+%{_qt5_archdatadir}/mkspecs/features/*.prf
 %dir %{_qt5_libdir}/cmake/Qt5Qml/
 %{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_*Factory.cmake
 
@@ -233,20 +204,16 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_libdir}/libQt5QmlDebug.a
 %{_qt5_libdir}/libQt5QmlDebug.prl
 
-%if 0%{?docs}
-%files doc
-%license LICENSE.FDL
-%{_qt5_docdir}/qtqml.qch
-%{_qt5_docdir}/qtqml/
-%{_qt5_docdir}/qtquick.qch
-%{_qt5_docdir}/qtquick/
-
 %files examples
 %{_qt5_examplesdir}/
-%endif
-
 
 %changelog
+* Fri May 05 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.3
+- New upstream beta3 release
+
+* Sun Apr 16 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.1
+- New upstream beta release
+
 * Mon Apr 03 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-3
 - build -doc on all archs
 
@@ -337,29 +304,29 @@ make check -k -C %{_target_platform}/tests ||:
 * Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.9
 - Update RC release
 
-* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8.beta
+* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8.beta3
 - build with -fno-delete-null-pointer-checks to workaround gcc6-related runtime crashes (#1303643)
 
-* Thu Jan 28 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.7.beta
+* Thu Jan 28 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.7.beta3
 - backport fix for older compilers (aka rhel6)
 
-* Sun Jan 17 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.6.beta
+* Sun Jan 17 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.6.beta3
 - use %%license
 
-* Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.5.beta
+* Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.5.beta3
 - fix Source URL, Release: tag
 
 * Mon Dec 21 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.4
-- Update to final beta release
+- Update to final beta3 release
 
 * Thu Dec 10 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.3
-- Official beta release
+- Official beta3 release
 
 * Sun Dec 06 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.2
 - de-bootstrap
 
 * Tue Nov 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.1
-- Start to implement 5.6.0 beta, bootstrap
+- Start to implement 5.6.0 beta3, bootstrap
 
 * Sat Oct 24 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-3
 - workaround QQuickShaderEffectSource::updatePaintNode deadlock (#1237269, kde#348385)
@@ -418,11 +385,11 @@ make check -k -C %{_target_platform}/tests ||:
 * Fri Nov 28 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.3.rc
 - 5.4.0-rc
 
-* Mon Nov 03 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.2.beta
+* Mon Nov 03 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.2.beta3
 - use new %%qmake_qt5 macro
 
-* Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta
-- 5.4.0-beta
+* Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta3
+- 5.4.0-beta3
 - %%ix84: drop sse2-optimized bits, need to rethink if/how to support it now
 
 * Tue Sep 16 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-1
@@ -474,14 +441,14 @@ make check -k -C %{_target_platform}/tests ||:
 * Mon Dec 02 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.10.rc1
 - 5.2.0-rc1
 
-* Mon Nov 25 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.5.beta1
+* Mon Nov 25 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.5.beta31
 - enable -doc only on primary archs (allow secondary bootstrap)
 
-* Sat Nov 09 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.4.beta1
+* Sat Nov 09 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.4.beta31
 - rebuild (arm/qreal)
 
-* Thu Oct 24 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.3.beta1
-- 5.2.0-beta1
+* Thu Oct 24 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.3.beta31
+- 5.2.0-beta31
 
 * Wed Oct 16 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.2.alpha
 - bootstrap ppc
