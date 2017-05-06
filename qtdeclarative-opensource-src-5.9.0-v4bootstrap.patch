@@ -1,0 +1,18 @@
+--- qtdeclarative-opensource-src-5.9.0-beta3/src/qml/jit/qv4isel_masm.cpp	2017-05-06 13:39:54.982089422 +0200
++++ qtdeclarative-opensource-src-5.9.0-beta3/src/qml/jit/qv4isel_masm.cpp.new	2017-05-06 13:39:31.943980330 +0200
+@@ -1635,6 +1635,7 @@
+ namespace QV4 { namespace JIT {
+ template class Q_QML_EXPORT InstructionSelection<>;
+ template class Q_QML_EXPORT ISelFactory<>;
++#if defined(V4_BOOTSTRAP)
+ 
+ Q_QML_EXPORT QV4::EvalISelFactory *createISelForArchitecture(const QString &architecture)
+ {
+@@ -1662,6 +1663,7 @@
+     return nullptr;
+ }
+ 
++#endif
+ } }
+ QT_END_NAMESPACE
+ 

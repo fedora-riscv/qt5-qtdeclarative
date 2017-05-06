@@ -25,6 +25,7 @@ Patch1: qtdeclarative-opensource-src-5.9.0-no_sse2.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1237269
 # https://bugs.kde.org/show_bug.cgi?id=348385
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
+Patch3: qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch
 
 ## upstream patches
 
@@ -83,6 +84,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch1 -p1 -b .no_sse2
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
+%patch -p1 -b .v5boot
 %patch201 -p0 -b .kdebug346118
 
 
