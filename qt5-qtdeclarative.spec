@@ -84,7 +84,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch1 -p1 -b .no_sse2
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
-%patch -p1 -b .v5boot
+%patch3 -p1 -b .v5boot
 %patch201 -p0 -b .kdebug346118
 
 
