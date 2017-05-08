@@ -10,7 +10,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.9.0
-Release: 0.beta.3%{?dist}
+Release: 0.beta.4%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -25,7 +25,6 @@ Patch1: qtdeclarative-opensource-src-5.9.0-no_sse2.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1237269
 # https://bugs.kde.org/show_bug.cgi?id=348385
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
-Patch3: qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch
 
 ## upstream patches
 
@@ -87,7 +86,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch1 -p1 -b .no_sse2
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
-%patch3 -p1 -b .v5boot
 %patch201 -p0 -b .kdebug346118
 %patch202 -p1 -b .nojitsupport
 
@@ -212,6 +210,11 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_examplesdir}/
 
 %changelog
+* Mon May 08 2017 Than Ngo <than@redhat.com> - 5.9.0-0.beta.4
+- drop useless qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch,
+  apply correct qtdeclarative-opensource-src-5.9.0-no_sse2.patch to 
+  fix the build issue in JIT on ppc64/ppc64le/s390x
+
 * Fri May 05 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.3
 - New upstream beta3 release
 
