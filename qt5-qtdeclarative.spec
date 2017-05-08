@@ -33,6 +33,9 @@ Patch3: qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch
 # use system double-conversation
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
 Patch201: qtdeclarative-kdebug346118.patch
+# To remove after beta 3
+Patch202: qtdeclarative-opensource-src-5.9.0-beta3-nojitsupport.patch
+
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -86,6 +89,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 %patch3 -p1 -b .v5boot
 %patch201 -p0 -b .kdebug346118
+%patch202 -p1 -b .nojitsupport
 
 
 %build

@@ -1,0 +1,58 @@
+From 7730affa0dd50960da90f30d41b694a9e9ddd52b Mon Sep 17 00:00:00 2001
+From: Simon Hausmann <simon.hausmann@qt.io>
+Date: Fri, 5 May 2017 15:21:40 +0200
+Subject: [PATCH] Prospective build fix for architectures where we don't
+ support the JIT
+
+Always export the isel factory method for qmlcachegen, so that we can
+link.
+
+Task-number: QTBUG-60597
+Change-Id: Ia348ee5dfe0892878e8fce6c8afd30bb8eb54a51
+Reviewed-by: Dmitry Shachnev <mitya57@gmail.com>
+Reviewed-by: Robin Burchell <robin.burchell@crimson.no>
+---
+ src/qml/jit/qv4isel_masm.cpp | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/qml/jit/qv4isel_masm.cpp b/src/qml/jit/qv4isel_masm.cpp
+index 4afcd1517..ac72d2e8f 100644
+--- a/src/qml/jit/qv4isel_masm.cpp
++++ b/src/qml/jit/qv4isel_masm.cpp
+@@ -1631,14 +1631,20 @@ QQmlRefPointer<CompiledData::CompilationUnit> ISelFactory<JITAssembler>::createU
+     return result;
+ }
+ 
++#endif // ENABLE(ASSEMBLER)
++
+ QT_BEGIN_NAMESPACE
+ namespace QV4 { namespace JIT {
++#if ENABLE(ASSEMBLER)
+ template class Q_QML_EXPORT InstructionSelection<>;
+ template class Q_QML_EXPORT ISelFactory<>;
++#endif
++
+ #if defined(V4_BOOTSTRAP)
+ 
+ Q_QML_EXPORT QV4::EvalISelFactory *createISelForArchitecture(const QString &architecture)
+ {
++#if ENABLE(ASSEMBLER)
+     using ARMv7CrossAssembler = QV4::JIT::Assembler<AssemblerTargetConfiguration<JSC::MacroAssemblerARMv7, NoOperatingSystemSpecialization>>;
+     using ARM64CrossAssembler = QV4::JIT::Assembler<AssemblerTargetConfiguration<JSC::MacroAssemblerARM64, NoOperatingSystemSpecialization>>;
+ 
+@@ -1659,6 +1665,7 @@ Q_QML_EXPORT QV4::EvalISelFactory *createISelForArchitecture(const QString &arch
+ #endif
+     if (!hostArch.isEmpty() && architecture == hostArch)
+         return new ISelFactory<>;
++#endif // ENABLE(ASSEMBLER)
+ 
+     return nullptr;
+ }
+@@ -1667,4 +1674,3 @@ Q_QML_EXPORT QV4::EvalISelFactory *createISelForArchitecture(const QString &arch
+ } }
+ QT_END_NAMESPACE
+ 
+-#endif // ENABLE(ASSEMBLER)
+-- 
+2.12.2
+
