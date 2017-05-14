@@ -7,15 +7,22 @@
 #   https://codereview.qt-project.org/#/c/127354/
 %endif
 
+# definition borrowed from qtbase
+%global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
+
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.9.0
-Release: 0.beta.4%{?dist}
+Release: 0.5.beta3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
 Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-beta3/submodules/%{qt_module}-opensource-src-%{version}-beta3.tar.xz
+
+# header file to workaround multilib issue
+# https://bugzilla.redhat.com/show_bug.cgi?id=1441343
+Source5: qv4global_p-multilib.h
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
@@ -118,6 +125,13 @@ mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
 %endif
 
+%ifarch %{multilib_archs}
+# multilib: qv4global_p.h
+  mv %{buildroot}%{_qt5_headerdir}/QtQml/%{version}/QtQml/private/qv4global_p.h \
+     %{buildroot}%{_qt5_headerdir}/QtQml/%{version}/QtQml/private/qv4global_p-%{__isa_bits}.h
+  install -p -m644 -D %{SOURCE5} %{buildroot}%{_qt5_headerdir}/QtQml/%{version}/QtQml/private/qv4global_p.h
+%endif
+
 # hardlink files to %{_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
 pushd %{buildroot}%{_qt5_bindir}
@@ -210,6 +224,9 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_examplesdir}/
 
 %changelog
+* Sun May 14 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.5.beta3
+- Conflict in qt5-qtdeclarative-devel (#1441343), fix Release:
+
 * Mon May 08 2017 Than Ngo <than@redhat.com> - 5.9.0-0.beta.4
 - drop useless qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch,
   apply correct qtdeclarative-opensource-src-5.9.0-no_sse2.patch to 
