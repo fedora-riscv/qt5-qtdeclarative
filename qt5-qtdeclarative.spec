@@ -179,7 +179,7 @@ make check -k -C %{_target_platform}/tests ||:
 
 %files
 %{!?_licensedir:%global license %%doc}
-%license LICENSE.LGPL* LGPL_EXCEPTION.txt
+%license LICENSE.LGPL*
 %{_qt5_libdir}/libQt5Qml.so.5*
 %if 0%{?nosse2_hack}
 %{_qt5_libdir}/sse2/libQt5Qml.so.5*
