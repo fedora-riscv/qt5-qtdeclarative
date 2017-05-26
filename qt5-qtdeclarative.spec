@@ -13,12 +13,12 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.9.0
-Release: 0.rc.1%{?dist}
+Release: 0.1.rc%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
-Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-rc1/submodules/%{qt_module}-opensource-src-%{version}-rc.tar.xz
+Source0: https://download.qt.io/development_releases/qt/5.9/%{version}-rc/submodules/%{qt_module}-opensource-src-%{version}-rc.tar.xz
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1441343
@@ -219,11 +219,14 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_examplesdir}/
 
 %changelog
+* Fri May 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.1.rc
+- Upstream Release Candidate retagged
+
 * Wed May 24 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.rc.1
 - Upstream Release Candidate 1
 
 * Sun May 14 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.5.beta3
-- Conflict in qt5-qtdeclarative-devel (#1441343), fix Release: 0.rc.1%{?dist}
+- Conflict in qt5-qtdeclarative-devel (#1441343), fix Release: 0.1.rc%{?dist}
 
 * Mon May 08 2017 Than Ngo <than@redhat.com> - 5.9.0-0.beta.4
 - drop useless qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch,
@@ -336,7 +339,7 @@ make check -k -C %{_target_platform}/tests ||:
 - use %%license
 
 * Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.5.beta3
-- fix Source URL, Release: 0.rc.1%{?dist}
+- fix Source URL, Release: 0.1.rc%{?dist}
 
 * Mon Dec 21 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.4
 - Update to final beta3 release
