@@ -4,17 +4,17 @@
  *
  * DO NOT INCLUDE THE NEW FILE DIRECTLY -- ALWAYS INCLUDE THIS ONE INSTEAD. */
 
-#ifndef QCONFIG_MULTILIB_H
-#define QCONFIG_MULTILIB_H
+#ifndef MULTILIB_QV4GLOBAL_H
+#define MULTILIB_QV4GLOBAL_H
 
 #ifndef __WORDSIZE
 #include <bits/wordsize.h>
 #endif
 
 #if __WORDSIZE == 32
-#include "QtQml/private/qv4global_p-32.h"
+#include <private/qv4global_p-32.h>
 #elif __WORDSIZE == 64
-#include "QtQml/private/qv4global_p-64.h"
+#include <private/qv4global_p-64.h>
 #else
 #error "unexpected value for __WORDSIZE macro"
 #endif
