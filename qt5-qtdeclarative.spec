@@ -13,7 +13,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.9.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -219,6 +219,9 @@ make check -k -C %{_target_platform}/tests ||:
 %{_qt5_examplesdir}/
 
 %changelog
+* Fri Jun 02 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-2
+- rebuild
+
 * Wed May 31 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-1
 - Upstream official release
 
