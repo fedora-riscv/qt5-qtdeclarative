@@ -13,7 +13,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.9.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -93,12 +93,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch201 -p0 -b .kdebug346118
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
 %{qmake_qt5} ..
-popd
 
-make %{?_smp_mflags} -C %{_target_platform}
+make %{?_smp_mflags}
 
 %if 0%{?nosse2_hack}
 # build libQt5Qml with no_sse2
@@ -112,7 +109,7 @@ popd
 
 
 %install
-make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
+make install INSTALL_ROOT=%{buildroot}
 
 %if 0%{?nosse2_hack}
 mkdir -p %{buildroot}%{_qt5_libdir}/sse2
@@ -166,11 +163,11 @@ popd
 export CTEST_OUTPUT_ON_FAILURE=1
 export PATH=%{buildroot}%{_qt5_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
-make sub-tests-all %{?_smp_mflags} -C %{_target_platform}
+make sub-tests-all %{?_smp_mflags}
 xvfb-run -a \
 dbus-launch --exit-with-session \
 time \
-make check -k -C %{_target_platform}/tests ||:
+make check -k -C tests ||:
 %endif
 
 
@@ -218,7 +215,11 @@ make check -k -C %{_target_platform}/tests ||:
 %files examples
 %{_qt5_examplesdir}/
 
+
 %changelog
+* Thu Jun 15 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-3
+- drop shadow/out-of-tree builds (#1456211,QTBUG-37417)
+
 * Fri Jun 02 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-2
 - rebuild
 
