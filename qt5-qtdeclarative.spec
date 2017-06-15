@@ -95,7 +95,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %build
 # no shadow builds until fixed: https://bugreports.qt.io/browse/QTBUG-37417
-%{qmake_qt5} ..
+%{qmake_qt5}
 
 make %{?_smp_mflags}
 
