@@ -22,7 +22,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.7.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -113,13 +113,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{qmake_qt5} ..
-popd
-
-make %{?_smp_mflags} -C %{_target_platform}
-
 %if 0%{?nosse2_hack}
 # build libQt5Qml with no_sse2
 mkdir -p %{_target_platform}-no_sse2
@@ -130,13 +123,17 @@ make %{?_smp_mflags} -C src/qml
 popd
 %endif
 
+%{qmake_qt5}
+
+make %{?_smp_mflags}
+
 %if 0%{?docs}
-make %{?_smp_mflags} docs -C %{_target_platform}
+make %{?_smp_mflags} docs
 %endif
 
 
 %install
-make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}
+make install INSTALL_ROOT=%{buildroot}
 
 %if 0%{?nosse2_hack}
 mkdir -p %{buildroot}%{_qt5_libdir}/sse2
@@ -145,7 +142,7 @@ make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
 %endif
 
 %if 0%{?docs}
-make install_docs INSTALL_ROOT=%{buildroot} -C %{_target_platform}
+make install_docs INSTALL_ROOT=%{buildroot}
 %endif
 
 # hardlink files to %{_bindir}, add -qt5 postfix to not conflict
@@ -187,11 +184,11 @@ popd
 export CTEST_OUTPUT_ON_FAILURE=1
 export PATH=%{buildroot}%{_qt5_bindir}:$PATH
 export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
-make sub-tests-all %{?_smp_mflags} -C %{_target_platform}
+make sub-tests-all %{?_smp_mflags}
 xvfb-run -a \
 dbus-launch --exit-with-session \
 time \
-make check -k -C %{_target_platform}/tests ||:
+make check -k -C tests ||:
 %endif
 
 
@@ -249,6 +246,9 @@ make check -k -C %{_target_platform}/tests ||:
 
 
 %changelog
+* Fri Jun 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-8
+- (branch backport): drop shadow/out-of-tree builds (#1456211,QTBUG-37417)
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.7.1-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
