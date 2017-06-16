@@ -183,7 +183,6 @@ make check -k -C tests ||:
 %postun -p /sbin/ldconfig
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license LICENSE.LGPL*
 %{_qt5_libdir}/libQt5Qml.so.5*
 %if 0%{?nosse2_hack}
