@@ -1,6 +1,7 @@
 %global qt_module qtdeclarative
 
-%ifarch %{ix86}
+%if 0
+#ifarch %{ix86}
 %global nosse2_hack 1
 ## TODO:
 # * consider debian's approach of runtime detection instead:
@@ -39,6 +40,10 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 # use system double-conversation
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
 Patch201: qtdeclarative-kdebug346118.patch
+
+# https://codereview.qt-project.org/#/c/127354/
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=792594
+Patch202: http://sources.debian.net/data/main/q/qtdeclarative-opensource-src/5.9.0~beta3-2/debian/patches/Do-not-make-lack-of-SSE2-support-on-x86-32-fatal.patch
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -91,14 +96,10 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 %patch201 -p0 -b .kdebug346118
+%patch202 -p1 -b .no_sse2_non_fatal
 
 
 %build
-# no shadow builds until fixed: https://bugreports.qt.io/browse/QTBUG-37417
-%{qmake_qt5}
-
-make %{?_smp_mflags}
-
 %if 0%{?nosse2_hack}
 # build libQt5Qml with no_sse2
 mkdir -p %{_target_platform}-no_sse2
@@ -108,6 +109,11 @@ make sub-src-clean
 make %{?_smp_mflags} -C src/qml
 popd
 %endif
+
+# no shadow builds until fixed: https://bugreports.qt.io/browse/QTBUG-37417
+%{qmake_qt5}
+
+make %{?_smp_mflags}
 
 
 %install
@@ -221,6 +227,7 @@ make check -k -C tests ||:
 %changelog
 * Thu Jun 15 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-3
 - drop shadow/out-of-tree builds (#1456211,QTBUG-37417)
+- use debian's i686/sse2 support patch
 
 * Fri Jun 02 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-2
 - rebuild
