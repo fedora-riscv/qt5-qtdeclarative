@@ -13,13 +13,13 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.9.0
-Release: 3%{?dist}
+Version: 5.9.1
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
-Source0: https://download.qt.io/official_releases/qt/5.9/5.9.0/submodules/qtdeclarative-opensource-src-5.9.0.tar.xz
+Source0: https://download.qt.io/official_releases/qt/5.9/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1441343
@@ -224,6 +224,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Wed Jul 19 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-1
+- 5.9.1
+
 * Thu Jun 15 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-3
 - drop shadow/out-of-tree builds (#1456211,QTBUG-37417)
 - use debian's i686/sse2 support patch
