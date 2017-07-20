@@ -22,7 +22,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.7.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -44,6 +44,7 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 # use system double-conversation
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
 Patch201: qtdeclarative-kdebug346118.patch
+Patch202: qt5-qtdeclarative-bz#1120451-persian-keyboard.patch
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -110,7 +111,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 %patch201 -p0 -b .kdebug346118
-
+%patch202 -p1 -b .bz#1120451
 
 %build
 %if 0%{?nosse2_hack}
@@ -246,6 +247,10 @@ make check -k -C tests ||:
 
 
 %changelog
+* Wed Jul 19 2017 Than Ngo <than@redhat.com> - 5.7.1-9
+- backported to fix bz#1120451, accept PUA characters, ZWNJ and ZWJ
+  as input in TextInput/Edit
+
 * Fri Jun 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-8
 - (branch backport): drop shadow/out-of-tree builds (#1456211,QTBUG-37417)
 
