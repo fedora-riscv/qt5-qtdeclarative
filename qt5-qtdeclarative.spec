@@ -44,6 +44,10 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 # use system double-conversation
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
 Patch201: qtdeclarative-kdebug346118.patch
+
+# backport fix to accept PUA characters, ZWNJ and ZWJ as input in TextInput/Edit
+# qtdeclarative needs qt5-qtbase >= %{version}-20 due to the change
+# in the privat header files to support PUA characters, ZWNJ and ZWJ as input in TextInput/Edit
 Patch202: qt5-qtdeclarative-bz#1120451-persian-keyboard.patch
 
 # filter qml provides
