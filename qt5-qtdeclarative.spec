@@ -1,37 +1,33 @@
 %global qt_module qtdeclarative
 
-# define to build docs, need to undef this for bootstrapping
-# where qt5-qttools builds are not yet available
-# only primary archs (for now), allow secondary to bootstrap
-#global bootstrap 1
-
-%if ! 0%{?bootstrap}
-%ifarch %{arm} %{ix86} x86_64
-%global docs 1
-#global tests 1
-%endif
-%endif
-
-%ifarch %{ix86}
+%if 0
+#ifarch %{ix86}
 %global nosse2_hack 1
 ## TODO:
 # * consider debian's approach of runtime detection instead:
 #   https://codereview.qt-project.org/#/c/127354/
 %endif
 
+# definition borrowed from qtbase
+%global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
+
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.7.1
-Release: 9%{?dist}
+Version: 5.9.1
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
-Source0: http://download.qt.io/official_releases/qt/5.7/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+Source0: https://download.qt.io/official_releases/qt/5.9/%{version}/submodules/%{qt_module}-opensource-src-%{version}.tar.xz
+
+# header file to workaround multilib issue
+# https://bugzilla.redhat.com/show_bug.cgi?id=1441343
+Source5: qv4global_p-multilib.h
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
-Patch1: qtdeclarative-opensource-src-5.7.0-no_sse2.patch
+Patch1: qtdeclarative-opensource-src-5.9.0-no_sse2.patch
 
 # workaround for possible deadlock condition in QQuickShaderEffectSource
 # https://bugzilla.redhat.com/show_bug.cgi?id=1237269
@@ -45,10 +41,10 @@ Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 # https://bugs.kde.org/show_bug.cgi?id=346118#c108
 Patch201: qtdeclarative-kdebug346118.patch
 
-# backport fix to accept PUA characters, ZWNJ and ZWJ as input in TextInput/Edit
-# qtdeclarative needs qt5-qtbase >= %{version}-20 due to the change
-# in the privat header files to support PUA characters, ZWNJ and ZWJ as input in TextInput/Edit
-Patch202: qt5-qtdeclarative-bz#1120451-persian-keyboard.patch
+# https://codereview.qt-project.org/#/c/127354/
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=792594
+Patch202: http://sources.debian.net/data/main/q/qtdeclarative-opensource-src/5.9.0~beta3-2/debian/patches/Do-not-make-lack-of-SSE2-support-on-x86-32-fatal.patch
+
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -58,9 +54,7 @@ Obsoletes: qt5-qtjsbackend < 5.2.0
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
-%if ! 0%{?bootstrap}
-BuildRequires: qt5-qtxmlpatterns-devel
-%endif
+BuildRequires: qt5-qtxmlpatterns-devel >= %{version}
 BuildRequires: python
 
 %if 0%{?tests}
@@ -89,18 +83,6 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 %description static
 %{summary}.
 
-%if 0%{?docs}
-%package doc
-Summary: API documentation for %{name}
-License: GFDL
-Requires: %{name} = %{version}-%{release}
-BuildRequires: qt5-qdoc
-BuildRequires: qt5-qhelpgenerator
-BuildArch: noarch
-%description doc
-%{summary}.
-%endif
-
 %package examples
 Summary: Programming examples for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -115,7 +97,8 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 %patch201 -p0 -b .kdebug346118
-%patch202 -p1 -b .bz#1120451
+%patch202 -p1 -b .no_sse2_non_fatal
+
 
 %build
 %if 0%{?nosse2_hack}
@@ -128,13 +111,10 @@ make %{?_smp_mflags} -C src/qml
 popd
 %endif
 
+# no shadow builds until fixed: https://bugreports.qt.io/browse/QTBUG-37417
 %{qmake_qt5}
 
 make %{?_smp_mflags}
-
-%if 0%{?docs}
-make %{?_smp_mflags} docs
-%endif
 
 
 %install
@@ -146,8 +126,11 @@ mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
 make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
 %endif
 
-%if 0%{?docs}
-make install_docs INSTALL_ROOT=%{buildroot}
+%ifarch %{multilib_archs}
+# multilib: qv4global_p.h
+  mv %{buildroot}%{_qt5_headerdir}/QtQml/%{version}/QtQml/private/qv4global_p.h \
+     %{buildroot}%{_qt5_headerdir}/QtQml/%{version}/QtQml/private/qv4global_p-%{__isa_bits}.h
+  install -p -m644 -D %{SOURCE5} %{buildroot}%{_qt5_headerdir}/QtQml/%{version}/QtQml/private/qv4global_p.h
 %endif
 
 # hardlink files to %{_bindir}, add -qt5 postfix to not conflict
@@ -201,8 +184,7 @@ make check -k -C tests ||:
 %postun -p /sbin/ldconfig
 
 %files
-%{!?_licensedir:%global license %%doc}
-%license LICENSE.LGPL* LGPL_EXCEPTION.txt
+%license LICENSE.LGPL*
 %{_qt5_libdir}/libQt5Qml.so.5*
 %if 0%{?nosse2_hack}
 %{_qt5_libdir}/sse2/libQt5Qml.so.5*
@@ -226,6 +208,7 @@ make check -k -C tests ||:
 %{_qt5_libdir}/cmake/Qt5*/Qt5*Config*.cmake
 %{_qt5_libdir}/pkgconfig/Qt5*.pc
 %{_qt5_archdatadir}/mkspecs/modules/*.pri
+%{_qt5_archdatadir}/mkspecs/features/*.prf
 %dir %{_qt5_libdir}/cmake/Qt5Qml/
 %{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_*Factory.cmake
 
@@ -237,29 +220,59 @@ make check -k -C tests ||:
 %{_qt5_libdir}/libQt5QmlDebug.a
 %{_qt5_libdir}/libQt5QmlDebug.prl
 
-%if 0%{?docs}
-%files doc
-%license LICENSE.FDL
-%{_qt5_docdir}/qtqml.qch
-%{_qt5_docdir}/qtqml/
-%{_qt5_docdir}/qtquick.qch
-%{_qt5_docdir}/qtquick/
-%endif
-
 %files examples
 %{_qt5_examplesdir}/
 
 
 %changelog
-* Wed Jul 19 2017 Than Ngo <than@redhat.com> - 5.7.1-9
-- backported to fix bz#1120451, accept PUA characters, ZWNJ and ZWJ
-  as input in TextInput/Edit
+* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.9.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
-* Fri Jun 16 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.7.1-8
-- (branch backport): drop shadow/out-of-tree builds (#1456211,QTBUG-37417)
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.9.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
-* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.7.1-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+* Wed Jul 19 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.1-1
+- 5.9.1
+
+* Thu Jun 15 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-3
+- drop shadow/out-of-tree builds (#1456211,QTBUG-37417)
+- use debian's i686/sse2 support patch
+
+* Fri Jun 02 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-2
+- rebuild
+
+* Wed May 31 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-1
+- Upstream official release
+
+* Fri May 26 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.1.rc
+- Upstream Release Candidate retagged
+
+* Wed May 24 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.rc.1
+- Upstream Release Candidate 1
+
+* Sun May 14 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.0-0.5.beta3
+- Conflict in qt5-qtdeclarative-devel (#1441343), fix Release: 1%{?dist}
+
+* Mon May 08 2017 Than Ngo <than@redhat.com> - 5.9.0-0.beta.4
+- drop useless qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch,
+  apply correct qtdeclarative-opensource-src-5.9.0-no_sse2.patch to 
+  fix the build issue in JIT on ppc64/ppc64le/s390x
+
+* Fri May 05 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.3
+- New upstream beta3 release
+
+* Sun Apr 16 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.1
+- New upstream beta release
+
+* Mon Apr 03 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-3
+- build -doc on all archs
+
+* Thu Mar 30 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.8.0-2
+- de-bootstrap
+
+* Fri Jan 27 2017 Helio Chissini de Castro <helio@kde.org> - 5.8.0-1
+- New upstream version
+- bootstrap
 
 * Mon Jan 02 2017 Rex Dieter <rdieter@math.unl.edu> - 5.7.1-6
 - filter qml provides
@@ -341,29 +354,29 @@ make check -k -C tests ||:
 * Mon Feb 15 2016 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.9
 - Update RC release
 
-* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8.beta
+* Tue Feb 02 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.8.beta3
 - build with -fno-delete-null-pointer-checks to workaround gcc6-related runtime crashes (#1303643)
 
-* Thu Jan 28 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.7.beta
+* Thu Jan 28 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.7.beta3
 - backport fix for older compilers (aka rhel6)
 
-* Sun Jan 17 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.6.beta
+* Sun Jan 17 2016 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.6.beta3
 - use %%license
 
-* Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.5.beta
-- fix Source URL, Release: tag
+* Mon Dec 21 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.5.beta3
+- fix Source URL, Release: 1%{?dist}
 
 * Mon Dec 21 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.4
-- Update to final beta release
+- Update to final beta3 release
 
 * Thu Dec 10 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.3
-- Official beta release
+- Official beta3 release
 
 * Sun Dec 06 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.0-0.2
 - de-bootstrap
 
 * Tue Nov 03 2015 Helio Chissini de Castro <helio@kde.org> - 5.6.0-0.1
-- Start to implement 5.6.0 beta, bootstrap
+- Start to implement 5.6.0 beta3, bootstrap
 
 * Sat Oct 24 2015 Rex Dieter <rdieter@fedoraproject.org> 5.5.1-3
 - workaround QQuickShaderEffectSource::updatePaintNode deadlock (#1237269, kde#348385)
@@ -422,11 +435,11 @@ make check -k -C tests ||:
 * Fri Nov 28 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.3.rc
 - 5.4.0-rc
 
-* Mon Nov 03 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.2.beta
+* Mon Nov 03 2014 Rex Dieter <rdieter@fedoraproject.org> 5.4.0-0.2.beta3
 - use new %%qmake_qt5 macro
 
-* Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta
-- 5.4.0-beta
+* Sat Oct 18 2014 Rex Dieter <rdieter@fedoraproject.org> - 5.4.0-0.1.beta3
+- 5.4.0-beta3
 - %%ix84: drop sse2-optimized bits, need to rethink if/how to support it now
 
 * Tue Sep 16 2014 Rex Dieter <rdieter@fedoraproject.org> 5.3.2-1
@@ -478,14 +491,14 @@ make check -k -C tests ||:
 * Mon Dec 02 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.10.rc1
 - 5.2.0-rc1
 
-* Mon Nov 25 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.5.beta1
+* Mon Nov 25 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.5.beta31
 - enable -doc only on primary archs (allow secondary bootstrap)
 
-* Sat Nov 09 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.4.beta1
+* Sat Nov 09 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.4.beta31
 - rebuild (arm/qreal)
 
-* Thu Oct 24 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.3.beta1
-- 5.2.0-beta1
+* Thu Oct 24 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.3.beta31
+- 5.2.0-beta31
 
 * Wed Oct 16 2013 Rex Dieter <rdieter@fedoraproject.org> 5.2.0-0.2.alpha
 - bootstrap ppc
