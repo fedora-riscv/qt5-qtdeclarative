@@ -13,8 +13,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.9.1
-Release: 3%{?dist}
+Version: 5.9.2
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -225,6 +225,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Mon Oct 09 2017 Jan Grulich <jgrulich@redhat.com> - 5.9.2-1
+- 5.9.2
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.9.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
@@ -255,7 +258,7 @@ make check -k -C tests ||:
 
 * Mon May 08 2017 Than Ngo <than@redhat.com> - 5.9.0-0.beta.4
 - drop useless qtdeclarative-opensource-src-5.9.0-v4bootstrap.patch,
-  apply correct qtdeclarative-opensource-src-5.9.0-no_sse2.patch to 
+  apply correct qtdeclarative-opensource-src-5.9.0-no_sse2.patch to
   fix the build issue in JIT on ppc64/ppc64le/s390x
 
 * Fri May 05 2017 Helio Chissini de Castro <helio@kde.org> - 5.9.0-0.beta.3
