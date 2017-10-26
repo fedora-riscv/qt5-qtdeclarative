@@ -14,7 +14,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.9.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -35,6 +35,9 @@ Patch1: qtdeclarative-opensource-src-5.9.0-no_sse2.patch
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
 ## upstream patches
+# regression https://bugreports.qt.io/browse/QTBUG-64017
+# so revert this offending commit (for now)
+Patch111: 0111-Fix-qml-cache-invalidation-when-changing-dependent-C.patch
 
 ## upstreamable patches
 # use system double-conversation
@@ -95,6 +98,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch1 -p1 -b .no_sse2
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
+
+%patch111 -p1 -R -b .0111
+
 %patch201 -p0 -b .kdebug346118
 %patch202 -p1 -b .no_sse2_non_fatal
 
@@ -224,6 +230,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Thu Oct 26 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-2
+- revert commit causing regresions (QTBUG-64017)
+
 * Mon Oct 09 2017 Jan Grulich <jgrulich@redhat.com> - 5.9.2-1
 - 5.9.2
 
