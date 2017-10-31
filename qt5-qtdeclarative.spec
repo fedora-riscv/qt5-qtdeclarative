@@ -14,7 +14,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.9.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -52,6 +52,7 @@ Patch202: http://sources.debian.net/data/main/q/qtdeclarative-opensource-src/5.9
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
+Obsoletes: qt5-qtdeclarative-render2d < 5.7.1-10
 
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
@@ -73,6 +74,7 @@ BuildRequires: xorg-x11-server-Xvfb
 %package devel
 Summary: Development files for %{name}
 Obsoletes: qt5-qtjsbackend-devel < 5.2.0
+Obsoletes: qt5-qtdeclarative-render2d-devel < 5.7.1-10
 Provides:  %{name}-private-devel = %{version}-%{release}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: qt5-qtbase-devel%{?_isa}
@@ -230,6 +232,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Tue Oct 31 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-3
+- Obsoletes: qt5-qtdeclarative-render2d
+
 * Thu Oct 26 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-2
 - revert commit causing regresions (QTBUG-64017)
 
