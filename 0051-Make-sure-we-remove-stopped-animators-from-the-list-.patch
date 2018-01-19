@@ -1,0 +1,31 @@
+From 6990ae6c1bad32952e371fa72bee65a7af11c313 Mon Sep 17 00:00:00 2001
+From: Gunnar Sletta <gunnar@crimson.no>
+Date: Mon, 23 Oct 2017 15:03:05 +0200
+Subject: [PATCH 051/140] Make sure we remove stopped animators from the list
+ of roots
+
+Change-Id: I89b36ee7d03ac6b8d07b24c656d3311728e8f9c3
+Reviewed-by: J-P Nurmi <jpnurmi@qt.io>
+---
+ src/quick/util/qquickanimatorcontroller.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/quick/util/qquickanimatorcontroller.cpp b/src/quick/util/qquickanimatorcontroller.cpp
+index 3f7347c01..5cf805192 100644
+--- a/src/quick/util/qquickanimatorcontroller.cpp
++++ b/src/quick/util/qquickanimatorcontroller.cpp
+@@ -123,8 +123,10 @@ static void qquickanimator_sync_before_start(QAbstractAnimationJob *job)
+ 
+ void QQuickAnimatorController::beforeNodeSync()
+ {
+-    for (const QSharedPointer<QAbstractAnimationJob> &toStop : qAsConst(m_rootsPendingStop))
++    for (const QSharedPointer<QAbstractAnimationJob> &toStop : qAsConst(m_rootsPendingStop)) {
+         toStop->stop();
++        m_animationRoots.remove(toStop.data());
++    }
+     m_rootsPendingStop.clear();
+ 
+ 
+-- 
+2.14.3
+
