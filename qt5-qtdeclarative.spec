@@ -14,7 +14,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.9.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -35,6 +35,8 @@ Patch1: qtdeclarative-opensource-src-5.9.0-no_sse2.patch
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
 ## upstream patches
+Patch51: 0051-Make-sure-we-remove-stopped-animators-from-the-list-.patch
+
 # regression https://bugreports.qt.io/browse/QTBUG-64017
 # so revert this offending commit (for now)
 Patch111: 0111-Fix-qml-cache-invalidation-when-changing-dependent-C.patch
@@ -99,6 +101,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 
+%patch51 -p1 -b .0051
 %patch111 -p1 -R -b .0111
 
 %patch201 -p0 -b .kdebug346118
@@ -230,6 +233,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Fri Jan 19 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-3
+- branch backport: Stopped animators are not removed (#1536606,kde#388759)
+
 * Thu Oct 26 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-2
 - revert commit causing regresions (QTBUG-64017)
 
