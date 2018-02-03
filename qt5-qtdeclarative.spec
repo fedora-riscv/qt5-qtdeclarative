@@ -13,8 +13,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.9.2
-Release: 3%{?dist}
+Version: 5.9.4
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -35,8 +35,6 @@ Patch1: qtdeclarative-opensource-src-5.9.0-no_sse2.patch
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
 ## upstream patches
-Patch51: 0051-Make-sure-we-remove-stopped-animators-from-the-list-.patch
-
 # regression https://bugreports.qt.io/browse/QTBUG-64017
 # so revert this offending commit (for now)
 Patch111: 0111-Fix-qml-cache-invalidation-when-changing-dependent-C.patch
@@ -55,6 +53,7 @@ Patch202: http://sources.debian.net/data/main/q/qtdeclarative-opensource-src/5.9
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
 
 Obsoletes: qt5-qtjsbackend < 5.2.0
+Obsoletes: qt5-qtdeclarative-render2d < 5.7.1-10
 
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
@@ -76,6 +75,7 @@ BuildRequires: xorg-x11-server-Xvfb
 %package devel
 Summary: Development files for %{name}
 Obsoletes: qt5-qtjsbackend-devel < 5.2.0
+Obsoletes: qt5-qtdeclarative-render2d-devel < 5.7.1-10
 Provides:  %{name}-private-devel = %{version}-%{release}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: qt5-qtbase-devel%{?_isa}
@@ -102,7 +102,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 
-%patch51 -p1 -b .0051
 %patch111 -p1 -R -b .0111
 
 %patch201 -p0 -b .kdebug346118
@@ -234,8 +233,14 @@ make check -k -C tests ||:
 
 
 %changelog
-* Fri Jan 19 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-3
-- branch backport: Stopped animators are not removed (#1536606,kde#388759)
+* Wed Jan 24 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-1
+- 5.9.4
+
+* Thu Nov 23 2017 Jan Grulich <jgrulich@redhat.com> - 5.9.3-1
+- 5.9.3
+
+* Tue Oct 31 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-3
+- Obsoletes: qt5-qtdeclarative-render2d
 
 * Thu Oct 26 2017 Rex Dieter <rdieter@fedoraproject.org> - 5.9.2-2
 - revert commit causing regresions (QTBUG-64017)
