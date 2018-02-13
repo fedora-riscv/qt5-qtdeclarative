@@ -13,8 +13,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.10.0
-Release: 2%{?dist}
+Version: 5.10.1
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -232,6 +232,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Tue Feb 13 2018 Jan Grulich <jgrulich@redhat.com> - 5.10.1-1
+- 5.10.1
+
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 5.10.0-2
 - Escape macros in %%changelog
 
