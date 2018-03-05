@@ -14,7 +14,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.10.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -54,6 +54,7 @@ Patch202: http://sources.debian.net/data/main/q/qtdeclarative-opensource-src/5.9
 Obsoletes: qt5-qtjsbackend < 5.2.0
 Obsoletes: qt5-qtdeclarative-render2d < 5.7.1-10
 
+BuildRequires: gcc-c++
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
@@ -66,7 +67,6 @@ BuildRequires: mesa-dri-drivers
 BuildRequires: time
 BuildRequires: xorg-x11-server-Xvfb
 %endif
-
 
 %description
 %{summary}.
@@ -114,18 +114,18 @@ mkdir -p %{_target_platform}-no_sse2
 pushd    %{_target_platform}-no_sse2
 %{qmake_qt5} -config no_sse2 ..
 make sub-src-clean
-make %{?_smp_mflags} -C src/qml
+%make_build -C src/qml
 popd
 %endif
 
 # no shadow builds until fixed: https://bugreports.qt.io/browse/QTBUG-37417
-%{qmake_qt5}
+%qmake_qt5
 
-make %{?_smp_mflags}
+%make_build
 
 
 %install
-make install INSTALL_ROOT=%{buildroot}
+%make_install INSTALL_ROOT=%{buildroot}
 
 %if 0%{?nosse2_hack}
 mkdir -p %{buildroot}%{_qt5_libdir}/sse2
@@ -187,8 +187,7 @@ make check -k -C tests ||:
 %endif
 
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
 %files
 %license LICENSE.LGPL*
@@ -232,6 +231,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Mon Mar 05 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-2
+- BR: gcc-c++, use %%make_build %%make_install %%ldconfig_scriptlets
+
 * Tue Feb 13 2018 Jan Grulich <jgrulich@redhat.com> - 5.10.1-1
 - 5.10.1
 
