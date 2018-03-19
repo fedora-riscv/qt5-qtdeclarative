@@ -14,7 +14,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.10.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -60,7 +60,7 @@ BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 BuildRequires: qt5-qtxmlpatterns-devel >= %{version}
-BuildRequires: python
+BuildRequires: python2
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -232,6 +232,10 @@ make check -k -C tests ||:
 
 
 %changelog
+* Sun Mar 18 2018 Iryna Shcherbina <ishcherb@redhat.com> - 5.10.1-4
+- Update Python 2 dependency declarations to new packaging standards
+  (See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3)
+
 * Thu Mar 08 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-3
 - BR: qt5-rpm-macros
 
