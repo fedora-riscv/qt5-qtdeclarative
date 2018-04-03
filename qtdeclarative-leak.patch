@@ -1,0 +1,22 @@
+diff -up qtdeclarative-everywhere-src-5.10.1/src/quick/scenegraph/qsgrenderloop.cpp.leak qtdeclarative-everywhere-src-5.10.1/src/quick/scenegraph/qsgrenderloop.cpp
+--- qtdeclarative-everywhere-src-5.10.1/src/quick/scenegraph/qsgrenderloop.cpp.leak	2018-04-03 11:14:09.975064043 -0500
++++ qtdeclarative-everywhere-src-5.10.1/src/quick/scenegraph/qsgrenderloop.cpp	2018-04-03 11:15:29.347573091 -0500
+@@ -305,6 +305,8 @@ void QSGGuiThreadRenderLoop::hide(QQuick
+ {
+     QQuickWindowPrivate *cd = QQuickWindowPrivate::get(window);
+     cd->fireAboutToStop();
++    if (m_windows.contains(window))
++        m_windows[window].updatePending = false;
+ }
+ 
+ void QSGGuiThreadRenderLoop::windowDestroyed(QQuickWindow *window)
+@@ -494,7 +496,8 @@ QImage QSGGuiThreadRenderLoop::grab(QQui
+ 
+ void QSGGuiThreadRenderLoop::maybeUpdate(QQuickWindow *window)
+ {
+-    if (!m_windows.contains(window))
++     QQuickWindowPrivate *cd = QQuickWindowPrivate::get(window);
++     if (!cd->isRenderable() || !m_windows.contains(window))
+         return;
+ 
+     m_windows[window].updatePending = true;
