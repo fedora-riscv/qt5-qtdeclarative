@@ -14,7 +14,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.10.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -35,6 +35,9 @@ Patch1: qtdeclarative-opensource-src-5.9.0-no_sse2.patch
 Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
 
 ## upstream patches
+# https://codereview.qt-project.org/#/c/224684/
+Patch100: qtdeclarative-leak.patch
+
 # regression https://bugreports.qt.io/browse/QTBUG-64017
 # so revert this offending commit (for now)
 Patch111: 0111-Fix-qml-cache-invalidation-when-changing-dependent-C.patch
@@ -102,7 +105,10 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %endif
 %patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 
+%patch100 -p1 -b .memleak
+
 %patch111 -p1 -R -b .0111
+
 
 %patch201 -p0 -b .kdebug346118
 %patch202 -p1 -b .no_sse2_non_fatal
@@ -232,6 +238,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Tue Apr 03 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-5
+- pull in candidate memleak fix (review#224684)
+
 * Sun Mar 18 2018 Iryna Shcherbina <ishcherb@redhat.com> - 5.10.1-4
 - Update Python 2 dependency declarations to new packaging standards
   (See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3)
