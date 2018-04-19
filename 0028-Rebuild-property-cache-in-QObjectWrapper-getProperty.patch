@@ -1,0 +1,41 @@
+From 73e8321255d9f0e70529a58c10dbaf4790a9a659 Mon Sep 17 00:00:00 2001
+From: David Edmundson <davidedmundson@kde.org>
+Date: Tue, 6 Mar 2018 10:56:23 +0000
+Subject: [PATCH 28/29] Rebuild property cache in QObjectWrapper::getProperty
+ if deleted
+
+QQmlData is shared between engines, but the relevant QObjectWrapper is
+not.
+
+Since 749a7212e903d8e8c6f256edb1836b9449cc7fe1 when a QObjectWrapper is
+deleted it resets the shared QQmlData propertyCache.
+
+ab5d4c78224c9ec79165e8890e5f8b8e838e0709 fixed this situation for
+bindings, however we would still hit effectively the same crash in the
+same situation if a function is evaluated before a binding.
+
+Change-Id: I20cd91cd8e31fd0176d542822c67e81a790599ba
+Reviewed-by: Simon Hausmann <simon.hausmann@qt.io>
+---
+ src/qml/jsruntime/qv4qobjectwrapper.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/qml/jsruntime/qv4qobjectwrapper.cpp b/src/qml/jsruntime/qv4qobjectwrapper.cpp
+index 5ebd385cf..c1bbe2a33 100644
+--- a/src/qml/jsruntime/qv4qobjectwrapper.cpp
++++ b/src/qml/jsruntime/qv4qobjectwrapper.cpp
+@@ -335,6 +335,11 @@ ReturnedValue QObjectWrapper::getProperty(ExecutionEngine *engine, QObject *obje
+     if (!ddata)
+         return QV4::Encode::undefined();
+ 
++    if (Q_UNLIKELY(!ddata->propertyCache)) {
++        ddata->propertyCache = QQmlEnginePrivate::get(engine)->cache(object->metaObject());
++        ddata->propertyCache->addref();
++    }
++
+     QQmlPropertyCache *cache = ddata->propertyCache;
+     Q_ASSERT(cache);
+     QQmlPropertyData *property = cache->property(propertyIndex);
+-- 
+2.14.3
+
