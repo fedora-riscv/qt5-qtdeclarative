@@ -42,12 +42,8 @@ Patch100: qtdeclarative-leak.patch
 # so revert this offending commit (for now)
 Patch111: 0111-Fix-qml-cache-invalidation-when-changing-dependent-C.patch
 
-# post v5.9.4 fix (5.9 branch)
-Patch114: 0014-Fix-crash-when-accessing-a-deleted-object.patch
-
 # 5.11 branch fixes
 Patch128: 0028-Rebuild-property-cache-in-QObjectWrapper-getProperty.patch
-Patch129: 0029-Fix-calling-Qt.binding-on-bound-functions.patch
 
 
 ## upstreamable patches
@@ -116,9 +112,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %patch111 -p1 -R -b .0111
 
-%patch114 -p1 -b .0014
 %patch128 -p1 -b .0028
-%patch129 -p1 -b .0029
 
 %patch201 -p0 -b .kdebug346118
 %patch202 -p1 -b .no_sse2_non_fatal
@@ -131,14 +125,14 @@ mkdir -p %{_target_platform}-no_sse2
 pushd    %{_target_platform}-no_sse2
 %{qmake_qt5} -config no_sse2 ..
 make sub-src-clean
-make %{?_smp_mflags} -C src/qml
+%make_build -C src/qml
 popd
 %endif
 
 # no shadow builds until fixed: https://bugreports.qt.io/browse/QTBUG-37417
 %{qmake_qt5}
 
-make %{?_smp_mflags}
+%make_build
 
 
 %install
