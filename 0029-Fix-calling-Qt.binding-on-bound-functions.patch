@@ -1,0 +1,46 @@
+From 4909773f8162de49830d65e886747c11fff72934 Mon Sep 17 00:00:00 2001
+From: Lars Knoll <lars.knoll@qt.io>
+Date: Tue, 20 Mar 2018 12:46:58 +0100
+Subject: [PATCH 29/29] Fix calling Qt.binding() on bound functions
+
+Calling Qt.binding() on a bound function object is a valid use
+case and used to work until Qt 5.8.
+
+The problem was that we optimized the code in QQmlBinding and
+QQmlJavascriptExpression to directly work on a QV4::Function,
+so this wouldn't work anymore.
+
+To fix this make sure recursive calls to Function.bind() are
+unrolled (so that the BoundFunction's target is never a bound
+function itself), then add the bound function as an optional
+member to the QQmlBinding and use it's bound arguments if
+present.
+
+Task-number: QTBUG-61927
+Change-Id: I472214ddd82fc2a1212efd9b769861fc43d2ddaf
+Reviewed-by: Simon Hausmann <simon.hausmann@qt.io>
+---
+ src/qml/jsruntime/qv4qobjectwrapper.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/qml/jsruntime/qv4qobjectwrapper.cpp b/src/qml/jsruntime/qv4qobjectwrapper.cpp
+index c1bbe2a33..816c259b9 100644
+--- a/src/qml/jsruntime/qv4qobjectwrapper.cpp
++++ b/src/qml/jsruntime/qv4qobjectwrapper.cpp
+@@ -460,9 +460,12 @@ void QObjectWrapper::setProperty(ExecutionEngine *engine, QObject *object, QQmlP
+ 
+             QV4::Scoped<QQmlBindingFunction> bindingFunction(scope, (const Value &)f);
+ 
++            QV4::ScopedFunctionObject f(scope, bindingFunction->bindingFunction());
+             QV4::ScopedContext ctx(scope, bindingFunction->scope());
+-            newBinding = QQmlBinding::create(property, bindingFunction->function(), object, callingQmlContext, ctx);
++            newBinding = QQmlBinding::create(property, f->function(), object, callingQmlContext, ctx);
+             newBinding->setSourceLocation(bindingFunction->currentLocation());
++            if (f->isBoundFunction())
++                newBinding->setBoundFunction(static_cast<QV4::BoundFunction *>(f.getPointer()));
+             newBinding->setTarget(object, *property, nullptr);
+         }
+     }
+-- 
+2.14.3
+
