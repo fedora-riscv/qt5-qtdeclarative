@@ -13,8 +13,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.9.4
-Release: 3%{?dist}
+Version: 5.9.6
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -110,7 +110,8 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %patch100 -p1 -b .memleak
 
-%patch111 -p1 -R -b .0111
+## try 5.9.6 without reversing this patch and see -- rex
+#patch111 -p1 -R -b .0111
 
 %patch128 -p1 -b .0028
 
@@ -243,6 +244,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Mon Jun 11 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.6-1
+- 5.9.6
+
 * Thu Apr 19 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.9.4-3
 - backport qv4qobjectwrapper fixes
 
