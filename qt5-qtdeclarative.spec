@@ -1,10 +1,12 @@
 %global qt_module qtdeclarative
 
+%if 0%{?fedora} < 29
 %ifarch %{ix86}
 %global nosse2_hack 1
 ## TODO:
 # * consider debian's approach of runtime detection instead,
 #   w hen/if their patch is rebased for 5.11.x
+%endif
 %endif
 
 # definition borrowed from qtbase
@@ -13,7 +15,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.11.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -219,6 +221,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Mon Jun 18 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-2
+- %%ix86: nosse2_hack on < f29 only
+
 * Wed May 23 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-1
 - 5.11.0
 - i686: use nosse2_hack again
