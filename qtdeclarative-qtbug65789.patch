@@ -1,0 +1,45 @@
+From 602a6589a1c8d52a3a1d9075528bc16d6e527818 Mon Sep 17 00:00:00 2001
+From: Andy Shaw <andy.shaw@qt.io>
+Date: Tue, 20 Feb 2018 06:36:59 +0100
+Subject: [PATCH] Image: respect aspect ratio of an SVG when width or height is
+ zero
+
+This amends f42f1366dcd4b070c69c9e7fe42a704ef23da14d
+
+Task-number: QTBUG-65789
+Change-Id: I1db05259f0aeb3310bbaf5ea03be52cbd243d115
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+---
+ src/quick/util/qquickimageprovider.cpp           | 2 +-
+ tests/auto/quick/qquickimage/tst_qquickimage.cpp | 5 +++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/quick/util/qquickimageprovider.cpp b/src/quick/util/qquickimageprovider.cpp
+index a1513336a5..4003b88d09 100644
+--- a/src/quick/util/qquickimageprovider.cpp
++++ b/src/quick/util/qquickimageprovider.cpp
+@@ -684,7 +684,7 @@ QSize QQuickImageProviderWithOptions::loadSize(const QSize &originalSize, const
+ 
+     const bool preserveAspectCropOrFit = options.preserveAspectRatioCrop() || options.preserveAspectRatioFit();
+ 
+-    if (!preserveAspectCropOrFit && (format == "svg" || format == "svgz"))
++    if (!preserveAspectCropOrFit && (format == "svg" || format == "svgz") && !requestedSize.isEmpty())
+         return requestedSize;
+ 
+     qreal ratio = 0.0;
+diff --git a/tests/auto/quick/qquickimage/tst_qquickimage.cpp b/tests/auto/quick/qquickimage/tst_qquickimage.cpp
+index 783e4aab4c..ec0ec6c2b6 100644
+--- a/tests/auto/quick/qquickimage/tst_qquickimage.cpp
++++ b/tests/auto/quick/qquickimage/tst_qquickimage.cpp
+@@ -418,6 +418,11 @@ void tst_qquickimage::svg()
+ 
+     QCOMPARE(obj->width(), 200.0);
+     QCOMPARE(obj->height(), 200.0);
++    obj->setSourceSize(QSize(100,0));
++    QCOMPARE(obj->width(), 100.0);
++    // Due to aspect ratio calculations we can't get a precise
++    // check for all setups, so we allow a small margin of error
++    QVERIFY(qAbs(obj->height() - 141) < 1);
+     delete obj;
+ }
+ 
