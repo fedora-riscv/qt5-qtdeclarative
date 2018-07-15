@@ -15,7 +15,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.11.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -52,7 +52,9 @@ BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 BuildRequires: qt5-qtxmlpatterns-devel >= %{version}
-BuildRequires: python2
+# recommended workaround from:
+# https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
+BuildRequires: /usr/bin/python
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -221,6 +223,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Sun Jul 15 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.1-3
+- BR: /usr/bin/python
+
 * Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.11.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
