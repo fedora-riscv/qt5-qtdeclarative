@@ -247,7 +247,7 @@ make check -k -C tests ||:
 
 %changelog
 * Sat Jun 30 2018 Robert-André Mauchin <zebob.m@gmail.com> - 5.10.1-6
-- (f28 branch) Add patches to backport fixes of QTBUG-65789 and QTBUG-67019 needed by GCompris-qt
+- Add patches to backport fixes of QTBUG-65789 and QTBUG-67019 needed by GCompris-qt
 
 * Tue Apr 03 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-5
 - pull in candidate memleak fix (review#224684)
