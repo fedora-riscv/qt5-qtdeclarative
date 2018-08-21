@@ -14,7 +14,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.10.1
-Release: 6%{?dist}
+Release: 5%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -50,12 +50,6 @@ Patch201: qtdeclarative-kdebug346118.patch
 # https://codereview.qt-project.org/#/c/127354/
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=792594
 Patch202: http://sources.debian.net/data/main/q/qtdeclarative-opensource-src/5.9.0~beta3-2/debian/patches/Do-not-make-lack-of-SSE2-support-on-x86-32-fatal.patch
-
-# https://bugreports.qt.io/browse/QTBUG-65789
-Patch203: https://github.com/qt/qtdeclarative/commit/602a6589.patch#/qtdeclarative-qtbug65789.patch
-# https://bugreports.qt.io/browse/QTBUG-67019
-# https://github.com/qt/qtdeclarative/commit/b1243b8c.patch without binary data
-Patch204: qtdeclarative-qtbug67019.patch
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -119,8 +113,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %patch201 -p0 -b .kdebug346118
 %patch202 -p1 -b .no_sse2_non_fatal
 
-%patch203 -p1 -b .qtbug65789
-%patch204 -p1 -b .qtbug67019
 
 %build
 %if 0%{?nosse2_hack}
@@ -246,9 +238,6 @@ make check -k -C tests ||:
 
 
 %changelog
-* Sat Jun 30 2018 Robert-André Mauchin <zebob.m@gmail.com> - 5.10.1-6
-- Add patches to backport fixes of QTBUG-65789 and QTBUG-67019 needed by GCompris-qt
-
 * Tue Apr 03 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-5
 - pull in candidate memleak fix (review#224684)
 
