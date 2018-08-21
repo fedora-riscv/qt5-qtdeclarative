@@ -1,11 +1,12 @@
 %global qt_module qtdeclarative
 
-%if 0
-#ifarch %{ix86}
+%if 0%{?fedora} < 29
+%ifarch %{ix86}
 %global nosse2_hack 1
 ## TODO:
-# * consider debian's approach of runtime detection instead:
-#   https://codereview.qt-project.org/#/c/127354/
+# * consider debian's approach of runtime detection instead,
+#   w hen/if their patch is rebased for 5.11.x
+%endif
 %endif
 
 # definition borrowed from qtbase
@@ -13,13 +14,14 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.10.1
-Release: 5%{?dist}
+Version: 5.11.1
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
-Source0: https://download.qt.io/official_releases/qt/5.10/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+%global majmin %(echo %{version} | cut -d. -f1-2)
+Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1441343
@@ -27,29 +29,16 @@ Source5: qv4global_p-multilib.h
 
 # support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
 # https://codereview.qt-project.org/#change,73710
-Patch1: qtdeclarative-opensource-src-5.9.0-no_sse2.patch
-
-# workaround for possible deadlock condition in QQuickShaderEffectSource
-# https://bugzilla.redhat.com/show_bug.cgi?id=1237269
-# https://bugs.kde.org/show_bug.cgi?id=348385
-Patch2: qtdeclarative-QQuickShaderEffectSource_deadlock.patch
+# inspired by https://build.opensuse.org/package/view_file/KDE:Unstable:Qt/libqt5-qtdeclarative/sse2_nojit.patch
+Patch1: qtdeclarative-opensource-src-5.11.0-no_sse2.patch
 
 ## upstream patches
-# https://codereview.qt-project.org/#/c/224684/
-Patch100: qtdeclarative-leak.patch
-
-# regression https://bugreports.qt.io/browse/QTBUG-64017
-# so revert this offending commit (for now)
-Patch111: 0111-Fix-qml-cache-invalidation-when-changing-dependent-C.patch
 
 ## upstreamable patches
-# use system double-conversation
-# https://bugs.kde.org/show_bug.cgi?id=346118#c108
-Patch201: qtdeclarative-kdebug346118.patch
 
 # https://codereview.qt-project.org/#/c/127354/
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=792594
-Patch202: http://sources.debian.net/data/main/q/qtdeclarative-opensource-src/5.9.0~beta3-2/debian/patches/Do-not-make-lack-of-SSE2-support-on-x86-32-fatal.patch
+#Patch202: https://sources.debian.org/data/main/q/qtdeclarative-opensource-src/5.10.1-4/debian/patches/Do-not-make-lack-of-SSE2-support-on-x86-32-fatal.patch
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -63,7 +52,9 @@ BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 BuildRequires: qt5-qtxmlpatterns-devel >= %{version}
-BuildRequires: python2
+# recommended workaround from:
+# https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
+BuildRequires: /usr/bin/python
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -103,15 +94,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %if 0%{?nosse2_hack}
 %patch1 -p1 -b .no_sse2
 %endif
-%patch2 -p1 -b .QQuickShaderEffectSource_deadlock
 
-%patch100 -p1 -b .memleak
-
-%patch111 -p1 -R -b .0111
-
-
-%patch201 -p0 -b .kdebug346118
-%patch202 -p1 -b .no_sse2_non_fatal
+## FIXME/REBASE
+#patch202 -p1 -b .no_sse2_non_fatal
 
 
 %build
@@ -238,6 +223,22 @@ make check -k -C tests ||:
 
 
 %changelog
+* Sun Jul 15 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.1-3
+- BR: /usr/bin/python
+
+* Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.11.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Tue Jun 19 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.1-1
+- 5.11.1
+
+* Mon Jun 18 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-2
+- %%ix86: nosse2_hack on < f29 only
+
+* Wed May 23 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.11.0-1
+- 5.11.0
+- i686: use nosse2_hack again
+
 * Tue Apr 03 2018 Rex Dieter <rdieter@fedoraproject.org> - 5.10.1-5
 - pull in candidate memleak fix (review#224684)
 
