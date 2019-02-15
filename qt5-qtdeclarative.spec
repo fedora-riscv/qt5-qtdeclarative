@@ -1,21 +1,14 @@
 %global qt_module qtdeclarative
 
-%if 0%{?fedora} < 29
-%ifarch %{ix86}
-%global nosse2_hack 1
-## TODO:
-# * consider debian's approach of runtime detection instead,
-#   w hen/if their patch is rebased for 5.11.x
-%endif
-%endif
-
 # definition borrowed from qtbase
 %global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 
+%global bootstrap 1
+
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.11.3
-Release: 2%{?dist}
+Version: 5.12.1
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -27,18 +20,9 @@ Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submod
 # https://bugzilla.redhat.com/show_bug.cgi?id=1441343
 Source5: qv4global_p-multilib.h
 
-# support no_sse2 CONFIG (fedora i686 builds cannot assume -march=pentium4 -msse2 -mfpmath=sse flags, or the JIT that needs them)
-# https://codereview.qt-project.org/#change,73710
-# inspired by https://build.opensuse.org/package/view_file/KDE:Unstable:Qt/libqt5-qtdeclarative/sse2_nojit.patch
-Patch1: qtdeclarative-opensource-src-5.11.0-no_sse2.patch
-
 ## upstream patches
 
 ## upstreamable patches
-
-# https://codereview.qt-project.org/#/c/127354/
-# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=792594
-#Patch202: https://sources.debian.org/data/main/q/qtdeclarative-opensource-src/5.10.1-4/debian/patches/Do-not-make-lack-of-SSE2-support-on-x86-32-fatal.patch
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -51,10 +35,16 @@ BuildRequires: qt5-rpm-macros >= %{version}
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
-BuildRequires: qt5-qtxmlpatterns-devel >= %{version}
 # recommended workaround from:
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
+# TODO: fixme to explicitly use python2 instead -- rex
 BuildRequires: /usr/bin/python
+
+%if 0%{?bootstrap}
+Obsoletes: %{name}-examples < %{version}-%{release}
+%else
+%global no_examples CONFIG-=compile_examples
+%endif
 
 %if 0%{?tests}
 BuildRequires: dbus-x11
@@ -90,26 +80,10 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %prep
-%setup -q -n %{qt_module}-everywhere-src-%{version}
-%if 0%{?nosse2_hack}
-%patch1 -p1 -b .no_sse2
-%endif
-
-## FIXME/REBASE
-#patch202 -p1 -b .no_sse2_non_fatal
+%autosetup -n %{qt_module}-everywhere-src-%{version}
 
 
 %build
-%if 0%{?nosse2_hack}
-# build libQt5Qml with no_sse2
-mkdir -p %{_target_platform}-no_sse2
-pushd    %{_target_platform}-no_sse2
-%{qmake_qt5} -config no_sse2 ..
-make sub-src-clean
-%make_build -C src/qml
-popd
-%endif
-
 # no shadow builds until fixed: https://bugreports.qt.io/browse/QTBUG-37417
 %qmake_qt5
 
@@ -118,12 +92,6 @@ popd
 
 %install
 %make_install INSTALL_ROOT=%{buildroot}
-
-%if 0%{?nosse2_hack}
-mkdir -p %{buildroot}%{_qt5_libdir}/sse2
-mv %{buildroot}%{_qt5_libdir}/libQt5Qml.so.5* %{buildroot}%{_qt5_libdir}/sse2/
-make install INSTALL_ROOT=%{buildroot} -C %{_target_platform}-no_sse2/src/qml
-%endif
 
 %ifarch %{multilib_archs}
 # multilib: qv4global_p.h
@@ -184,12 +152,10 @@ make check -k -C tests ||:
 %files
 %license LICENSE.LGPL*
 %{_qt5_libdir}/libQt5Qml.so.5*
-%if 0%{?nosse2_hack}
-%{_qt5_libdir}/sse2/libQt5Qml.so.5*
-%endif
 %{_qt5_libdir}/libQt5Quick.so.5*
 %{_qt5_libdir}/libQt5QuickWidgets.so.5*
 %{_qt5_libdir}/libQt5QuickParticles.so.5*
+%{_qt5_libdir}/libQt5QuickShapes.so.5*
 %{_qt5_libdir}/libQt5QuickTest.so.5*
 %{_qt5_plugindir}/qmltooling/
 %{_qt5_archdatadir}/qml/
@@ -218,11 +184,18 @@ make check -k -C tests ||:
 %{_qt5_libdir}/libQt5QmlDebug.a
 %{_qt5_libdir}/libQt5QmlDebug.prl
 
+%if ! 0%{?no_examples:1}
 %files examples
 %{_qt5_examplesdir}/
+%endif
 
 
 %changelog
+* Mon Feb 04 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-1
+- 5.12.1
+- drop remants of sse2 hack support
+- add bootstrap support (examples)
+
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 5.11.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
