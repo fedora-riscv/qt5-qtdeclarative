@@ -3,12 +3,12 @@
 # definition borrowed from qtbase
 %global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 
-%global bootstrap 1
+#global bootstrap 1
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.12.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -191,6 +191,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Fri Mar 15 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-2
+- de-bootstrap
+
 * Mon Feb 04 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.1-1
 - 5.12.1
 - drop remants of sse2 hack support
