@@ -42,7 +42,6 @@ BuildRequires: /usr/bin/python
 
 %if 0%{?bootstrap}
 Obsoletes: %{name}-examples < %{version}-%{release}
-%else
 %global no_examples CONFIG-=compile_examples
 %endif
 
