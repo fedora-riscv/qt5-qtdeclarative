@@ -7,7 +7,7 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.12.3
+Version: 5.12.4
 Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
@@ -190,6 +190,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Fri Jun 14 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.4-1
+- 5.12.4
+
 * Tue Jun 04 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.3-1
 - 5.12.3
 
