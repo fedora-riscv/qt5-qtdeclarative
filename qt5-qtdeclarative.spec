@@ -8,7 +8,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.12.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -35,10 +35,7 @@ BuildRequires: qt5-rpm-macros >= %{version}
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
-# recommended workaround from:
-# https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
-# TODO: fixme to explicitly use python2 instead -- rex
-BuildRequires: /usr/bin/python
+BuildRequires: python%{python3_pkgversion}
 
 %if 0%{?bootstrap}
 Obsoletes: %{name}-examples < %{version}-%{release}
@@ -83,7 +80,11 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %build
-# no shadow builds until fixed: https://bugreports.qt.io/browse/QTBUG-37417
+
+# HACK so calls to "python" get what we want
+ln -s %{__python3} python
+export PATH=`pwd`:$PATH
+
 %qmake_qt5
 
 %make_build
@@ -190,6 +191,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Tue Jul 16 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.4-2
+- build with python3
+
 * Fri Jun 14 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.4-1
 - 5.12.4
 
