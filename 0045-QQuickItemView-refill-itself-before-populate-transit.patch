@@ -1,0 +1,162 @@
+From f806d64249c6e961ab12270d3a045e9980e19cf4 Mon Sep 17 00:00:00 2001
+From: Wang Chuan <ouchuanm@outlook.com>
+Date: Thu, 11 Jul 2019 10:24:38 +0800
+Subject: [PATCH 45/56] QQuickItemView: refill itself before populate
+ transition
+
+The view uses a visible items list, which is maintained by the refill()
+method, to determine which items should be triggered to do the populate
+transition.  The refill() was only invoked when component completed
+before doing the populate transition; but if the size of the view
+depends on the size of window (for example, using anchors.fill), more
+delegates could become visible after component completed. In such a
+case, part of visible items were not be triggered to do the transition.
+
+[ChangeLog][QtQuick][Item Views] Item views such as ListView now properly
+populate delegates with a populate transition when the view is resized
+after componentComplete.
+
+Fixes: QTBUG-76487
+Change-Id: Id90c3f73d9911c8a1d6d8b1ea0c51f6c27d0ed5b
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+---
+ src/quick/items/qquickitemview.cpp            |  3 +
+ .../data/resizeAfterComponentComplete.qml     | 77 +++++++++++++++++++
+ .../qquicklistview/tst_qquicklistview.cpp     | 16 ++++
+ 3 files changed, 96 insertions(+)
+ create mode 100644 tests/auto/quick/qquicklistview/data/resizeAfterComponentComplete.qml
+
+diff --git a/src/quick/items/qquickitemview.cpp b/src/quick/items/qquickitemview.cpp
+index d0715cdb7..21d644dad 100644
+--- a/src/quick/items/qquickitemview.cpp
++++ b/src/quick/items/qquickitemview.cpp
+@@ -1845,6 +1845,9 @@ void QQuickItemViewPrivate::layout()
+     forceLayout = false;
+ 
+     if (transitioner && transitioner->canTransition(QQuickItemViewTransitioner::PopulateTransition, true)) {
++        // Give the view one more chance to refill itself,
++        // in case its size is changed such that more delegates become visible after component completed
++        refill();
+         for (FxViewItem *item : qAsConst(visibleItems)) {
+             if (!item->transitionScheduledOrRunning())
+                 item->transitionNextReposition(transitioner, QQuickItemViewTransitioner::PopulateTransition, true);
+diff --git a/tests/auto/quick/qquicklistview/data/resizeAfterComponentComplete.qml b/tests/auto/quick/qquicklistview/data/resizeAfterComponentComplete.qml
+new file mode 100644
+index 000000000..851d8f9a0
+--- /dev/null
++++ b/tests/auto/quick/qquicklistview/data/resizeAfterComponentComplete.qml
+@@ -0,0 +1,77 @@
++/****************************************************************************
++**
++** Copyright (C) 2019 The Qt Company Ltd.
++** Contact: https://www.qt.io/licensing/
++**
++** This file is part of the test suite of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:BSD$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see https://www.qt.io/terms-conditions. For further
++** information use the contact form at https://www.qt.io/contact-us.
++**
++** BSD License Usage
++** Alternatively, you may use this file under the terms of the BSD license
++** as follows:
++**
++** "Redistribution and use in source and binary forms, with or without
++** modification, are permitted provided that the following conditions are
++** met:
++**   * Redistributions of source code must retain the above copyright
++**     notice, this list of conditions and the following disclaimer.
++**   * Redistributions in binary form must reproduce the above copyright
++**     notice, this list of conditions and the following disclaimer in
++**     the documentation and/or other materials provided with the
++**     distribution.
++**   * Neither the name of The Qt Company Ltd nor the names of its
++**     contributors may be used to endorse or promote products derived
++**     from this software without specific prior written permission.
++**
++**
++** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++import QtQuick 2.12
++
++ListView {
++    id: listView
++    property var lastItem
++    anchors.fill: parent
++    model: 10
++    delegate: Rectangle {
++        width: parent.width
++        height: 40
++        border.color: "lightsteelblue"
++        Text {
++            text: "Item" + (index + 1)
++        }
++        Component.onCompleted: {
++            if (index == 9)
++                listView.lastItem = this
++        }
++    }
++
++    populate: Transition {
++        NumberAnimation {
++            properties: "x,y"
++            duration: 1000
++        }
++    }
++}
+diff --git a/tests/auto/quick/qquicklistview/tst_qquicklistview.cpp b/tests/auto/quick/qquicklistview/tst_qquicklistview.cpp
+index cfd740f33..d956d8929 100644
+--- a/tests/auto/quick/qquicklistview/tst_qquicklistview.cpp
++++ b/tests/auto/quick/qquicklistview/tst_qquicklistview.cpp
+@@ -276,6 +276,7 @@ private slots:
+     void addOnCompleted();
+     void setPositionOnLayout();
+     void touchCancel();
++    void resizeAfterComponentComplete();
+ 
+ private:
+     template <class T> void items(const QUrl &source);
+@@ -8994,6 +8995,21 @@ void tst_QQuickListView::touchCancel() // QTBUG-74679
+     QTRY_COMPARE(listview->contentY(), 500.0);
+ }
+ 
++void tst_QQuickListView::resizeAfterComponentComplete()  // QTBUG-76487
++{
++    QScopedPointer<QQuickView> window(createView());
++    window->setSource(testFileUrl("resizeAfterComponentComplete.qml"));
++    window->resize(640, 480);
++    window->show();
++    QVERIFY(QTest::qWaitForWindowExposed(window.data()));
++
++    QObject *listView = window->rootObject();
++    QVERIFY(listView);
++
++    QObject *lastItem = qvariant_cast<QObject *>(listView->property("lastItem"));
++    QTRY_COMPARE(lastItem->property("y").toInt(), 9 * lastItem->property("height").toInt());
++}
++
+ QTEST_MAIN(tst_QQuickListView)
+ 
+ #include "tst_qquicklistview.moc"
+-- 
+2.21.0
+

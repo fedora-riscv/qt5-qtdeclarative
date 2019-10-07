@@ -8,7 +8,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.12.5
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -23,6 +23,9 @@ Source5: qv4global_p-multilib.h
 ## upstream patches
 
 ## upstreamable patches
+# revert upstream commit that seemingly causes regressions with plasma-5.15.x notifcations applet
+# https://bugzilla.redhat.com/1758263
+Patch145: 0045-QQuickItemView-refill-itself-before-populate-transit.patch
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -76,7 +79,9 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %prep
-%autosetup -n %{qt_module}-everywhere-src-%{version}
+%setup -q -n %{qt_module}-everywhere-src-%{version}
+
+%patch145 -p1 -R
 
 
 %build
@@ -191,6 +196,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Mon Oct 07 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.5-2
+- revert upstream commit possibly related to plasma notification applet crashes (#1758263)
+
 * Tue Sep 24 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.5-1
 - 5.12.5
 
