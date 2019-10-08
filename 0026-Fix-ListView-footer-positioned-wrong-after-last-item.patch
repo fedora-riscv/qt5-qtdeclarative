@@ -1,0 +1,115 @@
+From 692b2da77427259a3589cf8a1311075863f2f5ec Mon Sep 17 00:00:00 2001
+From: Eirik Aavitsland <eirik.aavitsland@qt.io>
+Date: Fri, 21 Jun 2019 15:12:36 +0200
+Subject: [PATCH 26/56] Fix: ListView footer positioned wrong after last item
+ removed
+
+The refill() method would bail out early on an empty model. Make sure
+that it at least updates the header and footer in such situations.
+
+Fixes: QTBUG-31677
+Change-Id: I1f3a1848ff263a8f7f9ccfc3b20f16b61348f57b
+Reviewed-by: Mitch Curtis <mitch.curtis@qt.io>
+---
+ src/quick/items/qquickitemview.cpp            |  8 ++++-
+ .../quick/qquicklistview/data/footer2.qml     | 33 +++++++++++++++++++
+ .../qquicklistview/tst_qquicklistview.cpp     | 16 +++++++++
+ 3 files changed, 56 insertions(+), 1 deletion(-)
+ create mode 100644 tests/auto/quick/qquicklistview/data/footer2.qml
+
+diff --git a/src/quick/items/qquickitemview.cpp b/src/quick/items/qquickitemview.cpp
+index eead84d51..d0715cdb7 100644
+--- a/src/quick/items/qquickitemview.cpp
++++ b/src/quick/items/qquickitemview.cpp
+@@ -1717,8 +1717,14 @@ void QQuickItemViewPrivate::refill()
+ void QQuickItemViewPrivate::refill(qreal from, qreal to)
+ {
+     Q_Q(QQuickItemView);
+-    if (!isValid() || !q->isComponentComplete())
++    if (!model || !model->isValid() || !q->isComponentComplete())
+         return;
++    if (!model->count()) {
++        updateHeader();
++        updateFooter();
++        updateViewport();
++        return;
++    }
+ 
+     do {
+         bufferPause.stop();
+diff --git a/tests/auto/quick/qquicklistview/data/footer2.qml b/tests/auto/quick/qquicklistview/data/footer2.qml
+new file mode 100644
+index 000000000..bba74d89f
+--- /dev/null
++++ b/tests/auto/quick/qquicklistview/data/footer2.qml
+@@ -0,0 +1,33 @@
++import QtQuick 2.0
++
++Rectangle {
++    width: 240
++    height: 320
++
++    Timer {
++        running: true
++        repeat: false
++        interval: 100
++        onTriggered: {
++            list.model -= 3;
++        }
++    }
++
++    ListView {
++        id: list
++        objectName: "list"
++        anchors.fill: parent
++        model: 3
++        delegate: Rectangle {
++            color: "red"
++            width: 240
++            height: 10
++        }
++        footer: Rectangle {
++            color: "blue"
++            width: 240
++            height: 10
++        }
++    }
++}
++
+diff --git a/tests/auto/quick/qquicklistview/tst_qquicklistview.cpp b/tests/auto/quick/qquicklistview/tst_qquicklistview.cpp
+index fddba77f3..cfd740f33 100644
+--- a/tests/auto/quick/qquicklistview/tst_qquicklistview.cpp
++++ b/tests/auto/quick/qquicklistview/tst_qquicklistview.cpp
+@@ -152,6 +152,7 @@ private slots:
+     void headerChangesViewport();
+     void footer();
+     void footer_data();
++    void footer2();
+     void extents();
+     void extents_data();
+     void resetModel_headerFooter();
+@@ -4138,6 +4139,21 @@ void tst_QQuickListView::footer_data()
+         << QPointF(0, -(30 * 20) - 10);
+ }
+ 
++void tst_QQuickListView::footer2() // QTBUG-31677
++{
++    QQuickView *window = getView();
++    window->setSource(testFileUrl("footer2.qml"));
++    window->show();
++    QVERIFY(QTest::qWaitForWindowExposed(window));
++
++    QQuickListView *listview = findItem<QQuickListView>(window->rootObject(), "list");
++    QTRY_VERIFY(listview != nullptr);
++
++    QQuickItem *footer = listview->footerItem();
++    QVERIFY(footer != nullptr);
++    QTRY_COMPARE(footer->y(), 0.0);
++}
++
+ class LVAccessor : public QQuickListView
+ {
+ public:
+-- 
+2.21.0
+
