@@ -8,7 +8,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.12.5
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -23,9 +23,6 @@ Source5: qv4global_p-multilib.h
 ## upstream patches
 
 ## upstreamable patches
-# revert upstream commit that seemingly causes regressions with plasma-5.15.x notifcations applet
-# https://bugzilla.redhat.com/1758263
-Patch126: 0026-Fix-ListView-footer-positioned-wrong-after-last-item.patch
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -196,6 +193,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Wed Oct 16 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.5-4
+- Drop revert of upstream change
+
 * Tue Oct 08 2019 Rex Dieter <rdieter@fedoraproject.org> - 5.12.5-3
 - bisected different upstream commit as culprit for plasma notification crasher (#1758263)
 
