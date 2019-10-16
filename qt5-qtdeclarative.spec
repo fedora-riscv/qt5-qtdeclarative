@@ -78,8 +78,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %prep
 %setup -q -n %{qt_module}-everywhere-src-%{version}
 
-%patch126 -p1 -R
-
 
 %build
 
