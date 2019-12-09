@@ -7,8 +7,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.12.5
-Release: 4%{?dist}
+Version: 5.13.2
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -191,6 +191,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Mon Dec 09 2019 Jan Grulich <jgrulich@redhat.com> - 5.13.2-1
+- 5.13.2
+
 * Wed Oct 16 2019 Jan Grulich <jgrulich@redhat.com> - 5.12.5-4
 - Drop revert of upstream change
 
