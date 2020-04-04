@@ -7,8 +7,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.13.2
-Release: 2%{?dist}
+Version: 5.14.2
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -31,7 +31,7 @@ Obsoletes: qt5-qtjsbackend < 5.2.0
 Obsoletes: qt5-qtdeclarative-render2d < 5.7.1-10
 
 BuildRequires: gcc-c++
-BuildRequires: qt5-rpm-macros >= %{version}
+BuildRequires: qt5-rpm-macros
 BuildRequires: qt5-qtbase-devel >= %{version}
 BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
@@ -191,6 +191,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Sat Apr 04 2020 Rex Dieter <rdieter@fedoraproject.org> - 5.14.2-1
+- 5.14.2
+
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 5.13.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
