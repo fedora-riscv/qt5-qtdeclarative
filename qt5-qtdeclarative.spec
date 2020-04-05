@@ -152,6 +152,8 @@ make check -k -C tests ||:
 %files
 %license LICENSE.LGPL*
 %{_qt5_libdir}/libQt5Qml.so.5*
+%{_qt5_libdir}/libQt5QmlModels.so.5*
+%{_qt5_libdir}/libQt5QmlWorkerScript.so.5*
 %{_qt5_libdir}/libQt5Quick.so.5*
 %{_qt5_libdir}/libQt5QuickWidgets.so.5*
 %{_qt5_libdir}/libQt5QuickParticles.so.5*
@@ -166,6 +168,10 @@ make check -k -C tests ||:
 %{_qt5_headerdir}/Qt*/
 %{_qt5_libdir}/libQt5Qml.so
 %{_qt5_libdir}/libQt5Qml.prl
+%{_qt5_libdir}/libQt5QmlModels.so
+%{_qt5_libdir}/libQt5QmlModels.prl
+%{_qt5_libdir}/libQt5QmlWorkerScript.so
+%{_qt5_libdir}/libQt5QmlWorkerScript.prl
 %{_qt5_libdir}/libQt5Quick*.so
 %{_qt5_libdir}/libQt5Quick*.prl
 %dir %{_qt5_libdir}/cmake/Qt5Quick*/
@@ -175,6 +181,7 @@ make check -k -C tests ||:
 %{_qt5_archdatadir}/mkspecs/features/*.prf
 %dir %{_qt5_libdir}/cmake/Qt5Qml/
 %{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_*Factory.cmake
+%{_qt5_libdir}/cmake/Qt5QmlImportScanner/
 
 %files static
 %{_qt5_libdir}/libQt5QmlDevTools.a
