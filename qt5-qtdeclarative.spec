@@ -176,6 +176,7 @@ make check -k -C tests ||:
 %{_qt5_libdir}/libQt5Quick*.prl
 %dir %{_qt5_libdir}/cmake/Qt5Quick*/
 %{_qt5_libdir}/cmake/Qt5*/Qt5*Config*.cmake
+%{_qt5_libdir}/metatypes/qt5*_metatypes.json
 %{_qt5_libdir}/pkgconfig/Qt5*.pc
 %{_qt5_archdatadir}/mkspecs/modules/*.pri
 %{_qt5_archdatadir}/mkspecs/features/*.prf
