@@ -7,8 +7,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.15.1
-Release: 2%{?dist}
+Version: 5.15.2
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -201,6 +201,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Fri Nov 20 09:30:45 CET 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.2-1
+- 5.15.2
+
 * Fri Oct 16 2020 Jeff Law <law@redhat.com> - 5.15.1-2
 - Fix missing #includes for gcc-11
 
