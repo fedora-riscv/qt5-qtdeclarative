@@ -8,7 +8,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.15.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -201,6 +201,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Thu Dec 10 12:36:25 CET 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.2-3
+- Bump for eln build
+
 * Tue Nov 24 07:54:13 CET 2020 Jan Grulich <jgrulich@redhat.com> - 5.15.2-2
 - Rebuild for qtbase with -no-reduce-relocations option
 
