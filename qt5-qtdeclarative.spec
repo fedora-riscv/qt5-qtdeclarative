@@ -31,6 +31,7 @@ Patch0: %{name}-gcc11.patch
 Obsoletes: qt5-qtjsbackend < 5.2.0
 Obsoletes: qt5-qtdeclarative-render2d < 5.7.1-10
 
+BuildRequires: make
 BuildRequires: gcc-c++
 BuildRequires: qt5-rpm-macros
 BuildRequires: qt5-qtbase-devel >= %{version}
