@@ -1,0 +1,51 @@
+From 4ee1462686dc12eb463f5ba6b378d43a39aed074 Mon Sep 17 00:00:00 2001
+From: Fabian Kosmale <fabian.kosmale@qt.io>
+Date: Thu, 12 Nov 2020 12:11:29 +0100
+Subject: [PATCH 05/28] QQuickView docs: show correct usage of
+ setInitialProperties
+
+Change-Id: If63f4c59f18bc0754ce2e68e424f6efd0f512d30
+Reviewed-by: Mitch Curtis <mitch.curtis@qt.io>
+(cherry picked from commit 54d4f8f526f9c9a1af702b14925e1d34ee8b2134)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/quick/doc/snippets/qquickview-ex.cpp | 9 +++++++++
+ src/quick/items/qquickview.cpp           | 4 ++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/src/quick/doc/snippets/qquickview-ex.cpp b/src/quick/doc/snippets/qquickview-ex.cpp
+index 32406f8f2f..5f93dfdbe8 100644
+--- a/src/quick/doc/snippets/qquickview-ex.cpp
++++ b/src/quick/doc/snippets/qquickview-ex.cpp
+@@ -59,3 +59,12 @@ int main(int argc, char *argv[])
+     return app.exec();
+ }
+ //![0]
++
++void makeDocTeamHappyByKeepingExampleCompilable() {
++//![1]
++    QScopedPointer<QQuickView> view { new QQuickView };
++    view->setInitialProperties({"x, 100"}, {"width", 50});
++    view->setSource(QUrl::fromLocalFile("myqmlfile.qml"));
++    view->show();
++//![1]
++}
+diff --git a/src/quick/items/qquickview.cpp b/src/quick/items/qquickview.cpp
+index 97f6689d8a..b3a5270e9b 100644
+--- a/src/quick/items/qquickview.cpp
++++ b/src/quick/items/qquickview.cpp
+@@ -240,7 +240,11 @@ void QQuickView::setSource(const QUrl& url)
+    Sets the initial properties \a initialProperties with which the QML
+    component gets initialized after calling \l QQuickView::setSource().
+ 
++   \snippet qquickview-ex.cpp 1
++
+    \note You can only use this function to initialize top-level properties.
++   \note This function should always be called before setSource, as it has
++   no effect once the component has become \c Ready.
+ 
+    \sa QQmlComponent::createWithInitialProperties()
+    \since 5.14
+-- 
+2.31.1
+

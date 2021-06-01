@@ -1,0 +1,101 @@
+From 1241e4f3c3ec010ae121f5d56c3e9405ec43231f Mon Sep 17 00:00:00 2001
+From: Andy Shaw <andy.shaw@qt.io>
+Date: Fri, 6 Nov 2020 13:30:12 +0100
+Subject: [PATCH 19/28] Show a tableview even if the syncView has an empty
+ model
+
+By showing the tableview, we can be sure that headerviews will be
+visible even in the syncView has an empty model.
+
+Fixes: QTBUG-87526
+Change-Id: I68c8b119122a2d2f88c2afbeb2d6c71a83a3ce33
+Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
+(cherry picked from commit 27c254203b3e7dd6d3a4445feb205fbe98c32d30)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/quick/items/qquicktableview.cpp           |  7 +--
+ .../qquicktableview/tst_qquicktableview.cpp   | 43 +++++++++++++++++++
+ 2 files changed, 45 insertions(+), 5 deletions(-)
+
+diff --git a/src/quick/items/qquicktableview.cpp b/src/quick/items/qquicktableview.cpp
+index 7b73fcb393..1349d308d7 100644
+--- a/src/quick/items/qquicktableview.cpp
++++ b/src/quick/items/qquicktableview.cpp
+@@ -1760,11 +1760,8 @@ void QQuickTableViewPrivate::calculateTopLeft(QPoint &topLeftCell, QPointF &topL
+         const auto syncView_d = syncView->d_func();
+ 
+         if (syncView_d->loadedItems.isEmpty()) {
+-            // The sync view contains no loaded items. This probably means
+-            // that it has not been rebuilt yet. Which also means that
+-            // we cannot rebuild anything before this happens.
+-            topLeftCell.rx() = kEdgeIndexNotSet;
+-            topLeftCell.ry() = kEdgeIndexNotSet;
++            topLeftCell.rx() = 0;
++            topLeftCell.ry() = 0;
+             return;
+         }
+ 
+diff --git a/tests/auto/quick/qquicktableview/tst_qquicktableview.cpp b/tests/auto/quick/qquicktableview/tst_qquicktableview.cpp
+index 54f73c6e0c..d489a873e4 100644
+--- a/tests/auto/quick/qquicktableview/tst_qquicktableview.cpp
++++ b/tests/auto/quick/qquicktableview/tst_qquicktableview.cpp
+@@ -176,6 +176,7 @@ private slots:
+     void checkSyncView_connect_late_data();
+     void checkSyncView_connect_late();
+     void checkSyncView_pageFlicking();
++    void checkSyncView_emptyModel();
+     void delegateWithRequiredProperties();
+     void checkThatFetchMoreIsCalledWhenScrolledToTheEndOfTable();
+     void replaceModel();
+@@ -2731,6 +2732,48 @@ void tst_QQuickTableView::checkSyncView_pageFlicking()
+     QVERIFY(tableViewPrivate->scheduledRebuildOptions & QQuickTableViewPrivate::RebuildOption::CalculateNewTopLeftRow);
+ }
+ 
++void tst_QQuickTableView::checkSyncView_emptyModel()
++{
++    // When a tableview has a syncview with an empty model then it should still be
++    // showing the tableview without depending on the syncview. This is particularly
++    // important for headerviews for example
++    LOAD_TABLEVIEW("syncviewsimple.qml");
++    GET_QML_TABLEVIEW(tableViewH);
++    GET_QML_TABLEVIEW(tableViewV);
++    GET_QML_TABLEVIEW(tableViewHV);
++    QQuickTableView *views[] = {tableViewH, tableViewV, tableViewHV};
++
++    auto model = TestModelAsVariant(100, 100);
++
++    for (auto view : views)
++        view->setModel(model);
++
++    WAIT_UNTIL_POLISHED_ARG(tableViewHV);
++
++    // Check that geometry properties are mirrored
++    QCOMPARE(tableViewH->columnSpacing(), tableView->columnSpacing());
++    QCOMPARE(tableViewH->rowSpacing(), 0);
++    QCOMPARE(tableViewH->contentWidth(), tableView->contentWidth());
++    QVERIFY(tableViewH->contentHeight() > 0);
++    QCOMPARE(tableViewV->columnSpacing(), 0);
++    QCOMPARE(tableViewV->rowSpacing(), tableView->rowSpacing());
++    QCOMPARE(tableViewV->contentHeight(), tableView->contentHeight());
++    QVERIFY(tableViewV->contentWidth() > 0);
++
++    QCOMPARE(tableViewH->contentX(), tableView->contentX());
++    QCOMPARE(tableViewH->contentY(), 0);
++    QCOMPARE(tableViewV->contentX(), 0);
++    QCOMPARE(tableViewV->contentY(), tableView->contentY());
++    QCOMPARE(tableViewHV->contentX(), tableView->contentX());
++    QCOMPARE(tableViewHV->contentY(), tableView->contentY());
++
++    QCOMPARE(tableViewHPrivate->loadedTableOuterRect.left(), tableViewPrivate->loadedTableOuterRect.left());
++    QCOMPARE(tableViewHPrivate->loadedTableOuterRect.top(), 0);
++
++    QCOMPARE(tableViewVPrivate->loadedTableOuterRect.top(), tableViewPrivate->loadedTableOuterRect.top());
++    QCOMPARE(tableViewVPrivate->loadedTableOuterRect.left(), 0);
++}
++
+ void tst_QQuickTableView::checkThatFetchMoreIsCalledWhenScrolledToTheEndOfTable()
+ {
+     LOAD_TABLEVIEW("plaintableview.qml");
+-- 
+2.31.1
+

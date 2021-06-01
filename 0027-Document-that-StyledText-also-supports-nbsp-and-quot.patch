@@ -1,0 +1,29 @@
+From ebc0daeea59af400601e6207cd9939c746fccdc7 Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <albert.astals.cid@kdab.com>
+Date: Fri, 21 May 2021 13:17:15 +0200
+Subject: [PATCH 27/28] Document that StyledText also supports &nbsp; and
+ &quot;
+
+Change-Id: I1715f8ae8ec8d0fbaf6dbe2b8663cc169da663cd
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit 5848c081c094a66e024493fc1e5c2569e06f73b6)
+---
+ src/quick/items/qquicktext.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/quick/items/qquicktext.cpp b/src/quick/items/qquicktext.cpp
+index 581ab9f76a..26840b99e3 100644
+--- a/src/quick/items/qquicktext.cpp
++++ b/src/quick/items/qquicktext.cpp
+@@ -2168,7 +2168,7 @@ void QQuickText::resetMaximumLineCount()
+     <img src="" align="top,middle,bottom" width="" height=""> - inline images
+     <ol type="">, <ul type=""> and <li> - ordered and unordered lists
+     <pre></pre> - preformatted
+-    &gt; &lt; &amp;
++    &gt; &lt; &amp; &quot; &nbsp;
+     \endcode
+ 
+     \c Text.StyledText parser is strict, requiring tags to be correctly nested.
+-- 
+2.31.1
+

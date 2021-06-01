@@ -1,0 +1,71 @@
+From 83100a84f2b0068b4cf725896bbb810415908334 Mon Sep 17 00:00:00 2001
+From: Maximilian Goldstein <max.goldstein@qt.io>
+Date: Tue, 8 Dec 2020 09:26:36 +0100
+Subject: [PATCH 18/28] qqmlistmodel: Fix crash when modelCache is null
+
+Fixes: QTBUG-89173
+Change-Id: Ife82518808fc5504ec42407e80ed3de89ed4adeb
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+(cherry picked from commit c3860cd04bbc089ef95bc441a1f8f1e46f9606f8)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/qmlmodels/qqmllistmodel.cpp               |  2 +-
+ .../qml/qqmllistmodel/tst_qqmllistmodel.cpp   | 22 +++++++++++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/src/qmlmodels/qqmllistmodel.cpp b/src/qmlmodels/qqmllistmodel.cpp
+index e07951cab3..8830e08097 100644
+--- a/src/qmlmodels/qqmllistmodel.cpp
++++ b/src/qmlmodels/qqmllistmodel.cpp
+@@ -703,7 +703,7 @@ void ListModel::set(int elementIndex, QV4::Object *object, ListModel::SetElement
+         } else if (propertyValue->isNullOrUndefined()) {
+             if (reason == SetElement::WasJustInserted) {
+                 QQmlError err;
+-                auto memberName = propertyName->toString(m_modelCache->engine())->toQString();
++                auto memberName = propertyName->toString(v4)->toQString();
+                 err.setDescription(QString::fromLatin1("%1 is %2. Adding an object with a %2 member does not create a role for it.").arg(memberName, propertyValue->isNull() ? QLatin1String("null") : QLatin1String("undefined")));
+                 qmlWarning(nullptr, err);
+             } else {
+diff --git a/tests/auto/qml/qqmllistmodel/tst_qqmllistmodel.cpp b/tests/auto/qml/qqmllistmodel/tst_qqmllistmodel.cpp
+index d54e3467b7..1953798a15 100644
+--- a/tests/auto/qml/qqmllistmodel/tst_qqmllistmodel.cpp
++++ b/tests/auto/qml/qqmllistmodel/tst_qqmllistmodel.cpp
+@@ -130,6 +130,7 @@ private slots:
+     void dynamic_roles_crash_QTBUG_38907();
+     void nestedListModelIteration();
+     void undefinedAppendShouldCauseError();
++    void nullPropertyCrash();
+ };
+ 
+ bool tst_qqmllistmodel::compareVariantList(const QVariantList &testList, QVariant object)
+@@ -1723,6 +1724,27 @@ void tst_qqmllistmodel::undefinedAppendShouldCauseError()
+     QScopedPointer<QObject>(component.create());
+ }
+ 
++// QTBUG-89173
++void tst_qqmllistmodel::nullPropertyCrash()
++{
++    QQmlEngine engine;
++    QQmlComponent component(&engine);
++    component.setData(
++            R"(import QtQuick 2.15
++            ListView {
++                model: ListModel { id: listModel }
++
++                delegate: Item {}
++
++                Component.onCompleted: {
++                    listModel.append({"a": "value1", "b":[{"c":"value2"}]})
++                    listModel.append({"a": "value2", "b":[{"c":null}]})
++                }
++            })",
++            QUrl());
++    QTest::ignoreMessage(QtMsgType::QtWarningMsg, "<Unknown File>: c is null. Adding an object with a null member does not create a role for it.");
++    QScopedPointer<QObject>(component.create());
++}
+ 
+ QTEST_MAIN(tst_qqmllistmodel)
+ 
+-- 
+2.31.1
+

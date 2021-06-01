@@ -1,0 +1,32 @@
+From 30c7a6c6a874264800d398df8c3ec65f30707c92 Mon Sep 17 00:00:00 2001
+From: Li Xinwei <1326710505@qq.com>
+Date: Tue, 8 Dec 2020 15:36:01 +0800
+Subject: [PATCH 17/28] Use load(qt_tool) for qmltime
+
+The qmltime should be a tool, not a normal executable or an app.
+
+Change-Id: I64c76877907297a6a817ba5903786bcc7fba8fdd
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+(cherry picked from commit e6e262da1423bcb7cfe3db9f83fe0df54483c8d4)
+---
+ tools/qmltime/qmltime.pro | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tools/qmltime/qmltime.pro b/tools/qmltime/qmltime.pro
+index c915f6e8c1..366d90f75b 100644
+--- a/tools/qmltime/qmltime.pro
++++ b/tools/qmltime/qmltime.pro
+@@ -1,4 +1,3 @@
+-TEMPLATE = app
+ TARGET = qmltime
+ QT += qml quick
+ QT += quick-private
+@@ -12,3 +11,5 @@ QMAKE_TARGET_DESCRIPTION = QML Time
+ 
+ SOURCES += qmltime.cpp
+ HEADERS += qmltime.h
++
++load(qt_tool)
+-- 
+2.31.1
+

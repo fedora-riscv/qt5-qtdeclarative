@@ -1,0 +1,94 @@
+From 5652923d99166e942385eb35b778d26b55ab4b0a Mon Sep 17 00:00:00 2001
+From: Fabian Kosmale <fabian.kosmale@qt.io>
+Date: Tue, 27 Oct 2020 16:54:01 +0100
+Subject: [PATCH 02/28] Inline components: Fix custom parser support
+
+Fixes: QTBUG-85713
+Fixes: QTBUG-87464
+Change-Id: I5c190ad2d02190de90260042cc06e51c1da01c63
+Reviewed-by: Maximilian Goldstein <max.goldstein@qt.io>
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 2425cd478138c52694aaa20b7f7eb4a91d97b51c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/qml/qml/qqmltypecompiler.cpp                    |  6 ++++++
+ .../qml/qqmllanguage/data/customParserTypeInIC.qml  | 13 +++++++++++++
+ tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp    | 11 +++++++++++
+ 3 files changed, 30 insertions(+)
+ create mode 100644 tests/auto/qml/qqmllanguage/data/customParserTypeInIC.qml
+
+diff --git a/src/qml/qml/qqmltypecompiler.cpp b/src/qml/qml/qqmltypecompiler.cpp
+index 058bf8848c..f1a6b3bff2 100644
+--- a/src/qml/qml/qqmltypecompiler.cpp
++++ b/src/qml/qml/qqmltypecompiler.cpp
+@@ -683,6 +683,9 @@ QQmlCustomParserScriptIndexer::QQmlCustomParserScriptIndexer(QQmlTypeCompiler *t
+ void QQmlCustomParserScriptIndexer::annotateBindingsWithScriptStrings()
+ {
+     scanObjectRecursively(/*root object*/0);
++    for (int i = 0; i < qmlObjects.size(); ++i)
++        if (qmlObjects.at(i)->isInlineComponent)
++            scanObjectRecursively(i);
+ }
+ 
+ void QQmlCustomParserScriptIndexer::scanObjectRecursively(int objectIndex, bool annotateScriptBindings)
+@@ -1223,6 +1226,9 @@ QQmlDeferredAndCustomParserBindingScanner::QQmlDeferredAndCustomParserBindingSca
+ 
+ bool QQmlDeferredAndCustomParserBindingScanner::scanObject()
+ {
++    for (int i = 0; i < qmlObjects->size(); ++i)
++        if (qmlObjects->at(i)->isInlineComponent)
++            scanObject(i);
+     return scanObject(/*root object*/0);
+ }
+ 
+diff --git a/tests/auto/qml/qqmllanguage/data/customParserTypeInIC.qml b/tests/auto/qml/qqmllanguage/data/customParserTypeInIC.qml
+new file mode 100644
+index 0000000000..a29d87caa0
+--- /dev/null
++++ b/tests/auto/qml/qqmllanguage/data/customParserTypeInIC.qml
+@@ -0,0 +1,13 @@
++import QtQuick 2.15
++
++Item {
++    property int count: myModel.count
++    component MyModel : ListModel {
++        ListElement { a: 10 }
++        ListElement { a: 12 }
++    }
++
++    MyModel {
++        id: myModel
++    }
++}
+diff --git a/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp b/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp
+index e32fa884a2..8adcbc1837 100644
+--- a/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp
++++ b/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp
+@@ -111,6 +111,7 @@ private slots:
+     void bindJSValueToType();
+     void bindTypeToJSValue();
+     void customParserTypes();
++    void customParserTypeInInlineComponent();
+     void rootAsQmlComponent();
+     void rootItemIsComponent();
+     void inlineQmlComponents();
+@@ -1313,6 +1314,16 @@ void tst_qqmllanguage::customParserTypes()
+     QCOMPARE(object->property("count"), QVariant(2));
+ }
+ 
++// Tests that custom pursor types can be instantiated in ICs
++void tst_qqmllanguage::customParserTypeInInlineComponent()
++{
++    QQmlComponent component(&engine, testFileUrl("customParserTypeInIC.qml"));
++    VERIFY_ERRORS(0);
++    QScopedPointer<QObject> object(component.create());
++    QVERIFY(object != nullptr);
++    QCOMPARE(object->property("count"), 2);
++}
++
+ // Tests that the root item can be a custom component
+ void tst_qqmllanguage::rootAsQmlComponent()
+ {
+-- 
+2.31.1
+

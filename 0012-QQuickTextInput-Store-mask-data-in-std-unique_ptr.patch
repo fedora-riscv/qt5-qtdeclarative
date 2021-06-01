@@ -1,0 +1,66 @@
+From 89ea9f1f9468aa47718cbb398317c63a9479adf2 Mon Sep 17 00:00:00 2001
+From: Fabian Kosmale <fabian.kosmale@qt.io>
+Date: Tue, 24 Nov 2020 13:23:23 +0100
+Subject: [PATCH 12/28] QQuickTextInput: Store mask data in std::unique_ptr
+
+This ensures that the memory is freed reliably
+
+Fixes: QTBUG-88807
+Change-Id: I841a5a2b226a69ce50975d95702a948857d1b54f
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit d2d8e90e9f218103d60737e1273ab5322834d9ec)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/quick/items/qquicktextinput.cpp   | 6 ++----
+ src/quick/items/qquicktextinput_p_p.h | 4 +++-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/quick/items/qquicktextinput.cpp b/src/quick/items/qquicktextinput.cpp
+index 6275b298ed..bb78ead0e8 100644
+--- a/src/quick/items/qquicktextinput.cpp
++++ b/src/quick/items/qquicktextinput.cpp
+@@ -3831,8 +3831,7 @@ void QQuickTextInputPrivate::parseInputMask(const QString &maskFields)
+     int delimiter = maskFields.indexOf(QLatin1Char(';'));
+     if (maskFields.isEmpty() || delimiter == 0) {
+         if (m_maskData) {
+-            delete [] m_maskData;
+-            m_maskData = nullptr;
++            m_maskData.reset(nullptr);
+             m_maxLength = 32767;
+             internalSetText(QString());
+         }
+@@ -3863,8 +3862,7 @@ void QQuickTextInputPrivate::parseInputMask(const QString &maskFields)
+             m_maxLength++;
+     }
+ 
+-    delete [] m_maskData;
+-    m_maskData = new MaskInputData[m_maxLength];
++    m_maskData.reset(new MaskInputData[m_maxLength]);
+ 
+     MaskInputData::Casemode m = MaskInputData::NoCaseMode;
+     c = 0;
+diff --git a/src/quick/items/qquicktextinput_p_p.h b/src/quick/items/qquicktextinput_p_p.h
+index 7965f3d3f4..7fbba49405 100644
+--- a/src/quick/items/qquicktextinput_p_p.h
++++ b/src/quick/items/qquicktextinput_p_p.h
+@@ -58,6 +58,8 @@
+ 
+ #include "qplatformdefs.h"
+ 
++#include <memory>
++
+ //
+ //  W A R N I N G
+ //  -------------
+@@ -230,7 +232,7 @@ public:
+ 
+     QQuickItem *cursorItem;
+     QQuickTextNode *textNode;
+-    MaskInputData *m_maskData;
++    std::unique_ptr<MaskInputData[]> m_maskData;
+     QInputControl *m_inputControl;
+ 
+     QList<int> m_transactions;
+-- 
+2.31.1
+

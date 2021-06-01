@@ -1,0 +1,44 @@
+From 0dda47d9f1a22567ad8f1266be2f0cd8a9226c7f Mon Sep 17 00:00:00 2001
+From: Albert Astals Cid <albert.astals.cid@kdab.com>
+Date: Fri, 21 May 2021 13:42:35 +0200
+Subject: [PATCH 28/28] Support &apos; in styled text
+
+Pick-to: 6.1 5.15
+Change-Id: I4a8db963e52a7899ab1796f9a560e8029cc1c929
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
+(cherry picked from commit 96b528efcba1226d2980828d1255160bdceae4cf)
+---
+ src/quick/items/qquicktext.cpp      | 2 +-
+ src/quick/util/qquickstyledtext.cpp | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/quick/items/qquicktext.cpp b/src/quick/items/qquicktext.cpp
+index 26840b99e3..4ddd2a41bc 100644
+--- a/src/quick/items/qquicktext.cpp
++++ b/src/quick/items/qquicktext.cpp
+@@ -2168,7 +2168,7 @@ void QQuickText::resetMaximumLineCount()
+     <img src="" align="top,middle,bottom" width="" height=""> - inline images
+     <ol type="">, <ul type=""> and <li> - ordered and unordered lists
+     <pre></pre> - preformatted
+-    &gt; &lt; &amp; &quot; &nbsp;
++    &gt; &lt; &amp; &quot; &nbsp; &apos;
+     \endcode
+ 
+     \c Text.StyledText parser is strict, requiring tags to be correctly nested.
+diff --git a/src/quick/util/qquickstyledtext.cpp b/src/quick/util/qquickstyledtext.cpp
+index d531fc9205..a25af90414 100644
+--- a/src/quick/util/qquickstyledtext.cpp
++++ b/src/quick/util/qquickstyledtext.cpp
+@@ -564,6 +564,8 @@ void QQuickStyledTextPrivate::parseEntity(const QChar *&ch, const QString &textI
+                 textOut += QChar(60);
+             else if (entity == QLatin1String("amp"))
+                 textOut += QChar(38);
++            else if (entity == QLatin1String("apos"))
++                textOut += QChar(39);
+             else if (entity == QLatin1String("quot"))
+                 textOut += QChar(34);
+             else if (entity == QLatin1String("nbsp"))
+-- 
+2.31.1
+

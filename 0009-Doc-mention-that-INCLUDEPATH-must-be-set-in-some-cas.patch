@@ -1,0 +1,38 @@
+From 4d6078e4b556e83f55ffed55f14203c3ed880c62 Mon Sep 17 00:00:00 2001
+From: Mitch Curtis <mitch.curtis@qt.io>
+Date: Thu, 19 Nov 2020 16:39:23 +0100
+Subject: [PATCH 09/28] Doc: mention that INCLUDEPATH must be set in some cases
+
+Otherwise the generated type registrations .cpp file will not be able
+to include the sources.
+
+Change-Id: I7821c7674b4341546da2fc49e584bf10cc60b46f
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 06c31f386f8664343debd219a522a8897df0f3ec)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/qml/doc/src/cppintegration/definetypes.qdoc | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/qml/doc/src/cppintegration/definetypes.qdoc b/src/qml/doc/src/cppintegration/definetypes.qdoc
+index cbbbd9ba58..ece2fd5fd7 100644
+--- a/src/qml/doc/src/cppintegration/definetypes.qdoc
++++ b/src/qml/doc/src/cppintegration/definetypes.qdoc
+@@ -117,6 +117,14 @@ QML_IMPORT_NAME = com.mycompany.messaging
+ QML_IMPORT_MAJOR_VERSION = 1
+ \endcode
+ 
++If the header the class is declared in is not accessible from your project's
++include path, you may have to amend the include path so that the generated
++registration code can be compiled:
++
++\code
++INCLUDEPATH += com/mycompany/messaging
++\endcode
++
+ The type can be used in an \l{qtqml-syntax-basics.html#object-declarations}
+ {object declaration} from QML, and its properties can be read and written to,
+ as per the example below:
+-- 
+2.31.1
+

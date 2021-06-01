@@ -1,0 +1,44 @@
+From 514a69659a56fda410f4ab955f03c0d2a38b52f9 Mon Sep 17 00:00:00 2001
+From: Piotr Mikolajczyk <piotr.mikolajczyk@qt.io>
+Date: Tue, 10 Nov 2020 14:58:12 +0100
+Subject: [PATCH 14/28] Accessibility event is sent on item's geometry change
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+In case of enabled accessibility, whenever the geometry
+of a QQuickItem changes, accessibility module is notified
+by a LocationChange event. This enables responding to this
+by for example moving the accessibility frame on the screen.
+
+Task-number: QTBUG-79611
+Change-Id: I808e835384ef42bba2e9aabecf4be3cda07859fe
+Reviewed-by: Jan Arve Sæther <jan-arve.saether@qt.io>
+(cherry picked from commit def81070668f101e1e2cbb46d586bbab64c8e00f)
+Reviewed-by: Assam Boudjelthia <assam.boudjelthia@qt.io>
+---
+ src/quick/items/qquickitem.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
+index 67c4611d9e..ddd67522b9 100644
+--- a/src/quick/items/qquickitem.cpp
++++ b/src/quick/items/qquickitem.cpp
+@@ -3753,6 +3753,14 @@ void QQuickItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeo
+         emit widthChanged();
+     if (change.heightChange())
+         emit heightChanged();
++#if QT_CONFIG(accessibility)
++    if (QAccessible::isActive()) {
++        if (QObject *acc = QQuickAccessibleAttached::findAccessible(this)) {
++            QAccessibleEvent ev(acc, QAccessible::LocationChanged);
++            QAccessible::updateAccessibility(&ev);
++        }
++    }
++#endif
+ }
+ 
+ /*!
+-- 
+2.31.1
+

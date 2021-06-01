@@ -1,0 +1,146 @@
+From bb0ce1ffd48aa69da03dc43bd314351519ebf0d7 Mon Sep 17 00:00:00 2001
+From: Fabian Kosmale <fabian.kosmale@qt.io>
+Date: Tue, 8 Dec 2020 14:12:47 +0100
+Subject: [PATCH 22/28] Fix IC properties in same file
+
+Also fixes typename and metatype registration for inline components.
+
+Done-with: Fabian Kosmale <fabian.kosmale@qt.io>
+Fixes: QTBUG-89173
+Change-Id: I97d65d5539b577a8828d5711e5f2e79c8568b441
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit c2ca14ce22551ea72544b6e2b3a19823b6dc3050)
+---
+ src/qml/qml/qqmlpropertycachecreator.cpp      |  9 +++++++
+ src/qml/qml/qqmlpropertycachecreator_p.h      |  2 ++
+ src/qml/qml/qqmlpropertyvalidator.cpp         | 25 +++++++++++++++++++
+ src/qml/qml/qqmltypedata.cpp                  |  4 +--
+ .../data/inlineComponentsSameFile.qml         | 11 ++++++++
+ .../qml/qqmllanguage/tst_qqmllanguage.cpp     |  1 +
+ 6 files changed, 49 insertions(+), 3 deletions(-)
+ create mode 100644 tests/auto/qml/qqmllanguage/data/inlineComponentsSameFile.qml
+
+diff --git a/src/qml/qml/qqmlpropertycachecreator.cpp b/src/qml/qml/qqmlpropertycachecreator.cpp
+index 36581bda4e..88d80d88ab 100644
+--- a/src/qml/qml/qqmlpropertycachecreator.cpp
++++ b/src/qml/qml/qqmlpropertycachecreator.cpp
+@@ -90,6 +90,15 @@ QByteArray QQmlPropertyCacheCreatorBase::createClassNameTypeByUrl(const QUrl &ur
+             QByteArray::number(classIndexCounter.fetchAndAddRelaxed(1));
+ }
+ 
++QByteArray QQmlPropertyCacheCreatorBase::createClassNameForInlineComponent(const QUrl &baseUrl, int icId)
++{
++    QByteArray baseName = createClassNameTypeByUrl(baseUrl);
++    if (baseName.isEmpty())
++        baseName = QByteArray("ANON_QML_IC_") + QByteArray::number(classIndexCounter.fetchAndAddRelaxed(1));
++    baseName += "_" + QByteArray::number(icId);
++    return baseName;
++}
++
+ QQmlBindingInstantiationContext::QQmlBindingInstantiationContext(int referencingObjectIndex, const QV4::CompiledData::Binding *instantiatingBinding,
+                                                                  const QString &instantiatingPropertyName, QQmlPropertyCache *referencingObjectPropertyCache)
+     : referencingObjectIndex(referencingObjectIndex)
+diff --git a/src/qml/qml/qqmlpropertycachecreator_p.h b/src/qml/qml/qqmlpropertycachecreator_p.h
+index 6b02d6fb98..77e3763a49 100644
+--- a/src/qml/qml/qqmlpropertycachecreator_p.h
++++ b/src/qml/qml/qqmlpropertycachecreator_p.h
+@@ -104,6 +104,8 @@ public:
+     static int metaTypeForPropertyType(QV4::CompiledData::BuiltinType type);
+ 
+     static QByteArray createClassNameTypeByUrl(const QUrl &url);
++
++    static QByteArray createClassNameForInlineComponent(const QUrl &baseUrl, int icId);
+ };
+ 
+ template <typename ObjectContainer>
+diff --git a/src/qml/qml/qqmlpropertyvalidator.cpp b/src/qml/qml/qqmlpropertyvalidator.cpp
+index 3587609301..3a1f33113f 100644
+--- a/src/qml/qml/qqmlpropertyvalidator.cpp
++++ b/src/qml/qml/qqmlpropertyvalidator.cpp
+@@ -651,6 +651,19 @@ bool QQmlPropertyValidator::canCoerce(int to, QQmlPropertyCache *fromMo) const
+ {
+     QQmlPropertyCache *toMo = enginePrivate->rawPropertyCacheForType(to);
+ 
++    if (toMo == nullptr) {
++        // if we have an inline component from the current file,
++        // it is not properly registered at this point, as registration
++        // only occurs after the whole file has been validated
++        // Therefore we need to check the ICs here
++        for (const auto& icDatum : compilationUnit->inlineComponentData) {
++            if (icDatum.typeIds.id == to) {
++                toMo = compilationUnit->propertyCaches.at(icDatum.objectIndex);
++                break;
++            }
++        }
++    }
++
+     while (fromMo) {
+         if (fromMo == toMo)
+             return true;
+@@ -746,6 +759,18 @@ QQmlError QQmlPropertyValidator::validateObjectBinding(QQmlPropertyData *propert
+         // effect the properties on the type, but don't effect assignability
+         // Using -1 for the minor version ensures that we get the raw metaObject.
+         QQmlPropertyCache *propertyMetaObject = enginePrivate->rawPropertyCacheForType(propType, -1);
++        if (!propertyMetaObject) {
++            // if we have an inline component from the current file,
++            // it is not properly registered at this point, as registration
++            // only occurs after the whole file has been validated
++            // Therefore we need to check the ICs here
++            for (const auto& icDatum: compilationUnit->inlineComponentData) {
++                if (icDatum.typeIds.id == property->propType()) {
++                    propertyMetaObject = compilationUnit->propertyCaches.at(icDatum.objectIndex);
++                    break;
++                }
++            }
++        }
+ 
+         if (propertyMetaObject) {
+             // Will be true if the assigned type inherits propertyMetaObject
+diff --git a/src/qml/qml/qqmltypedata.cpp b/src/qml/qml/qqmltypedata.cpp
+index fc1d0cfbcf..92a90ea677 100644
+--- a/src/qml/qml/qqmltypedata.cpp
++++ b/src/qml/qml/qqmltypedata.cpp
+@@ -283,9 +283,7 @@ void setupICs(const ObjectContainer &container, QHash<int, InlineComponentData>
+     for (int i = 0; i != container->objectCount(); ++i) {
+         auto root = container->objectAt(i);
+         for (auto it = root->inlineComponentsBegin(); it != root->inlineComponentsEnd(); ++it) {
+-            auto url = finalUrl;
+-            url.setFragment(QString::number(it->objectIndex));
+-            const QByteArray &className = QQmlPropertyCacheCreatorBase::createClassNameTypeByUrl(url);
++            const QByteArray &className = QQmlPropertyCacheCreatorBase::createClassNameForInlineComponent(finalUrl, it->objectIndex);
+             InlineComponentData icDatum(QQmlMetaType::registerInternalCompositeType(className), int(it->objectIndex), int(it->nameIndex), 0, 0, 0);
+             icData->insert(it->objectIndex, icDatum);
+         }
+diff --git a/tests/auto/qml/qqmllanguage/data/inlineComponentsSameFile.qml b/tests/auto/qml/qqmllanguage/data/inlineComponentsSameFile.qml
+new file mode 100644
+index 0000000000..87cac10200
+--- /dev/null
++++ b/tests/auto/qml/qqmllanguage/data/inlineComponentsSameFile.qml
+@@ -0,0 +1,11 @@
++import QtQml 2.15
++
++QtObject {
++    component IC : QtObject {
++        property string name
++        property int age
++    }
++
++    property IC other: IC { name: "Toby"; age: 30 }
++    property list<IC> listProp: [IC { name: "Alfred Ill"; age: 65 }, IC { name: "Claire Zachanassian"; age: 62}]
++}
+diff --git a/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp b/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp
+index 8adcbc1837..e247a139ec 100644
+--- a/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp
++++ b/tests/auto/qml/qqmllanguage/tst_qqmllanguage.cpp
+@@ -5604,6 +5604,7 @@ void tst_qqmllanguage::inlineComponent_data()
+     QTest::newRow("Alias resolves correctly") << testFileUrl("inlineComponentWithAlias.qml") << QColorConstants::Svg::lime << 42 << true;
+ 
+     QTest::newRow("Two inline components in same do not crash (QTBUG-86989)") << testFileUrl("twoInlineComponents.qml") << QColor() << 0 << false;
++    QTest::newRow("Inline components used in same file (QTBUG-89173)") << testFileUrl("inlineComponentsSameFile.qml") << QColor() << 0 << false;
+ }
+ 
+ void tst_qqmllanguage::inlineComponentReferenceCycle_data()
+-- 
+2.31.1
+

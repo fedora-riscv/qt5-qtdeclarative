@@ -1,0 +1,43 @@
+From 81238e0ff8453f4fb78436ac9bec8452584680ae Mon Sep 17 00:00:00 2001
+From: Bartlomiej Moskal <bartlomiej.moskal@siili.com>
+Date: Thu, 5 Nov 2020 10:12:29 +0100
+Subject: [PATCH 06/28] QQuickWindow: Check if QQuickItem was not deleted
+
+Added check into deliverMatchingPointsToItem method for Android device.
+
+In QT_VERSION below 6.0.0 touchEnabled for QtQuickItems is set by default to true
+It causes delivering touch events to Items which are not interested
+In some cases it may cause a crash. For example using Material Style in Android.
+QQuickShaderEffectSource may be deleted and then try to handle touch
+
+Fixes: QTBUG-85379
+Change-Id: Ia2c4e016db57ef9c86fcc31d4cfba6154068a546
+Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
+(cherry picked from commit a14e4fcdf94d26774490b26a4ef77981594f583f)
+Reviewed-by: Bartlomiej Moskal <bartlomiej.moskal@siili.com>
+---
+ src/quick/items/qquickwindow.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/quick/items/qquickwindow.cpp b/src/quick/items/qquickwindow.cpp
+index d0c9ad5454..9ff91eb9a0 100644
+--- a/src/quick/items/qquickwindow.cpp
++++ b/src/quick/items/qquickwindow.cpp
+@@ -2864,6 +2864,14 @@ void QQuickWindowPrivate::deliverMatchingPointsToItem(QQuickItem *item, QQuickPo
+ {
+     Q_Q(QQuickWindow);
+     QQuickItemPrivate *itemPrivate = QQuickItemPrivate::get(item);
++#if defined(Q_OS_ANDROID) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
++    // QTBUG-85379
++    // In QT_VERSION below 6.0.0 touchEnabled for QtQuickItems is set by default to true
++    // It causes delivering touch events to Items which are not interested
++    // In some cases (like using Material Style in Android) it may cause a crash
++    if (itemPrivate->wasDeleted)
++        return;
++#endif
+     pointerEvent->localize(item);
+ 
+     // Let the Item's handlers (if any) have the event first.
+-- 
+2.31.1
+
