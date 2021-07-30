@@ -8,7 +8,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.15.2
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -56,6 +56,8 @@ Patch28: 0028-Support-apos-in-styled-text.patch
 
 ## upstreamable patches
 Patch100: %{name}-gcc11.patch
+# https://pagure.io/fedora-kde/SIG/issue/82
+Patch101: qtdeclarative-5.15.0-FixMaxXMaxYExtent.patch
 
 # filter qml provides
 %global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
@@ -233,6 +235,10 @@ make check -k -C tests ||:
 
 
 %changelog
+* Fri Jul 30 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-7
+- sync kde/5.15 branch fixes
+- pull in candidate fix QTBUG-83890
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.2-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
