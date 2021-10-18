@@ -8,7 +8,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.15.2
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -53,6 +53,14 @@ Patch25: 0025-Give-a-warning-when-StyledText-encounters-a-non-supp.patch
 Patch26: 0026-Add-missing-limits-include-to-fix-build-with-GCC-11.patch
 Patch27: 0027-Document-that-StyledText-also-supports-nbsp-and-quot.patch
 Patch28: 0028-Support-apos-in-styled-text.patch
+
+# Single, later commit cherrypicked during F35 freeze:
+# https://codereview.qt-project.org/c/qt/qtdeclarative/+/372646
+# https://bugzilla.redhat.com/show_bug.cgi?id=2011774
+# https://bugs.kde.org/show_bug.cgi?id=443583
+# Fixes the "other sources show as 'undefined'" part of the bug,
+# not the "list is redrawn and source might move" part
+Patch50: 0001-QQmlDelegateModel-Refresh-the-view-when-a-column-is-.patch
 
 ## upstreamable patches
 Patch100: %{name}-gcc11.patch
@@ -235,6 +243,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Mon Oct 18 2021 Adam Williamson <awilliam@redhat.com> - 5.15.2-8
+- Backport Qt review #372646 to partially fix #2011774
+
 * Fri Jul 30 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-7
 - sync kde/5.15 branch fixes
 - pull in candidate fix QTBUG-83890
