@@ -244,7 +244,7 @@ make check -k -C tests ||:
 
 %changelog
 * Sat Oct 30 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-9
-- syncn kde/5.15 branch fixes
+- sync kde/5.15 branch fixes
 
 * Mon Oct 18 2021 Adam Williamson <awilliam@redhat.com> - 5.15.2-8
 - Backport Qt review #372646 to partially fix #2011774
