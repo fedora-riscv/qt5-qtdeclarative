@@ -1,8 +1,8 @@
 From e0271324f05fee2c8670a73d1e7e89aef51532a3 Mon Sep 17 00:00:00 2001
 From: Aleix Pol <aleixpol@kde.org>
 Date: Thu, 23 Sep 2021 03:43:04 +0200
-Subject: [PATCH] QQmlDelegateModel: Refresh the view when a column is added at
- 0
+Subject: [PATCH 32/36] QQmlDelegateModel: Refresh the view when a column is
+ added at 0
 
 It can happen that a model reports n>0 rows but columns=0 (See
 QConcatenateTablesProxyModel). In those cases we would render glitchy
@@ -192,5 +192,5 @@ index 87f42c0c8a..1d338ac330 100644
  
  #include "tst_qqmldelegatemodel.moc"
 -- 
-2.33.0
+2.31.1
 

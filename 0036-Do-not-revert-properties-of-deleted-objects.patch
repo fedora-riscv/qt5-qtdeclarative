@@ -1,0 +1,192 @@
+From 55324650f9e759a43dce927f823c9858574106c3 Mon Sep 17 00:00:00 2001
+From: Alexey Edelev <alexey.edelev@qt.io>
+Date: Tue, 12 Jan 2021 16:37:09 +0100
+Subject: [PATCH 36/36] Do not revert properties of deleted objects
+
+If state contains revert action of properties of deleted objects,
+we should avoid adding them to apply list
+
+Fixes: QTBUG-85106
+Pick-to: 5.15
+Change-Id: Iff57eb9958a054476096f6d951ab7390277a2b39
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 96763dbb105fde20431a264789ac27abfdab841c)
+---
+ src/quick/util/qquickstate.cpp                |  5 ++
+ .../data/revertNullObjectBinding.qml          | 48 +++++++++++++
+ .../quick/qquickstates/tst_qquickstates.cpp   | 68 +++++++++++++++++++
+ 3 files changed, 121 insertions(+)
+ create mode 100644 tests/auto/quick/qquickstates/data/revertNullObjectBinding.qml
+
+diff --git a/src/quick/util/qquickstate.cpp b/src/quick/util/qquickstate.cpp
+index 71ab1f4d62..6a72754bde 100644
+--- a/src/quick/util/qquickstate.cpp
++++ b/src/quick/util/qquickstate.cpp
+@@ -635,6 +635,11 @@ void QQuickState::apply(QQuickTransition *trans, QQuickState *revert)
+             }
+         }
+         if (!found) {
++            // If revert list contains bindings assigned to deleted objects, we need to
++            // prevent reverting properties of those objects.
++            if (d->revertList.at(ii).binding() && !d->revertList.at(ii).property().object()) {
++                continue;
++            }
+             QVariant cur = d->revertList.at(ii).property().read();
+             QQmlPropertyPrivate::removeBinding(d->revertList.at(ii).property());
+ 
+diff --git a/tests/auto/quick/qquickstates/data/revertNullObjectBinding.qml b/tests/auto/quick/qquickstates/data/revertNullObjectBinding.qml
+new file mode 100644
+index 0000000000..dee82f52ed
+--- /dev/null
++++ b/tests/auto/quick/qquickstates/data/revertNullObjectBinding.qml
+@@ -0,0 +1,48 @@
++import QtQuick 2.12
++import Qt.test 1.0
++
++Item {
++    id: root
++    readonly property int someProp: 1234
++
++    property bool state1Active: false
++    property bool state2Active: false
++    StateGroup {
++        states: [
++            State {
++                id: state1
++                name: "state1"
++                when: state1Active
++                changes: [
++                    PropertyChanges {
++                        objectName: "propertyChanges1"
++                        target: ContainingObj.obj
++                        prop: root.someProp
++                    }
++                ]
++            }
++    ]}
++    StateGroup {
++        states: [
++            State {
++                id: state2
++                name: "state2"
++                when: state2Active
++                changes: [
++                    PropertyChanges {
++                        objectName: "propertyChanges2"
++                        target: ContainingObj.obj
++                        prop: 11111
++                    }
++                ]
++            }
++        ]
++    }
++
++    Component.onCompleted: {
++        state1Active = true;
++        state2Active = true;
++
++        ContainingObj.reset()
++    }
++}
+diff --git a/tests/auto/quick/qquickstates/tst_qquickstates.cpp b/tests/auto/quick/qquickstates/tst_qquickstates.cpp
+index d5fea3cb28..849522454f 100644
+--- a/tests/auto/quick/qquickstates/tst_qquickstates.cpp
++++ b/tests/auto/quick/qquickstates/tst_qquickstates.cpp
+@@ -79,6 +79,55 @@ private:
+ QML_DECLARE_TYPE(MyRect)
+ QML_DECLARE_TYPEINFO(MyRect, QML_HAS_ATTACHED_PROPERTIES)
+ 
++class RemovableObj : public QObject
++{
++    Q_OBJECT
++    Q_PROPERTY(int prop READ prop WRITE setProp NOTIFY propChanged)
++
++public:
++    RemovableObj(QObject *parent) : QObject(parent), m_prop(4321) { }
++    int prop() const { return m_prop; }
++
++public slots:
++    void setProp(int prop)
++    {
++        if (m_prop == prop)
++            return;
++
++        m_prop = prop;
++        emit propChanged(m_prop);
++    }
++
++signals:
++    void propChanged(int prop);
++
++private:
++    int m_prop;
++};
++
++class ContainingObj : public QObject
++{
++    Q_OBJECT
++    Q_PROPERTY(RemovableObj *obj READ obj NOTIFY objChanged)
++    RemovableObj *m_obj;
++
++public:
++    ContainingObj() : m_obj(new RemovableObj(this)) { }
++    RemovableObj *obj() const { return m_obj; }
++
++    Q_INVOKABLE void reset()
++    {
++        if (m_obj) {
++            m_obj->deleteLater();
++        }
++
++        m_obj = new RemovableObj(this);
++        emit objChanged();
++    }
++signals:
++    void objChanged();
++};
++
+ class tst_qquickstates : public QQmlDataTest
+ {
+     Q_OBJECT
+@@ -140,12 +189,20 @@ private slots:
+     void duplicateStateName();
+     void trivialWhen();
+     void parentChangeCorrectReversal();
++    void revertNullObjectBinding();
+ };
+ 
+ void tst_qquickstates::initTestCase()
+ {
+     QQmlDataTest::initTestCase();
+     qmlRegisterType<MyRect>("Qt.test", 1, 0, "MyRectangle");
++    qmlRegisterSingletonType<ContainingObj>(
++            "Qt.test", 1, 0, "ContainingObj", [](QQmlEngine *engine, QJSEngine *) {
++                static ContainingObj instance;
++                engine->setObjectOwnership(&instance, QQmlEngine::CppOwnership);
++                return &instance;
++            });
++    qmlRegisterUncreatableType<RemovableObj>("Qt.test", 1, 0, "RemovableObj", "Uncreatable");
+ }
+ 
+ QByteArray tst_qquickstates::fullDataPath(const QString &path) const
+@@ -1692,6 +1749,17 @@ void tst_qquickstates::parentChangeCorrectReversal()
+     QCOMPARE(oldX, stayingRectX.read().toDouble());
+ }
+ 
++void tst_qquickstates::revertNullObjectBinding()
++{
++    QQmlEngine engine;
++
++    QQmlComponent c(&engine, testFileUrl("revertNullObjectBinding.qml"));
++    QScopedPointer<QObject> root { c.create() };
++    QVERIFY(root);
++    QTest::qWait(10);
++    QQmlProperty state2Active(root.get(), "state2Active");
++    state2Active.write(false);
++}
+ 
+ QTEST_MAIN(tst_qquickstates)
+ 
+-- 
+2.31.1
+

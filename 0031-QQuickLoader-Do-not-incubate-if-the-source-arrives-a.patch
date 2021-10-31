@@ -1,0 +1,112 @@
+From 1c33a9d045897ce755a818ebff7ddecae97885d3 Mon Sep 17 00:00:00 2001
+From: Aleix Pol <aleixpol@kde.org>
+Date: Tue, 21 Sep 2021 00:10:26 +0200
+Subject: [PATCH 31/36] QQuickLoader: Do not incubate if the source arrives
+ after setActive(false)
+
+Otherwise we end up in the crazy place of active being false but item
+being non-null and forces us to workaround within the apps.
+
+Change-Id: I88c27c4b00ccec8b8e0c05a8e10b44fcabfc2e30
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit e78c068700fa74ab3aca6a23ab2450563b1c3a5c)
+Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
+---
+ src/quick/items/qquickloader.cpp              |  3 +++
+ .../data/loader-async-race-rect.qml           | 10 ++++++++++
+ .../qquickloader/data/loader-async-race.qml   | 14 ++++++++++++++
+ .../quick/qquickloader/tst_qquickloader.cpp   | 19 +++++++++++++++++++
+ 4 files changed, 46 insertions(+)
+ create mode 100644 tests/auto/quick/qquickloader/data/loader-async-race-rect.qml
+ create mode 100644 tests/auto/quick/qquickloader/data/loader-async-race.qml
+
+diff --git a/src/quick/items/qquickloader.cpp b/src/quick/items/qquickloader.cpp
+index 8cd63a4236..a6f7009946 100644
+--- a/src/quick/items/qquickloader.cpp
++++ b/src/quick/items/qquickloader.cpp
+@@ -738,6 +738,9 @@ void QQuickLoaderPrivate::_q_sourceLoaded()
+         return;
+     }
+ 
++    if (!active)
++        return;
++
+     QQmlContext *creationContext = component->creationContext();
+     if (!creationContext) creationContext = qmlContext(q);
+     itemContext = new QQmlContext(creationContext);
+diff --git a/tests/auto/quick/qquickloader/data/loader-async-race-rect.qml b/tests/auto/quick/qquickloader/data/loader-async-race-rect.qml
+new file mode 100644
+index 0000000000..a56dcea5ad
+--- /dev/null
++++ b/tests/auto/quick/qquickloader/data/loader-async-race-rect.qml
+@@ -0,0 +1,10 @@
++import QtQuick 2.15
++
++Rectangle {
++    anchors.fill: parent
++    color: "blue"
++    Item {
++        Item {
++        }
++    }
++}
+diff --git a/tests/auto/quick/qquickloader/data/loader-async-race.qml b/tests/auto/quick/qquickloader/data/loader-async-race.qml
+new file mode 100644
+index 0000000000..8ba625c5c1
+--- /dev/null
++++ b/tests/auto/quick/qquickloader/data/loader-async-race.qml
+@@ -0,0 +1,14 @@
++import QtQuick 2.15
++
++Item {
++    id: root
++    Component.onCompleted: {
++        myloader.active = false
++    }
++    Loader {
++        id: myloader
++        anchors.fill: parent
++        asynchronous: true
++        source: "loader-async-race-rect.qml"
++    }
++}
+diff --git a/tests/auto/quick/qquickloader/tst_qquickloader.cpp b/tests/auto/quick/qquickloader/tst_qquickloader.cpp
+index f4b682f3f4..fe2d71b037 100644
+--- a/tests/auto/quick/qquickloader/tst_qquickloader.cpp
++++ b/tests/auto/quick/qquickloader/tst_qquickloader.cpp
+@@ -132,6 +132,7 @@ private slots:
+     void statusChangeOnlyEmittedOnce();
+ 
+     void setSourceAndCheckStatus();
++    void asyncLoaderRace();
+ };
+ 
+ Q_DECLARE_METATYPE(QList<QQmlError>)
+@@ -1491,6 +1492,24 @@ void tst_QQuickLoader::setSourceAndCheckStatus()
+     QCOMPARE(loader->status(), QQuickLoader::Null);
+ }
+ 
++void tst_QQuickLoader::asyncLoaderRace()
++{
++    QQmlApplicationEngine engine;
++    auto url = testFileUrl("loader-async-race.qml");
++    engine.load(url);
++    auto root = engine.rootObjects().at(0);
++    QVERIFY(root);
++
++    QQuickLoader *loader = root->findChild<QQuickLoader *>();
++    QCOMPARE(loader->active(), false);
++    QCOMPARE(loader->status(), QQuickLoader::Null);
++    QCOMPARE(loader->item(), nullptr);
++
++    QSignalSpy spy(loader, &QQuickLoader::itemChanged);
++    QVERIFY(!spy.wait(100));
++    QCOMPARE(loader->item(), nullptr);
++}
++
+ QTEST_MAIN(tst_QQuickLoader)
+ 
+ #include "tst_qquickloader.moc"
+-- 
+2.31.1
+
