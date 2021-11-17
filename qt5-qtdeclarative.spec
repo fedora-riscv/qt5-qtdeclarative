@@ -8,7 +8,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.15.2
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -61,6 +61,9 @@ Patch33: 0033-Fix-sweep-step-for-tainted-QObject-JavaScript-wrappe.patch
 Patch34: 0034-Fix-distorted-text-with-subpixel-matrix-translation.patch
 Patch35: 0035-Revert-Fix-for-possible-crash-in-QSGDefaultLayer-gra.patch
 Patch36: 0036-Do-not-revert-properties-of-deleted-objects.patch
+Patch37: 0037-QQuickItemAnimation-close-potential-memory-leak.patch
+Patch38: 0038-qqmldelegatemodel-Fix-out-of-bounds-cache-removal.patch
+Patch39: 0039-QQuickWindow-don-t-leak-old-screenChanged-connection.patch
 
 ## upstreamable patches
 Patch100: %{name}-gcc11.patch
@@ -243,6 +246,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Wed Nov 17 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-10
+- sync kde/5.15 branch fixes
+
 * Sat Oct 30 2021 Rex Dieter <rdieter@fedoraproject.org> - 5.15.2-9
 - sync kde/5.15 branch fixes
 

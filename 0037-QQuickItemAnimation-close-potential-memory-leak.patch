@@ -1,0 +1,58 @@
+From 8e85afd011ea25eec0aa710481e2474dbaaee869 Mon Sep 17 00:00:00 2001
+From: Volker Hilsheimer <volker.hilsheimer@qt.io>
+Date: Wed, 17 Mar 2021 16:52:21 +0100
+Subject: [PATCH 37/41] QQuickItemAnimation: close potential memory leak
+
+Fix static analyzer warning bff6cb4333f531d5a72f7bf6dc1485f6.
+
+If ownership of viaData is not passed to the viaAction, then the object
+might be leaked. Use std::unique_ptr to make ownership transfer explicit
+and implicitly delete unowned objects.
+
+Pick-to: 6.1 5.15
+Change-Id: I89f2a6b630941a98a74db302bc1ab08055c71974
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 78aea267209c34abeb4895712dc76c923aa46165)
+---
+ src/quick/items/qquickitemanimation.cpp | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/src/quick/items/qquickitemanimation.cpp b/src/quick/items/qquickitemanimation.cpp
+index 23694e2de3..dfb56ccc00 100644
+--- a/src/quick/items/qquickitemanimation.cpp
++++ b/src/quick/items/qquickitemanimation.cpp
+@@ -230,8 +230,8 @@ QAbstractAnimationJob* QQuickParentAnimation::transition(QQuickStateActions &act
+ {
+     Q_D(QQuickParentAnimation);
+ 
+-    QQuickParentAnimationData *data = new QQuickParentAnimationData;
+-    QQuickParentAnimationData *viaData = new QQuickParentAnimationData;
++    std::unique_ptr<QQuickParentAnimationData> data(new QQuickParentAnimationData);
++    std::unique_ptr<QQuickParentAnimationData> viaData(new QQuickParentAnimationData);
+ 
+     bool hasExplicit = false;
+     if (d->target && d->newParent) {
+@@ -377,8 +377,8 @@ QAbstractAnimationJob* QQuickParentAnimation::transition(QQuickStateActions &act
+         QParallelAnimationGroupJob *ag = new QParallelAnimationGroupJob;
+ 
+         if (d->via)
+-            viaAction->setAnimAction(viaData);
+-        targetAction->setAnimAction(data);
++            viaAction->setAnimAction(viaData.release());
++        targetAction->setAnimAction(data.release());
+ 
+         //take care of any child animations
+         bool valid = d->defaultProperty.isValid();
+@@ -405,9 +405,6 @@ QAbstractAnimationJob* QQuickParentAnimation::transition(QQuickStateActions &act
+             topLevelGroup->appendAnimation(d->via ? viaAction : targetAction);
+         }
+         return initInstance(topLevelGroup);
+-    } else {
+-        delete data;
+-        delete viaData;
+     }
+     return nullptr;
+ }
+-- 
+2.33.1
+

@@ -1,0 +1,30 @@
+From fe8c06d78a1b2f261806797c6f15f313cc3fc490 Mon Sep 17 00:00:00 2001
+From: Maximilian Goldstein <max.goldstein@qt.io>
+Date: Tue, 23 Feb 2021 16:10:44 +0100
+Subject: [PATCH 38/41] qqmldelegatemodel: Fix out of bounds cache removal
+
+Pick-to: 5.15 6.0 6.1
+Task-number: QTBUG-91276
+Change-Id: I1ddbb4a3326d61ff94e3881beb64a14dade11c46
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 31ad81d81e623a34cd71567b9507f16601f1c1d4)
+---
+ src/qmlmodels/qqmldelegatemodel.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/qmlmodels/qqmldelegatemodel.cpp b/src/qmlmodels/qqmldelegatemodel.cpp
+index 8ce3da1cf1..8a74a854f4 100644
+--- a/src/qmlmodels/qqmldelegatemodel.cpp
++++ b/src/qmlmodels/qqmldelegatemodel.cpp
+@@ -1621,7 +1621,7 @@ void QQmlDelegateModelPrivate::itemsRemoved(
+         removed[i] = 0;
+ 
+     for (const Compositor::Remove &remove : removes) {
+-        for (; cacheIndex < remove.cacheIndex; ++cacheIndex)
++        for (; cacheIndex < remove.cacheIndex && cacheIndex < m_cache.size(); ++cacheIndex)
+             incrementIndexes(m_cache.at(cacheIndex), m_groupCount, removed);
+ 
+         for (int i = 1; i < m_groupCount; ++i) {
+-- 
+2.33.1
+
