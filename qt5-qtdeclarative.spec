@@ -7,14 +7,14 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.15.2
-Release: 11%{?dist}
+Version: 5.15.3
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
 Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
+Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz
 
 # header file to workaround multilib issue
 # https://bugzilla.redhat.com/show_bug.cgi?id=1441343
@@ -23,47 +23,27 @@ Source5: qv4global_p-multilib.h
 ## upstream patches
 ## repo: https://invent.kde.org/qt/qt/qtdeclarative
 ## branch: kde/5.15
-## git format-patch v5.15.2
-## Some of these are already included in stock 5.15.2 tarball, referenced here for completeness
-#Patch1: 0001-Bump-version.patch
-#Patch2: 0002-Inline-components-Fix-custom-parser-support.patch
-#Patch3: 0003-Revert-qquickloader-Free-memory-of-loaded-components.patch
-#Patch4: 0004-Add-changes-file-for-Qt-5.15.2.patch
-Patch5: 0005-QQuickView-docs-show-correct-usage-of-setInitialProp.patch
-Patch6: 0006-QQuickWindow-Check-if-QQuickItem-was-not-deleted.patch
-Patch7: 0007-Avoid-GHS-linker-to-optimize-away-QML-type-registrat.patch
-Patch8: 0008-QML-Text-doesn-t-reset-lineCount-when-text-is-empty.patch
-Patch9: 0009-Doc-mention-that-INCLUDEPATH-must-be-set-in-some-cas.patch
-Patch10: 0010-qmlfunctions.qdoc-Add-clarification-to-QML_FOREIGN.patch
-Patch11: 0011-Fix-QML-property-cache-leaks-of-delegate-items.patch
-Patch12: 0012-QQuickTextInput-Store-mask-data-in-std-unique_ptr.patch
-Patch13: 0013-Fix-crash-when-calling-hasOwnProperty-on-proxy-objec.patch
-Patch14: 0014-Accessibility-event-is-sent-on-item-s-geometry-chang.patch
-Patch15: 0015-qmltypes.prf-Take-abi-into-account-for-_metatypes.js.patch
-Patch16: 0016-qv4qmlcontext-Fix-bounded-signal-expressions-when-de.patch
-Patch17: 0017-Use-load-qt_tool-for-qmltime.patch
-Patch18: 0018-qqmlistmodel-Fix-crash-when-modelCache-is-null.patch
-Patch19: 0019-Show-a-tableview-even-if-the-syncView-has-an-empty-m.patch
-Patch20: 0020-DesignerSupport-Don-t-skip-already-inspected-objects.patch
-Patch21: 0021-QML-Fix-proxy-iteration.patch
-Patch22: 0022-Fix-IC-properties-in-same-file.patch
-Patch23: 0023-JIT-When-making-memory-writable-include-the-exceptio.patch
-Patch24: 0024-doc-explain-QQItem-event-delivery-handlers-setAccept.patch
-Patch25: 0025-Give-a-warning-when-StyledText-encounters-a-non-supp.patch
-Patch26: 0026-Add-missing-limits-include-to-fix-build-with-GCC-11.patch
-Patch27: 0027-Document-that-StyledText-also-supports-nbsp-and-quot.patch
-Patch28: 0028-Support-apos-in-styled-text.patch
-Patch29: 0029-Remove-unused-QPointer-QQuickPointerMask.patch
-Patch30: 0030-Include-limits-in-Yarr.h-to-fix-build-with-GCC-11.patch
-Patch31: 0031-QQuickLoader-Do-not-incubate-if-the-source-arrives-a.patch
-Patch32: 0032-QQmlDelegateModel-Refresh-the-view-when-a-column-is-.patch
-Patch33: 0033-Fix-sweep-step-for-tainted-QObject-JavaScript-wrappe.patch
-Patch34: 0034-Fix-distorted-text-with-subpixel-matrix-translation.patch
-Patch35: 0035-Revert-Fix-for-possible-crash-in-QSGDefaultLayer-gra.patch
-Patch36: 0036-Do-not-revert-properties-of-deleted-objects.patch
-Patch37: 0037-QQuickItemAnimation-close-potential-memory-leak.patch
-Patch38: 0038-qqmldelegatemodel-Fix-out-of-bounds-cache-removal.patch
-Patch39: 0039-QQuickWindow-don-t-leak-old-screenChanged-connection.patch
+## git format-patch v5.15.3-lts-lgpl
+Patch1:  0001-Give-a-warning-when-StyledText-encounters-a-non-supp.patch
+Patch2:  0002-Add-missing-limits-include-to-fix-build-with-GCC-11.patch
+Patch3:  0003-Document-that-StyledText-also-supports-nbsp-and-quot.patch
+Patch4:  0004-Support-apos-in-styled-text.patch
+Patch5:  0005-Remove-unused-QPointer-QQuickPointerMask.patch
+Patch6:  0006-Include-limits-in-Yarr.h-to-fix-build-with-GCC-11.patch
+Patch7:  0007-QQuickLoader-Do-not-incubate-if-the-source-arrives-a.patch
+Patch8:  0008-QQmlDelegateModel-Refresh-the-view-when-a-column-is-.patch
+Patch9:  0009-Fix-sweep-step-for-tainted-QObject-JavaScript-wrappe.patch
+Patch10: 0010-Fix-distorted-text-with-subpixel-matrix-translation.patch
+Patch11: 0011-Revert-Fix-for-possible-crash-in-QSGDefaultLayer-gra.patch
+Patch12: 0012-QQuickItemAnimation-close-potential-memory-leak.patch
+Patch13: 0013-qqmldelegatemodel-Fix-out-of-bounds-cache-removal.patch
+Patch14: 0014-QQuickWindow-don-t-leak-old-screenChanged-connection.patch
+Patch15: 0015-Fix-TapHandler-so-that-it-actually-registers-a-tap.patch
+Patch16: 0016-Revert-Fix-TapHandler-so-that-it-actually-registers-.patch
+Patch17: 0017-QQmlJs-FixedPoolArray-fix-UB-precondition-violation-.patch
+Patch18: 0018-QQuickTextInput-update-cursor-rectangle-after-paddin.patch
+Patch19: 0019-V4-Do-not-call-dtor-of-an-object-we-continue-to-use.patch
+Patch20: 0020-Make-sure-QQuickWidget-and-its-offscreen-window-s-sc.patch
 
 ## upstreamable patches
 Patch100: %{name}-gcc11.patch
@@ -246,6 +226,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Fri Mar 04 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.3-1
+- 5.15.3 + kde-5.15 fixes
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.2-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 

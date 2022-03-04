@@ -1,7 +1,7 @@
-From 6d7dfed857ab9e83ab2a917a929ce3b25342d90a Mon Sep 17 00:00:00 2001
+From a6ec2f93dba2a3e4ac07332c5adf4456348bf4a1 Mon Sep 17 00:00:00 2001
 From: Albert Astals Cid <albert.astals.cid@kdab.com>
 Date: Fri, 21 May 2021 13:30:41 +0200
-Subject: [PATCH 25/28] Give a warning when StyledText encounters a non
+Subject: [PATCH 01/20] Give a warning when StyledText encounters a non
  supported entity
 
 Pick-to: 6.1 5.15
@@ -35,5 +35,5 @@ index 660852ba83..d531fc9205 100644
          } else if (*ch == QLatin1Char(' ')) {
              QStringRef entity(&textIn, entityStart - 1, entityLength + 1);
 -- 
-2.31.1
+2.35.1
 

@@ -1,7 +1,7 @@
-From 0dda47d9f1a22567ad8f1266be2f0cd8a9226c7f Mon Sep 17 00:00:00 2001
+From bac7823a97ab901abc8da392ba23747feac4c933 Mon Sep 17 00:00:00 2001
 From: Albert Astals Cid <albert.astals.cid@kdab.com>
 Date: Fri, 21 May 2021 13:42:35 +0200
-Subject: [PATCH 28/28] Support &apos; in styled text
+Subject: [PATCH 04/20] Support &apos; in styled text
 
 Pick-to: 6.1 5.15
 Change-Id: I4a8db963e52a7899ab1796f9a560e8029cc1c929
@@ -14,7 +14,7 @@ Reviewed-by: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
  2 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/src/quick/items/qquicktext.cpp b/src/quick/items/qquicktext.cpp
-index 26840b99e3..4ddd2a41bc 100644
+index 43c29d1f58..459dea8f74 100644
 --- a/src/quick/items/qquicktext.cpp
 +++ b/src/quick/items/qquicktext.cpp
 @@ -2168,7 +2168,7 @@ void QQuickText::resetMaximumLineCount()
@@ -40,5 +40,5 @@ index d531fc9205..a25af90414 100644
                  textOut += QChar(34);
              else if (entity == QLatin1String("nbsp"))
 -- 
-2.31.1
+2.35.1
 

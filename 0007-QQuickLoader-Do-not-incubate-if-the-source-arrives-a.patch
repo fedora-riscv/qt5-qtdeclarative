@@ -1,7 +1,7 @@
-From 1c33a9d045897ce755a818ebff7ddecae97885d3 Mon Sep 17 00:00:00 2001
+From 31179b578276f10841fcb60a876ea757f9ca82ff Mon Sep 17 00:00:00 2001
 From: Aleix Pol <aleixpol@kde.org>
 Date: Tue, 21 Sep 2021 00:10:26 +0200
-Subject: [PATCH 31/36] QQuickLoader: Do not incubate if the source arrives
+Subject: [PATCH 07/20] QQuickLoader: Do not incubate if the source arrives
  after setActive(false)
 
 Otherwise we end up in the crazy place of active being false but item
@@ -21,10 +21,10 @@ Reviewed-by: Qt Cherry-pick Bot <cherrypick_bot@qt-project.org>
  create mode 100644 tests/auto/quick/qquickloader/data/loader-async-race.qml
 
 diff --git a/src/quick/items/qquickloader.cpp b/src/quick/items/qquickloader.cpp
-index 8cd63a4236..a6f7009946 100644
+index cb4f79a3c2..7fbe66fdda 100644
 --- a/src/quick/items/qquickloader.cpp
 +++ b/src/quick/items/qquickloader.cpp
-@@ -738,6 +738,9 @@ void QQuickLoaderPrivate::_q_sourceLoaded()
+@@ -737,6 +737,9 @@ void QQuickLoaderPrivate::_q_sourceLoaded()
          return;
      }
  
@@ -71,7 +71,7 @@ index 0000000000..8ba625c5c1
 +    }
 +}
 diff --git a/tests/auto/quick/qquickloader/tst_qquickloader.cpp b/tests/auto/quick/qquickloader/tst_qquickloader.cpp
-index f4b682f3f4..fe2d71b037 100644
+index 0f6c811adb..dddacbaa0b 100644
 --- a/tests/auto/quick/qquickloader/tst_qquickloader.cpp
 +++ b/tests/auto/quick/qquickloader/tst_qquickloader.cpp
 @@ -132,6 +132,7 @@ private slots:
@@ -82,7 +82,7 @@ index f4b682f3f4..fe2d71b037 100644
  };
  
  Q_DECLARE_METATYPE(QList<QQmlError>)
-@@ -1491,6 +1492,24 @@ void tst_QQuickLoader::setSourceAndCheckStatus()
+@@ -1496,6 +1497,24 @@ void tst_QQuickLoader::setSourceAndCheckStatus()
      QCOMPARE(loader->status(), QQuickLoader::Null);
  }
  
@@ -108,5 +108,5 @@ index f4b682f3f4..fe2d71b037 100644
  
  #include "tst_qquickloader.moc"
 -- 
-2.31.1
+2.35.1
 

@@ -1,7 +1,7 @@
-From d7ede3462d7e12e4fa60a6efa1b83e2157be4b00 Mon Sep 17 00:00:00 2001
+From f8f6b9d084decbad8ee90880493c413ac90c2911 Mon Sep 17 00:00:00 2001
 From: Andreas Hartmetz <andreas@ixgreen.de>
 Date: Fri, 5 Mar 2021 12:41:06 +0100
-Subject: [PATCH 39/41] QQuickWindow: don't leak old screenChanged connections
+Subject: [PATCH 14/20] QQuickWindow: don't leak old screenChanged connections
 
 Connections could accumulate. Because the newest one was invoked
 last due to how signal-slot invocations are ordered, rendering
@@ -23,7 +23,7 @@ Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/src/quick/items/qquickwindow.cpp b/src/quick/items/qquickwindow.cpp
-index 9ff91eb9a0..fbb807ca96 100644
+index eea1e93f32..c956c85091 100644
 --- a/src/quick/items/qquickwindow.cpp
 +++ b/src/quick/items/qquickwindow.cpp
 @@ -450,15 +450,14 @@ void QQuickWindow::physicalDpiChanged()
@@ -46,5 +46,5 @@ index 9ff91eb9a0..fbb807ca96 100644
  
      d->forcePolish();
 -- 
-2.33.1
+2.35.1
 

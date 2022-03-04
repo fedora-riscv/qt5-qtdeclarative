@@ -1,0 +1,36 @@
+From c6e595e7fbbe80c8db7ae33d8af05a4fd946a2f5 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 21 Dec 2021 09:20:17 +0100
+Subject: [PATCH 17/20] QQmlJs::FixedPoolArray: fix UB (precondition violation)
+ in allocate()
+
+Says ubsan:
+
+  qqmljsfixedpoolarray_p.h:90:19: runtime error: null pointer passed as argument 2, which is declared to never be null
+
+Fix, like in so many other places, by a size check.
+
+Pick-to: 6.3 6.2 5.15
+Change-Id: I9181d6ecb467c2dc726978ce7f93b35a6bf2f944
+Reviewed-by: Lars Knoll <lars.knoll@qt.io>
+(cherry picked from commit d74e931f3fc2587ac6d1e2930acbbe54ea5be2b5)
+---
+ src/qml/common/qqmljsfixedpoolarray_p.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/qml/common/qqmljsfixedpoolarray_p.h b/src/qml/common/qqmljsfixedpoolarray_p.h
+index b65b994d6c..15a8cd6878 100644
+--- a/src/qml/common/qqmljsfixedpoolarray_p.h
++++ b/src/qml/common/qqmljsfixedpoolarray_p.h
+@@ -86,7 +86,7 @@ public:
+         if (QTypeInfo<T>::isComplex) {
+             for (int i = 0; i < count; ++i)
+                 new (data + i) T(vector.at(i));
+-        } else {
++        } else if (count) {
+             memcpy(data, static_cast<const void*>(vector.constData()), count * sizeof(T));
+         }
+     }
+-- 
+2.35.1
+

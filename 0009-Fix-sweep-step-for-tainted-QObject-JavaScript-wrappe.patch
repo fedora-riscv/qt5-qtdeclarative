@@ -1,7 +1,7 @@
-From 9c0030bc8e828ecfbd8a4c8dd6bbfcbd3655b71c Mon Sep 17 00:00:00 2001
+From 00dd37619f35db3cddb2ac59198d3bde7ce73cd7 Mon Sep 17 00:00:00 2001
 From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
 Date: Sun, 10 Oct 2021 21:04:21 +0300
-Subject: [PATCH 33/36] Fix sweep step for tainted QObject JavaScript wrappers
+Subject: [PATCH 09/20] Fix sweep step for tainted QObject JavaScript wrappers
 
 Currently, whenever the garbage collector runs, it will destroy all
 valid tainted wrappers.
@@ -115,5 +115,5 @@ index 5d635aa63b..824fd89e5b 100644
          // engine2 doesn't own the object as engine1 was the first to wrap it above.
          // Therefore, no effect here.
 -- 
-2.31.1
+2.35.1
 

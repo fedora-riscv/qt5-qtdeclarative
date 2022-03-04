@@ -1,7 +1,7 @@
-From 4f08a2da5b0da675cf6a75683a43a106f5a1e7b8 Mon Sep 17 00:00:00 2001
+From 0eb5ff2e97713e12318c00bab9f3605abb8592c2 Mon Sep 17 00:00:00 2001
 From: Antonio Rojas <arojas@archlinux.org>
 Date: Sun, 23 May 2021 14:32:46 +0200
-Subject: [PATCH 26/28] Add missing limits include to fix build with GCC 11
+Subject: [PATCH 02/20] Add missing limits include to fix build with GCC 11
 
 This is not required for Qt 6, since it is indirectly pulled via
 qanystrigview.h, but it is for Qt 5 (where qanystrigview does
@@ -29,5 +29,5 @@ index a7e37d1964..01b2f58f16 100644
  
  //
 -- 
-2.31.1
+2.35.1
 

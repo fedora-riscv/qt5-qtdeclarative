@@ -1,7 +1,7 @@
-From 8e85afd011ea25eec0aa710481e2474dbaaee869 Mon Sep 17 00:00:00 2001
+From c3804f86e0a75c0c8402127a5b01bc7a858e6492 Mon Sep 17 00:00:00 2001
 From: Volker Hilsheimer <volker.hilsheimer@qt.io>
 Date: Wed, 17 Mar 2021 16:52:21 +0100
-Subject: [PATCH 37/41] QQuickItemAnimation: close potential memory leak
+Subject: [PATCH 12/20] QQuickItemAnimation: close potential memory leak
 
 Fix static analyzer warning bff6cb4333f531d5a72f7bf6dc1485f6.
 
@@ -54,5 +54,5 @@ index 23694e2de3..dfb56ccc00 100644
      return nullptr;
  }
 -- 
-2.33.1
+2.35.1
 
