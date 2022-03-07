@@ -1,3 +1,7 @@
+
+# Bug: https://bugzilla.redhat.com/show_bug.cgi?id=2061194
+%define _lto_cflags %{nil}
+
 %global qt_module qtdeclarative
 
 # definition borrowed from qtbase
@@ -8,7 +12,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.15.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -226,6 +230,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Mon Mar 07 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.3-2
+- Disable LTO
+
 * Fri Mar 04 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.3-1
 - 5.15.3 + kde-5.15 fixes
 
