@@ -1,7 +1,7 @@
-From 31179b578276f10841fcb60a876ea757f9ca82ff Mon Sep 17 00:00:00 2001
+From 103503f1cae9e928a4fa8b5e7e1f7af34f1add4d Mon Sep 17 00:00:00 2001
 From: Aleix Pol <aleixpol@kde.org>
 Date: Tue, 21 Sep 2021 00:10:26 +0200
-Subject: [PATCH 07/20] QQuickLoader: Do not incubate if the source arrives
+Subject: [PATCH 07/17] QQuickLoader: Do not incubate if the source arrives
  after setActive(false)
 
 Otherwise we end up in the crazy place of active being false but item
@@ -108,5 +108,5 @@ index 0f6c811adb..dddacbaa0b 100644
  
  #include "tst_qquickloader.moc"
 -- 
-2.35.1
+2.36.1
 

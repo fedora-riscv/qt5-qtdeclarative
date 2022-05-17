@@ -11,8 +11,8 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.15.3
-Release: 2%{?dist}
+Version: 5.15.4
+Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -27,27 +27,24 @@ Source5: qv4global_p-multilib.h
 ## upstream patches
 ## repo: https://invent.kde.org/qt/qt/qtdeclarative
 ## branch: kde/5.15
-## git format-patch v5.15.3-lts-lgpl
-Patch1:  0001-Give-a-warning-when-StyledText-encounters-a-non-supp.patch
-Patch2:  0002-Add-missing-limits-include-to-fix-build-with-GCC-11.patch
-Patch3:  0003-Document-that-StyledText-also-supports-nbsp-and-quot.patch
-Patch4:  0004-Support-apos-in-styled-text.patch
-Patch5:  0005-Remove-unused-QPointer-QQuickPointerMask.patch
-Patch6:  0006-Include-limits-in-Yarr.h-to-fix-build-with-GCC-11.patch
-Patch7:  0007-QQuickLoader-Do-not-incubate-if-the-source-arrives-a.patch
-Patch8:  0008-QQmlDelegateModel-Refresh-the-view-when-a-column-is-.patch
-Patch9:  0009-Fix-sweep-step-for-tainted-QObject-JavaScript-wrappe.patch
+## git format-patch v5.15.4-lts-lgpl
+Patch1: 0001-Give-a-warning-when-StyledText-encounters-a-non-supp.patch
+Patch2: 0002-Add-missing-limits-include-to-fix-build-with-GCC-11.patch
+Patch3: 0003-Document-that-StyledText-also-supports-nbsp-and-quot.patch
+Patch4: 0004-Support-apos-in-styled-text.patch
+Patch5: 0005-Remove-unused-QPointer-QQuickPointerMask.patch
+Patch6: 0006-Include-limits-in-Yarr.h-to-fix-build-with-GCC-11.patch
+Patch7: 0007-QQuickLoader-Do-not-incubate-if-the-source-arrives-a.patch
+Patch8: 0008-QQmlDelegateModel-Refresh-the-view-when-a-column-is-.patch
+Patch9: 0009-Fix-sweep-step-for-tainted-QObject-JavaScript-wrappe.patch
 Patch10: 0010-Fix-distorted-text-with-subpixel-matrix-translation.patch
 Patch11: 0011-Revert-Fix-for-possible-crash-in-QSGDefaultLayer-gra.patch
-Patch12: 0012-QQuickItemAnimation-close-potential-memory-leak.patch
-Patch13: 0013-qqmldelegatemodel-Fix-out-of-bounds-cache-removal.patch
-Patch14: 0014-QQuickWindow-don-t-leak-old-screenChanged-connection.patch
-Patch15: 0015-Fix-TapHandler-so-that-it-actually-registers-a-tap.patch
-Patch16: 0016-Revert-Fix-TapHandler-so-that-it-actually-registers-.patch
-Patch17: 0017-QQmlJs-FixedPoolArray-fix-UB-precondition-violation-.patch
-Patch18: 0018-QQuickTextInput-update-cursor-rectangle-after-paddin.patch
-Patch19: 0019-V4-Do-not-call-dtor-of-an-object-we-continue-to-use.patch
-Patch20: 0020-Make-sure-QQuickWidget-and-its-offscreen-window-s-sc.patch
+Patch12: 0012-Fix-TapHandler-so-that-it-actually-registers-a-tap.patch
+Patch13: 0013-Revert-Fix-TapHandler-so-that-it-actually-registers-.patch
+Patch14: 0014-QQmlJs-FixedPoolArray-fix-UB-precondition-violation-.patch
+Patch15: 0015-V4-Do-not-call-dtor-of-an-object-we-continue-to-use.patch
+Patch16: 0016-Make-sure-QQuickWidget-and-its-offscreen-window-s-sc.patch
+Patch17: 0017-QQuickItem-Guard-against-cycles-in-nextPrevItemInTab.patch
 
 ## upstreamable patches
 Patch100: %{name}-gcc11.patch
@@ -230,6 +227,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Mon May 16 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.4-1
+- 5.15.4
+
 * Mon Mar 07 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.3-2
 - Disable LTO
 

@@ -1,7 +1,7 @@
-From ffa77919e72951c7accf84ad09dc669d166aedf8 Mon Sep 17 00:00:00 2001
+From 8b0a4b1a329010e056b19fdd9940bad2036b5f57 Mon Sep 17 00:00:00 2001
 From: Laszlo Agocs <laszlo.agocs@qt.io>
 Date: Mon, 11 Oct 2021 15:37:33 +0200
-Subject: [PATCH 11/20] Revert "Fix for possible crash in
+Subject: [PATCH 11/17] Revert "Fix for possible crash in
  QSGDefaultLayer::grab"
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -67,5 +67,5 @@ index 4deb6c70a3..c0a1ccab78 100644
  protected:
      void releaseResources() override;
 -- 
-2.35.1
+2.36.1
 

@@ -1,7 +1,7 @@
-From 02105099301450c890e1caba977ef44efdc43da7 Mon Sep 17 00:00:00 2001
+From 5eee7419f55c592a24d9c7746df0f197d8f0a71d Mon Sep 17 00:00:00 2001
 From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
 Date: Sat, 29 Jan 2022 21:59:33 +0200
-Subject: [PATCH 20/20] Make sure QQuickWidget and its offscreen window's
+Subject: [PATCH 16/17] Make sure QQuickWidget and its offscreen window's
  screens are always in sync
 
 By default, the offscreen window is placed on the primary screen.
@@ -80,5 +80,5 @@ index 39780f8de3..223d91f579 100644
      case QEvent::Move:
          d->updatePosition();
 -- 
-2.35.1
+2.36.1
 
