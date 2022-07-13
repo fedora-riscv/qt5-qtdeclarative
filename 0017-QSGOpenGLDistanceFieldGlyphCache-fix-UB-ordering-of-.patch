@@ -1,0 +1,68 @@
+From 59019a226146d9d80a01db21c0c3d692027048aa Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@kdab.com>
+Date: Tue, 16 Jul 2019 11:31:01 +0200
+Subject: [PATCH 17/19] QSGOpenGLDistanceFieldGlyphCache: fix UB (ordering of
+ pointers not from the same array)
+
+The code performed out of bounds checks by adding the size of the
+buffer to a pointer and comparing the result to the the
+one-past-the-end pointer of the buffer.
+
+This is UB, for three reasons:
+
+- in one case, a qint64 is added to a pointer, silently truncating the
+  result on 32bit platforms
+
+- if the buffer overflow is large, the pointer value may wrap around,
+  yielding a result that is numerically less than the end pointer, but
+  still out-of-bounds.
+
+- pointer order is only defined within a C array, plus one past the
+  end. On failure, pointers outside that range are compared.
+
+Fix by comparing distance(it, end) with the required size for the
+chunk to be written instead.
+
+Pick-to: 6.3 6.2 5.15
+Change-Id: I356bb8c8a65a93b8b1c1eb7bac381dd64bea719e
+Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+(cherry picked from commit 8d9bd6b381bfc759d575954801b683354ad6a790)
+---
+ src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp b/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp
+index f7cb8bede3..219cdd5966 100644
+--- a/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp
++++ b/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp
+@@ -446,7 +446,7 @@ bool QSGRhiDistanceFieldGlyphCache::loadPregeneratedCache(const QRawFont &font)
+ 
+         const char *textureRecord = allocatorData;
+         for (int i = 0; i < textureCount; ++i, textureRecord += Qtdf::TextureRecordSize) {
+-            if (textureRecord + Qtdf::TextureRecordSize > qtdfTableEnd) {
++            if (qtdfTableEnd - textureRecord < Qtdf::TextureRecordSize) {
+                 qWarning("qtdf table too small in font '%s'.",
+                          qPrintable(font.familyName()));
+                 return false;
+@@ -462,7 +462,7 @@ bool QSGRhiDistanceFieldGlyphCache::loadPregeneratedCache(const QRawFont &font)
+ 
+         const char *glyphRecord = textureRecord;
+         for (quint32 i = 0; i < glyphCount; ++i, glyphRecord += Qtdf::GlyphRecordSize) {
+-            if (glyphRecord + Qtdf::GlyphRecordSize > qtdfTableEnd) {
++            if (qtdfTableEnd - glyphRecord < Qtdf:: GlyphRecordSize) {
+                 qWarning("qtdf table too small in font '%s'.",
+                          qPrintable(font.familyName()));
+                 return false;
+@@ -513,7 +513,7 @@ bool QSGRhiDistanceFieldGlyphCache::loadPregeneratedCache(const QRawFont &font)
+             int width = texInfo->allocatedArea.width();
+             int height = texInfo->allocatedArea.height();
+             qint64 size = qint64(width) * height;
+-            if (reinterpret_cast<const char *>(textureData + size) > qtdfTableEnd) {
++            if (qtdfTableEnd - reinterpret_cast<const char *>(textureData) < size) {
+                 qWarning("qtdf table too small in font '%s'.",
+                          qPrintable(font.familyName()));
+                 return false;
+-- 
+2.36.1
+

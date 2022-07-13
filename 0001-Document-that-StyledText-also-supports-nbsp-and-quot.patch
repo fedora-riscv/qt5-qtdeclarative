@@ -1,7 +1,7 @@
-From eb9ebe3815ac100d4ab3b3a708f691a1dde270bf Mon Sep 17 00:00:00 2001
+From 48fc7f164a347f88c221c6a86614008b63b7767f Mon Sep 17 00:00:00 2001
 From: Albert Astals Cid <albert.astals.cid@kdab.com>
 Date: Fri, 21 May 2021 13:17:15 +0200
-Subject: [PATCH 03/17] Document that StyledText also supports &nbsp; and
+Subject: [PATCH 01/19] Document that StyledText also supports &nbsp; and
  &quot;
 
 Change-Id: I1715f8ae8ec8d0fbaf6dbe2b8663cc169da663cd

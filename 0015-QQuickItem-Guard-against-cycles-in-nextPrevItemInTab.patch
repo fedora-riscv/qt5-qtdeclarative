@@ -1,7 +1,7 @@
-From 51efb2ed2f071beda188270a23ac450fe4b318f7 Mon Sep 17 00:00:00 2001
+From aca0c736c99439a8f4d297bc57c1fa5a2d2a6e88 Mon Sep 17 00:00:00 2001
 From: Fabian Kosmale <fabian.kosmale@qt.io>
 Date: Wed, 4 May 2022 09:10:54 +0200
-Subject: [PATCH 17/17] QQuickItem: Guard against cycles in
+Subject: [PATCH 15/19] QQuickItem: Guard against cycles in
  nextPrevItemInTabFocusChain
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -37,7 +37,7 @@ Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
  create mode 100644 tests/auto/quick/qquickitem2/data/activeFocusOnTab_infiniteLoop3.qml
 
 diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
-index 497672b497..81b0db0b69 100644
+index 3df899d63d..83e52b12e5 100644
 --- a/src/quick/items/qquickitem.cpp
 +++ b/src/quick/items/qquickitem.cpp
 @@ -59,6 +59,7 @@
@@ -48,7 +48,7 @@ index 497672b497..81b0db0b69 100644
  
  #include <private/qqmlglobal_p.h>
  #include <private/qqmlengine_p.h>
-@@ -2520,6 +2521,7 @@ QQuickItem* QQuickItemPrivate::nextPrevItemInTabFocusChain(QQuickItem *item, boo
+@@ -2526,6 +2527,7 @@ QQuickItem* QQuickItemPrivate::nextPrevItemInTabFocusChain(QQuickItem *item, boo
      QQuickItem *current = item;
      qCDebug(DBG_FOCUS) << "QQuickItemPrivate::nextPrevItemInTabFocusChain: startItem:" << startItem;
      qCDebug(DBG_FOCUS) << "QQuickItemPrivate::nextPrevItemInTabFocusChain: firstFromItem:" << firstFromItem;
@@ -56,7 +56,7 @@ index 497672b497..81b0db0b69 100644
      do {
          qCDebug(DBG_FOCUS) << "QQuickItemPrivate::nextPrevItemInTabFocusChain: current:" << current;
          qCDebug(DBG_FOCUS) << "QQuickItemPrivate::nextPrevItemInTabFocusChain: from:" << from;
-@@ -2586,7 +2588,10 @@ QQuickItem* QQuickItemPrivate::nextPrevItemInTabFocusChain(QQuickItem *item, boo
+@@ -2592,7 +2594,10 @@ QQuickItem* QQuickItemPrivate::nextPrevItemInTabFocusChain(QQuickItem *item, boo
          // traversed all of the chain (by compare the [current] item with [startItem])
          // Since the [startItem] might be promoted to its parent if it is invisible,
          // we still have to check [current] item with original start item

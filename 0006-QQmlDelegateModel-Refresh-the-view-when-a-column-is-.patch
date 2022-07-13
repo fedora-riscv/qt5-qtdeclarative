@@ -1,7 +1,7 @@
-From 0fdd8a998075a8b52954724743d3a04c105c6ce2 Mon Sep 17 00:00:00 2001
+From 95064bee0366ed3aa9cc823ed73fba55093ced01 Mon Sep 17 00:00:00 2001
 From: Aleix Pol <aleixpol@kde.org>
 Date: Thu, 23 Sep 2021 03:43:04 +0200
-Subject: [PATCH 08/17] QQmlDelegateModel: Refresh the view when a column is
+Subject: [PATCH 06/19] QQmlDelegateModel: Refresh the view when a column is
  added at 0
 
 It can happen that a model reports n>0 rows but columns=0 (See
@@ -22,7 +22,7 @@ Signed-off-by: Aleix Pol <aleixpol@kde.org>
  create mode 100644 tests/auto/qml/qqmldelegatemodel/data/redrawUponColumnChange.qml
 
 diff --git a/src/qmlmodels/qqmldelegatemodel.cpp b/src/qmlmodels/qqmldelegatemodel.cpp
-index 26ded63c41..53e511303e 100644
+index 312a621029..f5d586a4c2 100644
 --- a/src/qmlmodels/qqmldelegatemodel.cpp
 +++ b/src/qmlmodels/qqmldelegatemodel.cpp
 @@ -389,6 +389,12 @@ void QQmlDelegateModelPrivate::connectToAbstractItemModel()
@@ -51,7 +51,7 @@ index 26ded63c41..53e511303e 100644
      QObject::disconnect(aim, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
                          q, SLOT(_q_dataChanged(QModelIndex,QModelIndex,QVector<int>)));
      QObject::disconnect(aim, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)),
-@@ -1958,6 +1970,38 @@ void QQmlDelegateModel::_q_rowsMoved(
+@@ -1960,6 +1972,38 @@ void QQmlDelegateModel::_q_rowsMoved(
      }
  }
  
@@ -122,7 +122,7 @@ index 0000000000..206133bb39
 +    }
 +}
 diff --git a/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp b/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
-index 71550a50f3..4c1eae7ac7 100644
+index 9bc359d243..120b1897a1 100644
 --- a/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
 +++ b/tests/auto/qml/qqmldelegatemodel/tst_qqmldelegatemodel.cpp
 @@ -27,6 +27,8 @@
@@ -134,16 +134,16 @@ index 71550a50f3..4c1eae7ac7 100644
  #include <QtQml/qqmlcomponent.h>
  #include <QtQmlModels/private/qqmldelegatemodel_p.h>
  #include <QtQuick/qquickview.h>
-@@ -45,6 +47,7 @@ private slots:
-     void valueWithoutCallingObjectFirst_data();
+@@ -46,6 +48,7 @@ private slots:
      void valueWithoutCallingObjectFirst();
      void filterOnGroup_removeWhenCompleted();
+     void qtbug_86017();
 +    void redrawUponColumnChange();
  };
  
  class AbstractItemModel : public QAbstractItemModel
-@@ -149,6 +152,30 @@ void tst_QQmlDelegateModel::filterOnGroup_removeWhenCompleted()
-     QTest::qWaitFor([=]{ return model->count() == 2; } );
+@@ -164,6 +167,30 @@ void tst_QQmlDelegateModel::qtbug_86017()
+     QCOMPARE(model->filterGroup(), "selected");
  }
  
 +void tst_QQmlDelegateModel::redrawUponColumnChange()

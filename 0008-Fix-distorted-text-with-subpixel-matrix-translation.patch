@@ -1,7 +1,7 @@
-From b884339e8b6dd8dcaed9704afda2ebed4fcaf9b5 Mon Sep 17 00:00:00 2001
+From 74db4a874a39b189d000d0b8507fccfbacf83294 Mon Sep 17 00:00:00 2001
 From: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
 Date: Tue, 12 Oct 2021 13:13:01 +0200
-Subject: [PATCH 10/17] Fix distorted text with subpixel matrix translation
+Subject: [PATCH 08/19] Fix distorted text with subpixel matrix translation
 
 We would pixel-align native text *before* applying the
 model-view matrix, which would cause GL_NEAREST artifacts to

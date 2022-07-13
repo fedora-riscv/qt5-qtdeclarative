@@ -11,7 +11,7 @@
 
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
-Version: 5.15.4
+Version: 5.15.5
 Release: 1%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
@@ -27,24 +27,27 @@ Source5: qv4global_p-multilib.h
 ## upstream patches
 ## repo: https://invent.kde.org/qt/qt/qtdeclarative
 ## branch: kde/5.15
-## git format-patch v5.15.4-lts-lgpl
-Patch1: 0001-Give-a-warning-when-StyledText-encounters-a-non-supp.patch
-Patch2: 0002-Add-missing-limits-include-to-fix-build-with-GCC-11.patch
-Patch3: 0003-Document-that-StyledText-also-supports-nbsp-and-quot.patch
-Patch4: 0004-Support-apos-in-styled-text.patch
-Patch5: 0005-Remove-unused-QPointer-QQuickPointerMask.patch
-Patch6: 0006-Include-limits-in-Yarr.h-to-fix-build-with-GCC-11.patch
-Patch7: 0007-QQuickLoader-Do-not-incubate-if-the-source-arrives-a.patch
-Patch8: 0008-QQmlDelegateModel-Refresh-the-view-when-a-column-is-.patch
-Patch9: 0009-Fix-sweep-step-for-tainted-QObject-JavaScript-wrappe.patch
-Patch10: 0010-Fix-distorted-text-with-subpixel-matrix-translation.patch
-Patch11: 0011-Revert-Fix-for-possible-crash-in-QSGDefaultLayer-gra.patch
-Patch12: 0012-Fix-TapHandler-so-that-it-actually-registers-a-tap.patch
-Patch13: 0013-Revert-Fix-TapHandler-so-that-it-actually-registers-.patch
-Patch14: 0014-QQmlJs-FixedPoolArray-fix-UB-precondition-violation-.patch
-Patch15: 0015-V4-Do-not-call-dtor-of-an-object-we-continue-to-use.patch
-Patch16: 0016-Make-sure-QQuickWidget-and-its-offscreen-window-s-sc.patch
-Patch17: 0017-QQuickItem-Guard-against-cycles-in-nextPrevItemInTab.patch
+## git format-patch v5.15.5-lts-lgpl
+Patch1:  0001-Document-that-StyledText-also-supports-nbsp-and-quot.patch
+Patch2:  0002-Support-apos-in-styled-text.patch
+Patch3:  0003-Remove-unused-QPointer-QQuickPointerMask.patch
+Patch4:  0004-Include-limits-in-Yarr.h-to-fix-build-with-GCC-11.patch
+Patch5:  0005-QQuickLoader-Do-not-incubate-if-the-source-arrives-a.patch
+Patch6:  0006-QQmlDelegateModel-Refresh-the-view-when-a-column-is-.patch
+Patch7:  0007-Fix-sweep-step-for-tainted-QObject-JavaScript-wrappe.patch
+Patch8:  0008-Fix-distorted-text-with-subpixel-matrix-translation.patch
+Patch9:  0009-Revert-Fix-for-possible-crash-in-QSGDefaultLayer-gra.patch
+Patch10: 0010-Fix-TapHandler-so-that-it-actually-registers-a-tap.patch
+Patch11: 0011-Revert-Fix-TapHandler-so-that-it-actually-registers-.patch
+Patch12: 0012-QQmlJs-FixedPoolArray-fix-UB-precondition-violation-.patch
+Patch13: 0013-V4-Do-not-call-dtor-of-an-object-we-continue-to-use.patch
+Patch14: 0014-Make-sure-QQuickWidget-and-its-offscreen-window-s-sc.patch
+Patch15: 0015-QQuickItem-Guard-against-cycles-in-nextPrevItemInTab.patch
+Patch16: 0016-QSGOpenGLDistanceFieldGlyphCache-fix-multiplication-.patch
+Patch17: 0017-QSGOpenGLDistanceFieldGlyphCache-fix-UB-ordering-of-.patch
+Patch18: 0018-Fix-Flickable-wheel-velocity-calculation.patch
+Patch19: 0019-Fix-Flickable-with-QTBUG-56075-patch-applied.patch
+
 
 ## upstreamable patches
 Patch100: %{name}-gcc11.patch
@@ -227,6 +230,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Wed Jul 13 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.5-1
+- 5.15.5
+
 * Mon May 16 2022 Jan Grulich <jgrulich@redhat.com> - 5.15.4-1
 - 5.15.4
 
