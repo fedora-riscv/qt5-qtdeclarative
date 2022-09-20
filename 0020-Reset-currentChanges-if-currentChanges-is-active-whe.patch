@@ -1,0 +1,38 @@
+From b3aaf1482c48bbc0ca4f7c7934597c055afe4b6a Mon Sep 17 00:00:00 2001
+From: Tony Leinonen <tony.leinonen@qt.io>
+Date: Thu, 21 Oct 2021 14:44:02 +0300
+Subject: [PATCH 20/20] Reset currentChanges if currentChanges is active when
+ refilling listView
+
+currentIndex was not getting updated because itemViewChangeSet was left
+active from previous interaction. Clear the changes if they are still
+active on refill.
+
+Task-number: QTBUG-92809
+Pick-to: 6.2 5.15
+Change-Id: I81558a5e0bfe0f880851fff85370bd5be60a5391
+Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
+(cherry picked from commit 2d8033a4ffb9ca60adee29d375491d7ed2a82747)
+
+* asturmlechner 2021-11-09: Other part of 2d8033a4 is in qtquickcontrols2
+  but only consists of tests.
+---
+ src/quick/items/qquickitemview.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/quick/items/qquickitemview.cpp b/src/quick/items/qquickitemview.cpp
+index 010a0152e1..f8ad168a17 100644
+--- a/src/quick/items/qquickitemview.cpp
++++ b/src/quick/items/qquickitemview.cpp
+@@ -1785,7 +1785,7 @@ void QQuickItemViewPrivate::refill(qreal from, qreal to)
+ 
+     do {
+         bufferPause.stop();
+-        if (currentChanges.hasPendingChanges() || bufferedChanges.hasPendingChanges()) {
++        if (currentChanges.hasPendingChanges() || bufferedChanges.hasPendingChanges() || currentChanges.active) {
+             currentChanges.reset();
+             bufferedChanges.reset();
+             releaseVisibleItems(reusableFlag);
+-- 
+2.37.3
+

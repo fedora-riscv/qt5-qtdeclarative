@@ -1,7 +1,7 @@
-From db0c06d98464d8d0cc6dfddfc502593951bac768 Mon Sep 17 00:00:00 2001
+From 920c4e95b85f7f06b58ac1016ca01ecb4043e755 Mon Sep 17 00:00:00 2001
 From: Marc Mutz <marc.mutz@kdab.com>
 Date: Tue, 16 Jul 2019 11:23:37 +0200
-Subject: [PATCH 16/19] QSGOpenGLDistanceFieldGlyphCache: fix multiplication
+Subject: [PATCH 16/20] QSGOpenGLDistanceFieldGlyphCache: fix multiplication
  result truncation
 
 The type of the expression int * int is int, so truncation has already
@@ -39,5 +39,5 @@ index 53b6fe117f..f7cb8bede3 100644
                  qWarning("qtdf table too small in font '%s'.",
                           qPrintable(font.familyName()));
 -- 
-2.36.1
+2.37.3
 

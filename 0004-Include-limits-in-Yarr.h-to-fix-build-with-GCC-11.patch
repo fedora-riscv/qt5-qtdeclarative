@@ -1,7 +1,7 @@
-From 814f570d51323630ff84038ca04b5c02639e0ee5 Mon Sep 17 00:00:00 2001
+From 2e36092b74206315a637fd68eceb5e864e6dd0dd Mon Sep 17 00:00:00 2001
 From: Dmitry Shachnev <mitya57@gmail.com>
 Date: Wed, 18 Aug 2021 22:50:29 +0300
-Subject: [PATCH 04/19] Include <limits> in Yarr.h to fix build with GCC 11
+Subject: [PATCH 04/20] Include <limits> in Yarr.h to fix build with GCC 11
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -39,5 +39,5 @@ index ccf78f9880..2955ea7e72 100644
  
  namespace JSC { namespace Yarr {
 -- 
-2.36.1
+2.37.3
 

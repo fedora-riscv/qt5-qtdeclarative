@@ -1,7 +1,7 @@
-From 955c47dd07d4337c279433b246421b92a4d16341 Mon Sep 17 00:00:00 2001
+From 79fa06279d26de7da111ddc88201324e55d68e8a Mon Sep 17 00:00:00 2001
 From: Shawn Rutledge <shawn.rutledge@qt.io>
 Date: Tue, 4 May 2021 10:12:39 +0200
-Subject: [PATCH 18/19] Fix Flickable wheel velocity calculation
+Subject: [PATCH 18/20] Fix Flickable wheel velocity calculation
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -419,5 +419,5 @@ index 9e84261687..e69d6207a9 100644
  
      Component.onCompleted: {
 -- 
-2.36.1
+2.37.3
 

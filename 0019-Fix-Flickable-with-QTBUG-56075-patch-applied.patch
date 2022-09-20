@@ -1,7 +1,7 @@
-From c47f3d7b227c9bc86ca1702ae3291a62c2116cfa Mon Sep 17 00:00:00 2001
+From e1ecf1c4e09b2f1d04f94971771019e59a50679f Mon Sep 17 00:00:00 2001
 From: Wolfgang Frisch <wfrisch@riseup.net>
 Date: Thu, 19 May 2022 00:55:50 +0200
-Subject: [PATCH 19/19] Fix Flickable with QTBUG-56075 patch applied
+Subject: [PATCH 19/20] Fix Flickable with QTBUG-56075 patch applied
 
 ---
  src/quick/items/qquickflickable.cpp | 2 ++
@@ -21,5 +21,5 @@ index efb2f11d02..2a5b16c31a 100644
  // FlickThreshold determines how far the "mouse" must have moved
  // before we perform a flick.
 -- 
-2.36.1
+2.37.3
 
