@@ -1,7 +1,7 @@
-From 920c4e95b85f7f06b58ac1016ca01ecb4043e755 Mon Sep 17 00:00:00 2001
+From 76113c63af23d516f488f5e6b9062ca97e062e9e Mon Sep 17 00:00:00 2001
 From: Marc Mutz <marc.mutz@kdab.com>
 Date: Tue, 16 Jul 2019 11:23:37 +0200
-Subject: [PATCH 16/20] QSGOpenGLDistanceFieldGlyphCache: fix multiplication
+Subject: [PATCH 13/18] QSGOpenGLDistanceFieldGlyphCache: fix multiplication
  result truncation
 
 The type of the expression int * int is int, so truncation has already

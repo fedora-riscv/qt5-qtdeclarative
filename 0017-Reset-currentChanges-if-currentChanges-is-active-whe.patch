@@ -1,7 +1,7 @@
-From b3aaf1482c48bbc0ca4f7c7934597c055afe4b6a Mon Sep 17 00:00:00 2001
+From 10d77845723f1e7fa60bbb0f60f708949f3a538c Mon Sep 17 00:00:00 2001
 From: Tony Leinonen <tony.leinonen@qt.io>
 Date: Thu, 21 Oct 2021 14:44:02 +0300
-Subject: [PATCH 20/20] Reset currentChanges if currentChanges is active when
+Subject: [PATCH 17/18] Reset currentChanges if currentChanges is active when
  refilling listView
 
 currentIndex was not getting updated because itemViewChangeSet was left
@@ -21,7 +21,7 @@ Reviewed-by: Richard Moe Gustavsen <richard.gustavsen@qt.io>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/quick/items/qquickitemview.cpp b/src/quick/items/qquickitemview.cpp
-index 010a0152e1..f8ad168a17 100644
+index 13e7b87049..c8ea286d3e 100644
 --- a/src/quick/items/qquickitemview.cpp
 +++ b/src/quick/items/qquickitemview.cpp
 @@ -1785,7 +1785,7 @@ void QQuickItemViewPrivate::refill(qreal from, qreal to)

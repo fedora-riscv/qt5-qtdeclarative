@@ -1,7 +1,7 @@
-From 757782a0a62b90b223e6e008287b4cafc91beff1 Mon Sep 17 00:00:00 2001
+From eb04ee7e02c5e7a2b84b129c09f13025242688d6 Mon Sep 17 00:00:00 2001
 From: Ulf Hermann <ulf.hermann@qt.io>
 Date: Thu, 3 Feb 2022 10:02:06 +0100
-Subject: [PATCH 13/20] V4: Do not call dtor of an object we continue to use
+Subject: [PATCH 10/18] V4: Do not call dtor of an object we continue to use
 
 After destroyObject(), the QObjectWrapper is still alive. We might use
 its heap object again. Furthermore, the Heap::QObjectWrapper dtor does

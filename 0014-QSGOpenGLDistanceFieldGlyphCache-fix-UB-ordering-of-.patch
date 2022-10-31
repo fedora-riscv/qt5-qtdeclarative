@@ -1,7 +1,7 @@
-From 98e65ca71e389ad3e36aa3461ad4617815f9cd9a Mon Sep 17 00:00:00 2001
+From 985358efb1e60a8ff493da4d6ca9056f63dc9982 Mon Sep 17 00:00:00 2001
 From: Marc Mutz <marc.mutz@kdab.com>
 Date: Tue, 16 Jul 2019 11:31:01 +0200
-Subject: [PATCH 17/20] QSGOpenGLDistanceFieldGlyphCache: fix UB (ordering of
+Subject: [PATCH 14/18] QSGOpenGLDistanceFieldGlyphCache: fix UB (ordering of
  pointers not from the same array)
 
 The code performed out of bounds checks by adding the size of the
