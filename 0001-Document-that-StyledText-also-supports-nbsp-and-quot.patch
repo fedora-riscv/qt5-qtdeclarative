@@ -1,7 +1,7 @@
-From 43b6267d024afd655a8c0c8c833f71850d7a8bb9 Mon Sep 17 00:00:00 2001
+From 3f272e04492cd884deb4e7948e39b749809d5256 Mon Sep 17 00:00:00 2001
 From: Albert Astals Cid <albert.astals.cid@kdab.com>
 Date: Fri, 21 May 2021 13:17:15 +0200
-Subject: [PATCH 01/18] Document that StyledText also supports &nbsp; and
+Subject: [PATCH 01/21] Document that StyledText also supports &nbsp; and
  &quot;
 
 Change-Id: I1715f8ae8ec8d0fbaf6dbe2b8663cc169da663cd
@@ -25,5 +25,5 @@ index 6230186933..c1571fc6f5 100644
  
      \c Text.StyledText parser is strict, requiring tags to be correctly nested.
 -- 
-2.37.3
+2.39.0
 

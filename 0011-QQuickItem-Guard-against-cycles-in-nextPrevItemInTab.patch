@@ -1,7 +1,7 @@
-From 74c8c421763597f778313ea976fffdc03183226b Mon Sep 17 00:00:00 2001
+From 052dba54ae335b42fdcd1c0c68c9fce0031ffe9e Mon Sep 17 00:00:00 2001
 From: Fabian Kosmale <fabian.kosmale@qt.io>
 Date: Wed, 4 May 2022 09:10:54 +0200
-Subject: [PATCH 12/18] QQuickItem: Guard against cycles in
+Subject: [PATCH 11/21] QQuickItem: Guard against cycles in
  nextPrevItemInTabFocusChain
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -118,5 +118,5 @@ index c8f251dbe1..c8ef36ee68 100644
  {
      if (!qt_tab_all_widgets())
 -- 
-2.37.3
+2.39.0
 

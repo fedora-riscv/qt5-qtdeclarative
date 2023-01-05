@@ -1,7 +1,7 @@
-From 76113c63af23d516f488f5e6b9062ca97e062e9e Mon Sep 17 00:00:00 2001
+From f9faa4cfa0dbbac12cdf79e56a02b9aa0022018c Mon Sep 17 00:00:00 2001
 From: Marc Mutz <marc.mutz@kdab.com>
 Date: Tue, 16 Jul 2019 11:23:37 +0200
-Subject: [PATCH 13/18] QSGOpenGLDistanceFieldGlyphCache: fix multiplication
+Subject: [PATCH 12/21] QSGOpenGLDistanceFieldGlyphCache: fix multiplication
  result truncation
 
 The type of the expression int * int is int, so truncation has already
@@ -26,7 +26,7 @@ Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp b/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp
-index 53b6fe117f..f7cb8bede3 100644
+index eb4db0f85e..2c9868b335 100644
 --- a/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp
 +++ b/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp
 @@ -512,7 +512,7 @@ bool QSGRhiDistanceFieldGlyphCache::loadPregeneratedCache(const QRawFont &font)
@@ -39,5 +39,5 @@ index 53b6fe117f..f7cb8bede3 100644
                  qWarning("qtdf table too small in font '%s'.",
                           qPrintable(font.familyName()));
 -- 
-2.37.3
+2.39.0
 

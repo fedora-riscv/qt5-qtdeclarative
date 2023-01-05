@@ -1,7 +1,7 @@
-From 0f3b328766038c1161f4f613a0bf3a4fcbdb4cef Mon Sep 17 00:00:00 2001
+From da206ac99b58218a1e51a2e75032647d24cd0fdb Mon Sep 17 00:00:00 2001
 From: Albert Astals Cid <albert.astals.cid@kdab.com>
 Date: Thu, 17 Jun 2021 16:32:28 +0200
-Subject: [PATCH 03/18] Remove unused QPointer<QQuickPointerMask>
+Subject: [PATCH 03/21] Remove unused QPointer<QQuickPointerMask>
 
 Change-Id: I009fa6bbd8599dc3bb2e810176fe20e70ed50851
 Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
@@ -31,5 +31,5 @@ index fba383e268..0d63618622 100644
      QPointF targetStartPos;
      QPointF lastPos;
 -- 
-2.37.3
+2.39.0
 

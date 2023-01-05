@@ -1,7 +1,7 @@
-From 8e28af8076873503bbf036487aaf7310407a2f11 Mon Sep 17 00:00:00 2001
+From bf4b4f3dfb3534e7919c50faa60a0fe7fbcdacf5 Mon Sep 17 00:00:00 2001
 From: Albert Astals Cid <albert.astals.cid@kdab.com>
 Date: Fri, 21 May 2021 13:42:35 +0200
-Subject: [PATCH 02/18] Support &apos; in styled text
+Subject: [PATCH 02/21] Support &apos; in styled text
 
 Pick-to: 6.1 5.15
 Change-Id: I4a8db963e52a7899ab1796f9a560e8029cc1c929
@@ -40,5 +40,5 @@ index d531fc9205..a25af90414 100644
                  textOut += QChar(34);
              else if (entity == QLatin1String("nbsp"))
 -- 
-2.37.3
+2.39.0
 

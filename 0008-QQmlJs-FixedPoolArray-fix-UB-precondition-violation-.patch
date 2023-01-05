@@ -1,7 +1,7 @@
-From 2d11778ce9348716ce936ce11c89ced58d8ec188 Mon Sep 17 00:00:00 2001
+From 99ada3c3d329b6d7136b0425841dcaa654c9c05b Mon Sep 17 00:00:00 2001
 From: Marc Mutz <marc.mutz@qt.io>
 Date: Tue, 21 Dec 2021 09:20:17 +0100
-Subject: [PATCH 09/18] QQmlJs::FixedPoolArray: fix UB (precondition violation)
+Subject: [PATCH 08/21] QQmlJs::FixedPoolArray: fix UB (precondition violation)
  in allocate()
 
 Says ubsan:
@@ -32,5 +32,5 @@ index b65b994d6c..15a8cd6878 100644
          }
      }
 -- 
-2.37.3
+2.39.0
 

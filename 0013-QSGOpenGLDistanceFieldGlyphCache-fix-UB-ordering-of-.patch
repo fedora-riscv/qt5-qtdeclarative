@@ -1,7 +1,7 @@
-From 985358efb1e60a8ff493da4d6ca9056f63dc9982 Mon Sep 17 00:00:00 2001
+From 6d844f0250d97acdf66fd0d9cdabd26588e72333 Mon Sep 17 00:00:00 2001
 From: Marc Mutz <marc.mutz@kdab.com>
 Date: Tue, 16 Jul 2019 11:31:01 +0200
-Subject: [PATCH 14/18] QSGOpenGLDistanceFieldGlyphCache: fix UB (ordering of
+Subject: [PATCH 13/21] QSGOpenGLDistanceFieldGlyphCache: fix UB (ordering of
  pointers not from the same array)
 
 The code performed out of bounds checks by adding the size of the
@@ -33,7 +33,7 @@ Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp b/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp
-index f7cb8bede3..219cdd5966 100644
+index 2c9868b335..2325a2665b 100644
 --- a/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp
 +++ b/src/quick/scenegraph/qsgrhidistancefieldglyphcache.cpp
 @@ -446,7 +446,7 @@ bool QSGRhiDistanceFieldGlyphCache::loadPregeneratedCache(const QRawFont &font)
@@ -64,5 +64,5 @@ index f7cb8bede3..219cdd5966 100644
                           qPrintable(font.familyName()));
                  return false;
 -- 
-2.37.3
+2.39.0
 
