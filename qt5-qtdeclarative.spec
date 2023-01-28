@@ -12,7 +12,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.15.8
-Release: 4%{?dist}
+Release: 4.rv64%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
@@ -116,6 +116,13 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %build
+
+%ifarch riscv64
+%global optflags %(echo %{optflags} -pthread)
+CFLAGS="%{optflags}"
+CXXFLAGS="%{optflags}"
+LDFLAGS="%{optflags}"
+%endif
 
 # HACK so calls to "python" get what we want
 ln -s %{__python3} python
@@ -235,6 +242,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Wed May 24 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 5.15.8-4.rv64
+- Fix build on riscv64.
+
 * Wed Mar 15 2023 Neal Gompa <ngompa@fedoraproject.org> - 5.15.8-4
 - Backport fix for crashes in V4 JIT (#2177696)
 
