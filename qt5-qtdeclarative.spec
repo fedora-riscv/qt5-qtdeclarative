@@ -12,7 +12,7 @@
 Summary: Qt5 - QtDeclarative component
 Name:    qt5-%{qt_module}
 Version: 5.15.8
-Release: 1%{?dist}
+Release: 1.rv64%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions
@@ -113,6 +113,13 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %build
+
+%ifarch riscv64
+%global optflags %(echo %{optflags} -pthread)
+CFLAGS="%{optflags}"
+CXXFLAGS="%{optflags}"
+LDFLAGS="%{optflags}"
+%endif
 
 # HACK so calls to "python" get what we want
 ln -s %{__python3} python
@@ -232,6 +239,9 @@ make check -k -C tests ||:
 
 
 %changelog
+* Sat Jan 28 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 5.15.8-1.rv64
+- Fix build on riscv64.
+
 * Thu Jan 05 2023 Jan Grulich <jgrulich@redhat.com> - 5.15.8-1
 - 5.15.8
 
