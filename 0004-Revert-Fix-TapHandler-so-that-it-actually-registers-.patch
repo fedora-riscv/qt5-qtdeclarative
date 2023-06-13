@@ -1,7 +1,7 @@
-From 2842ffc4e6bc4f6a7578866fbbe58c8ceb1efb16 Mon Sep 17 00:00:00 2001
+From d6514d71fe897493e76bd5e38bccf9b9159c4880 Mon Sep 17 00:00:00 2001
 From: Albert Astals Cid <aacid@kde.org>
 Date: Tue, 16 Nov 2021 22:43:37 +0100
-Subject: [PATCH 04/19] Revert "Fix TapHandler so that it actually registers a
+Subject: [PATCH 04/26] Revert "Fix TapHandler so that it actually registers a
  tap"
 
 This reverts commit 36e8ccd434f948e4f11a8f9d59139ec072e41ff5.
@@ -13,7 +13,7 @@ It's causing regresions
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/src/quick/handlers/qquickhandlerpoint.cpp b/src/quick/handlers/qquickhandlerpoint.cpp
-index 6aef3545dd..72efdfd0f4 100644
+index 02141b9a9e..7103206470 100644
 --- a/src/quick/handlers/qquickhandlerpoint.cpp
 +++ b/src/quick/handlers/qquickhandlerpoint.cpp
 @@ -82,7 +82,7 @@ void QQuickHandlerPoint::localize(QQuickItem *item)
@@ -35,7 +35,7 @@ index 6aef3545dd..72efdfd0f4 100644
      // all points are required to be from the same event, so pressed buttons and modifiers should be the same
      m_pressedButtons = points.first().pressedButtons();
 diff --git a/src/quick/handlers/qquicksinglepointhandler.cpp b/src/quick/handlers/qquicksinglepointhandler.cpp
-index 89081b4e84..b51f53b74f 100644
+index a508de455d..d785d8c0ca 100644
 --- a/src/quick/handlers/qquicksinglepointhandler.cpp
 +++ b/src/quick/handlers/qquicksinglepointhandler.cpp
 @@ -75,7 +75,7 @@ bool QQuickSinglePointHandler::wantsPointerEvent(QQuickPointerEvent *event)
@@ -57,5 +57,5 @@ index 89081b4e84..b51f53b74f 100644
  
  void QQuickSinglePointHandler::handlePointerEventImpl(QQuickPointerEvent *event)
 -- 
-2.40.0
+2.40.1
 

@@ -1,7 +1,7 @@
-From 19afcf36b92dc36e83b613e4b9ee383f6beb02dc Mon Sep 17 00:00:00 2001
+From 2384b04415045b2203894b24a3743b03eeadbc88 Mon Sep 17 00:00:00 2001
 From: Volker Hilsheimer <volker.hilsheimer@qt.io>
 Date: Wed, 9 Nov 2022 15:34:11 +0100
-Subject: [PATCH 11/19] QQuickItem: avoid emitting signals during destruction
+Subject: [PATCH 11/26] QQuickItem: avoid emitting signals during destruction
 
 If a QQuickItem is in the QQuickItem destructor, then it is both unsafe
 and unnecessary to emit property change notifications. Connected code
@@ -109,5 +109,5 @@ index 841d91bb40..ade8fb61f2 100644
      enum DirtyType {
          TransformOrigin         = 0x00000001,
 -- 
-2.40.0
+2.40.1
 

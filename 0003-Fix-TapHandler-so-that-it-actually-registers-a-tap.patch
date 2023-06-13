@@ -1,7 +1,7 @@
-From 18b10527cc14a42a19b5d088845bfd2e96326bbb Mon Sep 17 00:00:00 2001
+From ac46066b113c8c8b93277f717dd2f90207ed0e85 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jan=20Arve=20S=C3=A6ther?= <jan-arve.saether@qt.io>
 Date: Thu, 3 Sep 2020 10:51:01 +0200
-Subject: [PATCH 03/19] Fix TapHandler so that it actually registers a tap
+Subject: [PATCH 03/26] Fix TapHandler so that it actually registers a tap
 
 This bug caused all quick examples that used the
 shared\LauncherList.qml to be broken.
@@ -25,7 +25,7 @@ Reviewed-by: Shawn Rutledge <shawn.rutledge@qt.io>
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/src/quick/handlers/qquickhandlerpoint.cpp b/src/quick/handlers/qquickhandlerpoint.cpp
-index 72efdfd0f4..6aef3545dd 100644
+index 7103206470..02141b9a9e 100644
 --- a/src/quick/handlers/qquickhandlerpoint.cpp
 +++ b/src/quick/handlers/qquickhandlerpoint.cpp
 @@ -82,7 +82,7 @@ void QQuickHandlerPoint::localize(QQuickItem *item)
@@ -47,7 +47,7 @@ index 72efdfd0f4..6aef3545dd 100644
      // all points are required to be from the same event, so pressed buttons and modifiers should be the same
      m_pressedButtons = points.first().pressedButtons();
 diff --git a/src/quick/handlers/qquicksinglepointhandler.cpp b/src/quick/handlers/qquicksinglepointhandler.cpp
-index b51f53b74f..89081b4e84 100644
+index d785d8c0ca..a508de455d 100644
 --- a/src/quick/handlers/qquicksinglepointhandler.cpp
 +++ b/src/quick/handlers/qquicksinglepointhandler.cpp
 @@ -75,7 +75,7 @@ bool QQuickSinglePointHandler::wantsPointerEvent(QQuickPointerEvent *event)
@@ -69,5 +69,5 @@ index b51f53b74f..89081b4e84 100644
  
  void QQuickSinglePointHandler::handlePointerEventImpl(QQuickPointerEvent *event)
 -- 
-2.40.0
+2.40.1
 

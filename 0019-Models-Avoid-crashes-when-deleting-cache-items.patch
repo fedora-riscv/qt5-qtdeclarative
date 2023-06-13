@@ -1,7 +1,7 @@
-From 89bf481b9b14f038c5e16421a7fce6dc6523785f Mon Sep 17 00:00:00 2001
+From 32730dad9adcaab137cf2fe434b03be23bbe9c7d Mon Sep 17 00:00:00 2001
 From: Ulf Hermann <ulf.hermann@qt.io>
 Date: Wed, 29 Mar 2023 16:36:03 +0200
-Subject: [PATCH 19/19] Models: Avoid crashes when deleting cache items
+Subject: [PATCH 19/26] Models: Avoid crashes when deleting cache items
 
 Pick-to: 6.5 6.2 5.15
 Fixes: QTBUG-91425
@@ -20,7 +20,7 @@ Reviewed-by: Fabian Kosmale <fabian.kosmale@qt.io>
  create mode 100644 tests/auto/qml/qqmldelegatemodel/data/deleteRace.qml
 
 diff --git a/src/qmlmodels/qqmldelegatemodel.cpp b/src/qmlmodels/qqmldelegatemodel.cpp
-index bc6b2447af..551e0ede95 100644
+index 4157899aa6..5b7e767ae2 100644
 --- a/src/qmlmodels/qqmldelegatemodel.cpp
 +++ b/src/qmlmodels/qqmldelegatemodel.cpp
 @@ -1883,10 +1883,15 @@ void QQmlDelegateModelPrivate::emitChanges()
@@ -158,5 +158,5 @@ index 1722447830..f473cff75f 100644
  
  #include "tst_qqmldelegatemodel.moc"
 -- 
-2.40.0
+2.40.1
 

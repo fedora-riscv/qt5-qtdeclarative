@@ -1,7 +1,7 @@
-From 70b44dd18b9727e9aae857297265a751700a297e Mon Sep 17 00:00:00 2001
+From 187bb66368921ce4a6522aca78531714485c377c Mon Sep 17 00:00:00 2001
 From: Fushan Wen <qydwhotmail@gmail.com>
 Date: Tue, 10 Jan 2023 20:42:04 +0800
-Subject: [PATCH 16/19] Revert "Fix missing glyphs when using NativeRendering"
+Subject: [PATCH 16/26] Revert "Fix missing glyphs when using NativeRendering"
 
 This reverts commit da5e53b649f50cd9cdd89dadbba16f05e4070be2.
 
@@ -28,5 +28,5 @@ index fd128aa06e..f912da5799 100644
           QTextureGlyphCache::GlyphAndSubPixelPosition glyph(glyphIndexes.at(i), subPixelPosition);
           const QTextureGlyphCache::Coord &c = cache->coords.value(glyph);
 -- 
-2.40.0
+2.40.1
 

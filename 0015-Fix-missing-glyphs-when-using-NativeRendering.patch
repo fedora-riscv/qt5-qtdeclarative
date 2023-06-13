@@ -1,7 +1,7 @@
-From d54b978c0cba2bf75e145c9e1b00d2a9ab495d70 Mon Sep 17 00:00:00 2001
+From 4f645419ab8def41d1bdddddc5976b2ff5620bff Mon Sep 17 00:00:00 2001
 From: Eskil Abrahamsen Blomfeldt <eskil.abrahamsen-blomfeldt@qt.io>
 Date: Mon, 19 Dec 2022 10:05:33 +0100
-Subject: [PATCH 15/19] Fix missing glyphs when using NativeRendering
+Subject: [PATCH 15/26] Fix missing glyphs when using NativeRendering
 
 When we look up glyphs with subpixel positions in the glyph cache,
 we use the calculated subpixel position (from a set of predefined
@@ -50,5 +50,5 @@ index f912da5799..fd128aa06e 100644
           QTextureGlyphCache::GlyphAndSubPixelPosition glyph(glyphIndexes.at(i), subPixelPosition);
           const QTextureGlyphCache::Coord &c = cache->coords.value(glyph);
 -- 
-2.40.0
+2.40.1
 

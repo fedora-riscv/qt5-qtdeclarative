@@ -1,7 +1,7 @@
-From 7be5422134167fe6d9fd44ef683f407bbda1bce7 Mon Sep 17 00:00:00 2001
+From 0d21fc0cb74c01368107bf2779c34e5734b5e5ae Mon Sep 17 00:00:00 2001
 From: Ulf Hermann <ulf.hermann@qt.io>
 Date: Tue, 30 Nov 2021 14:39:48 +0100
-Subject: [PATCH 14/19] Qml: Don't crash when as-casting to type with errors
+Subject: [PATCH 14/26] Qml: Don't crash when as-casting to type with errors
 
 Such types don't have a compilation unit, but we still know their names.
 
@@ -109,5 +109,5 @@ index bffb62c59e..97cc64991f 100644
  
  #include "tst_qqmllanguage.moc"
 -- 
-2.40.0
+2.40.1
 

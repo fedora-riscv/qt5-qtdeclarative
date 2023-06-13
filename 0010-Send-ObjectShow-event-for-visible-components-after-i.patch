@@ -1,7 +1,7 @@
-From bdb3af04019b9134d6e815f4fe54317db63d0152 Mon Sep 17 00:00:00 2001
+From ffa3c975270c5026be40912451a289492956f01c Mon Sep 17 00:00:00 2001
 From: Fushan Wen <qydwhotmail@gmail.com>
 Date: Sat, 5 Nov 2022 01:44:30 +0800
-Subject: [PATCH 10/19] Send ObjectShow event for visible components after
+Subject: [PATCH 10/26] Send ObjectShow event for visible components after
  initialized
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -42,5 +42,5 @@ index ec55fb2998..499fb61d1b 100644
  
  QQuickStateGroup *QQuickItemPrivate::_states()
 -- 
-2.40.0
+2.40.1
 

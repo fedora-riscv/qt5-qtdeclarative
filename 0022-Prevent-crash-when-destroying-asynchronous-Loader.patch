@@ -1,0 +1,129 @@
+From 3366947eb58c0c5ad8a7e714a6b9667e1c3ff7b8 Mon Sep 17 00:00:00 2001
+From: Joni Poikelin <joni.poikelin@qt.io>
+Date: Thu, 3 Sep 2020 14:22:26 +0300
+Subject: [PATCH 22/26] Prevent crash when destroying asynchronous Loader
+
+Fixes: QTBUG-86255
+Pick-to: 5.15
+Change-Id: I30488b64d910a1409a43e2e98ee7ab084aec33d2
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 149c1dd07b54ee0c027d94a49d52160dc4f4e2ac)
+
+* asturmlechner 2023-01-06: Resolve conflict with dev branch commits
+  d51c007ecc8aa6256cb95cf3992e5ac34a70fa3f and
+  b2a4a61e8cb0839ba293783ac03c72f35c7b1307
+---
+ src/qml/qml/qqmlvmemetaobject.cpp             |  2 +-
+ .../quick/qquickgridview/data/qtbug86255.qml  | 55 +++++++++++++++++++
+ .../qquickgridview/tst_qquickgridview.cpp     | 13 +++++
+ 3 files changed, 69 insertions(+), 1 deletion(-)
+ create mode 100644 tests/auto/quick/qquickgridview/data/qtbug86255.qml
+
+diff --git a/src/qml/qml/qqmlvmemetaobject.cpp b/src/qml/qml/qqmlvmemetaobject.cpp
+index aa9f4bc1bd..09503a7e99 100644
+--- a/src/qml/qml/qqmlvmemetaobject.cpp
++++ b/src/qml/qml/qqmlvmemetaobject.cpp
+@@ -254,7 +254,7 @@ void QQmlVMEMetaObjectEndpoint::tryConnect()
+             if (!pd)
+                 return;
+ 
+-            if (pd->notifyIndex() != -1)
++            if (pd->notifyIndex() != -1 && ctxt->engine)
+                 connect(target, pd->notifyIndex(), ctxt->engine);
+         }
+ 
+diff --git a/tests/auto/quick/qquickgridview/data/qtbug86255.qml b/tests/auto/quick/qquickgridview/data/qtbug86255.qml
+new file mode 100644
+index 0000000000..20688b1967
+--- /dev/null
++++ b/tests/auto/quick/qquickgridview/data/qtbug86255.qml
+@@ -0,0 +1,55 @@
++import QtQuick 2.15
++
++Item {
++    width: 240
++    height: 320
++
++    GridView {
++        id: grid
++        objectName: "view"
++        anchors.fill: parent
++        cellWidth: 64
++        cellHeight: 64
++        model: ListModel {
++            id: listModel
++
++            Component.onCompleted: reload()
++
++            function reload() {
++                clear();
++                for (let i = 0; i < 1000; i++) {
++                    let magic = Math.random();
++                    append( { magic } );
++                }
++            }
++        }
++        clip: true
++        delegate: Item {
++            id: d
++            property string val: magic
++            Loader {
++                property alias value: d.val
++                asynchronous: true
++                sourceComponent: cmp
++            }
++        }
++    }
++
++    Timer {
++        running: true
++        interval: 1000
++        onTriggered: listModel.reload()
++    }
++    Timer {
++        running: true
++        interval: 500
++        onTriggered: grid.flick(0, -4000)
++    }
++
++    Component {
++        id: cmp
++        Text {
++            text: value
++        }
++    }
++}
+diff --git a/tests/auto/quick/qquickgridview/tst_qquickgridview.cpp b/tests/auto/quick/qquickgridview/tst_qquickgridview.cpp
+index 94ec4f44d5..7d0d9fa7a7 100644
+--- a/tests/auto/quick/qquickgridview/tst_qquickgridview.cpp
++++ b/tests/auto/quick/qquickgridview/tst_qquickgridview.cpp
+@@ -213,6 +213,7 @@ private slots:
+     void QTBUG_45640();
+     void QTBUG_49218();
+     void QTBUG_48870_fastModelUpdates();
++    void QTBUG_86255();
+ 
+     void keyNavigationEnabled();
+     void resizeDynamicCellWidthRtL();
+@@ -6814,6 +6815,18 @@ void tst_QQuickGridView::resizeDynamicCellWidthRtL()
+     QTRY_COMPARE(gridview->contentX(), 0.f);
+ }
+ 
++void tst_QQuickGridView::QTBUG_86255()
++{
++    QScopedPointer<QQuickView> window(createView());
++    window->setSource(testFileUrl("qtbug86255.qml"));
++    window->show();
++    QVERIFY(QTest::qWaitForWindowExposed(window.data()));
++    QQuickGridView *view = findItem<QQuickGridView>(window->rootObject(), "view");
++    QVERIFY(view != nullptr);
++    QTRY_COMPARE(view->isFlicking(), true);
++    QTRY_COMPARE(view->isFlicking(), false);
++}
++
+ void tst_QQuickGridView::releaseItems()
+ {
+     QScopedPointer<QQuickView> view(createView());
+-- 
+2.40.1
+
