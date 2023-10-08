@@ -1,0 +1,54 @@
+From d15af4ca5c7b94b1ce1fa202c33e5dc1640185c7 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Mon, 26 Jun 2023 11:00:56 +0200
+Subject: [PATCH 27/30] QRecyclePool: fix potential UB
+
+Return the pointer returned by placement new, not the pointer used as
+input to placement new. There is a subtle difference and this grey
+zone of the C++ standard is best avoided (keyword: std::launder()).
+
+Pick-to: 6.6 6.5 6.2 5.15
+Change-Id: I27c159cdb29a5837120f3d44aa6c95da040fd1a2
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 7381110745572478ffa3c68000574bc4ccb2396c)
+---
+ src/qml/qml/ftw/qrecyclepool_p.h | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/src/qml/qml/ftw/qrecyclepool_p.h b/src/qml/qml/ftw/qrecyclepool_p.h
+index 39f4f88512..c963e1878e 100644
+--- a/src/qml/qml/ftw/qrecyclepool_p.h
++++ b/src/qml/qml/ftw/qrecyclepool_p.h
+@@ -130,8 +130,7 @@ template<typename T, int Step>
+ T *QRecyclePool<T, Step>::New()
+ {
+     T *rv = d->allocate();
+-    new (rv) T;
+-    return rv;
++    return new (rv) T;
+ }
+ 
+ template<typename T, int Step>
+@@ -139,8 +138,7 @@ template<typename T1>
+ T *QRecyclePool<T, Step>::New(const T1 &a)
+ {
+     T *rv = d->allocate();
+-    new (rv) T(a);
+-    return rv;
++    return new (rv) T(a);
+ }
+ 
+ template<typename T, int Step>
+@@ -148,8 +146,7 @@ template<typename T1>
+ T *QRecyclePool<T, Step>::New(T1 &a)
+ {
+     T *rv = d->allocate();
+-    new (rv) T(a);
+-    return rv;
++    return new (rv) T(a);
+ }
+ 
+ template<typename T, int Step>
+-- 
+2.41.0
+

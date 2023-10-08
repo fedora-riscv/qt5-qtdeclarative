@@ -1,7 +1,7 @@
-From 70bc0c03423fe861bb917c67041f71e08ec10343 Mon Sep 17 00:00:00 2001
+From 75d7d0370a3a19615e9aab6a23519eb529e4de87 Mon Sep 17 00:00:00 2001
 From: Fushan Wen <qydwhotmail@gmail.com>
 Date: Fri, 21 Apr 2023 23:38:04 +0800
-Subject: [PATCH 24/26] Revert "QQuickItem: Fix effective visibility for items
+Subject: [PATCH 22/30] Revert "QQuickItem: Fix effective visibility for items
  without parent"
 
 This breaks applications that use QQmlPropertyList to store QQuickItem
@@ -47,5 +47,5 @@ index 34eefd85e6..42348d8dd1 100644
      QQuickItem *child1 = new QQuickItem;
      child1->setParentItem(root);
 -- 
-2.40.1
+2.41.0
 

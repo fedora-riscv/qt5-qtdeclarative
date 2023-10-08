@@ -1,7 +1,7 @@
-From 5352f113b3c7a5af2ad2741d593c6e6a758eb93e Mon Sep 17 00:00:00 2001
+From f2e8ebd9e19e0d725c820010ab3cdf153fd62a3b Mon Sep 17 00:00:00 2001
 From: Shawn Rutledge <shawn.rutledge@qt.io>
 Date: Tue, 16 May 2023 07:59:46 +0200
-Subject: [PATCH 26/26] qml tool: Use QCommandLineParser::process() rather than
+Subject: [PATCH 24/30] qml tool: Use QCommandLineParser::process() rather than
  parse()
 
 This handles the --version, --help and --help-all options.
@@ -53,5 +53,5 @@ index beeec88f07..2cb7653d65 100644
          listConfFiles();
      if (applicationType == QmlApplicationTypeUnknown) {
 -- 
-2.40.1
+2.41.0
 

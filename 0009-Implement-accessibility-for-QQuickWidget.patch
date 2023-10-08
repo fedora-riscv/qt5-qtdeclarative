@@ -1,7 +1,7 @@
-From 95f4632430db5668fa022983c76e4f6bde74c33d Mon Sep 17 00:00:00 2001
+From e88fbf0d32d56eea40c8aec75e81b40f21c581a5 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Morten=20Johan=20S=C3=B8rvig?= <morten.sorvig@qt.io>
 Date: Fri, 7 May 2021 10:07:50 +0200
-Subject: [PATCH 09/26] Implement accessibility for QQuickWidget
+Subject: [PATCH 09/30] Implement accessibility for QQuickWidget
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -469,7 +469,7 @@ index 0000000000..8c63b09f81
 +
 +#endif
 diff --git a/src/quickwidgets/qquickwidget.cpp b/src/quickwidgets/qquickwidget.cpp
-index 223d91f579..9c97b43518 100644
+index c791f209cf..b0117683f7 100644
 --- a/src/quickwidgets/qquickwidget.cpp
 +++ b/src/quickwidgets/qquickwidget.cpp
 @@ -39,6 +39,7 @@
@@ -561,5 +561,5 @@ index 2438e577ae..f46deb54ac 100644
  
  load(qt_module)
 -- 
-2.40.1
+2.41.0
 

@@ -1,7 +1,7 @@
-From 688795f02ecc163e7cb18dfb6c87273d7e613cbf Mon Sep 17 00:00:00 2001
+From 632e062466b5252049b3bf1d75c91d5e010f021c Mon Sep 17 00:00:00 2001
 From: Volker Hilsheimer <volker.hilsheimer@qt.io>
 Date: Fri, 18 Nov 2022 14:20:20 +0100
-Subject: [PATCH 23/26] QQuickItem: Fix effective visibility for items without
+Subject: [PATCH 21/30] QQuickItem: Fix effective visibility for items without
  parent
 
 Items are visible if they are children of a visible parent, and not
@@ -77,5 +77,5 @@ index 42348d8dd1..34eefd85e6 100644
      QQuickItem *child1 = new QQuickItem;
      child1->setParentItem(root);
 -- 
-2.40.1
+2.41.0
 

@@ -1,0 +1,116 @@
+From 1b0e366092bcfae0392592c3b7891f0e47af1018 Mon Sep 17 00:00:00 2001
+From: Oliver Eftevaag <oliver.eftevaag@qt.io>
+Date: Fri, 9 Dec 2022 18:40:54 +0100
+Subject: [PATCH 30/30] Flickable: prevent fixup() from being called while
+ dragging
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A previous patch 5647527a8cde84b51fff66fc482f02435770b3dd causes
+a regression. The purpose of the patch, that caused this regression,
+was to update the pressPos variables, in cases where the contentItem's
+geometry was modified externally, while a user were dragging the
+contentItem around.
+
+The mistake that was made, was how width and height changes were
+handled. We had previously added logic in setContentWidth() and
+setContentHeight() that would call fixup() (with immediate fixupMode)
+to ensure that the contentItem would immediately be repositioned
+inside the flickable's viewport, if the contentItem was being dragged.
+
+It turns out that setContentWidth() and setContentHeight() are being
+called from QQuickItemViewPrivate::updateViewport(), which happens
+quite often, while dragging. This would make fixup() and dragging
+constantly interfere with each other, since they'd not always agree on
+a specific position for the contentItem.
+
+This patch reverts the changes made to setContentWidth() and
+setContentHeight(), since it turns out that those changes weren't
+necessary after all. QQuickFlickablePrivate::itemGeometryChanged() only
+calls viewportMoved() on x and y changes anyways.
+
+Done-with: Jan Arve Sæther <jan-arve.saether@qt.io>
+Done-with: Santhosh Kumar Selvaraj <santhosh.kumar.selvaraj@qt.io>
+Fixes: QTBUG-109140
+Pick-to: 5.15 6.2 6.3 6.4 6.5
+Change-Id: I0bddf8685d3afc1ae04b2c092212d3c1bd742c3b
+Reviewed-by: Paul Wicking <paul.wicking@qt.io>
+(cherry picked from commit b307bf3c4f63c6e04874a972c747f18e18ddc199)
+---
+ src/quick/items/qquickflickable.cpp                      | 8 ++------
+ src/quick/items/qquickflickable_p_p.h                    | 1 +
+ tests/auto/quick/qquickflickable/tst_qquickflickable.cpp | 8 +++++++-
+ 3 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/src/quick/items/qquickflickable.cpp b/src/quick/items/qquickflickable.cpp
+index ea357d819d..2634b68248 100644
+--- a/src/quick/items/qquickflickable.cpp
++++ b/src/quick/items/qquickflickable.cpp
+@@ -2120,11 +2120,9 @@ void QQuickFlickable::setContentWidth(qreal w)
+         d->contentItem->setWidth(w);
+     d->hData.markExtentsDirty();
+     // Make sure that we're entirely in view.
+-    if ((!d->pressed && !d->hData.moving && !d->vData.moving) || d->hData.dragging) {
+-        d->hData.contentPositionChangedExternallyDuringDrag = d->hData.dragging;
++    if (!d->pressed && !d->hData.moving && !d->vData.moving) {
+         d->fixupMode = QQuickFlickablePrivate::Immediate;
+         d->fixupX();
+-        d->hData.contentPositionChangedExternallyDuringDrag = false;
+     } else if (!d->pressed && d->hData.fixingUp) {
+         d->fixupMode = QQuickFlickablePrivate::ExtentChanged;
+         d->fixupX();
+@@ -2151,11 +2149,9 @@ void QQuickFlickable::setContentHeight(qreal h)
+         d->contentItem->setHeight(h);
+     d->vData.markExtentsDirty();
+     // Make sure that we're entirely in view.
+-    if ((!d->pressed && !d->hData.moving && !d->vData.moving) || d->vData.dragging) {
+-        d->vData.contentPositionChangedExternallyDuringDrag = d->vData.dragging;
++    if (!d->pressed && !d->hData.moving && !d->vData.moving) {
+         d->fixupMode = QQuickFlickablePrivate::Immediate;
+         d->fixupY();
+-        d->vData.contentPositionChangedExternallyDuringDrag = false;
+     } else if (!d->pressed && d->vData.fixingUp) {
+         d->fixupMode = QQuickFlickablePrivate::ExtentChanged;
+         d->fixupY();
+diff --git a/src/quick/items/qquickflickable_p_p.h b/src/quick/items/qquickflickable_p_p.h
+index d5d838eaea..aef15e150a 100644
+--- a/src/quick/items/qquickflickable_p_p.h
++++ b/src/quick/items/qquickflickable_p_p.h
+@@ -120,6 +120,7 @@ public:
+             dragStartOffset = 0;
+             fixingUp = false;
+             inOvershoot = false;
++            contentPositionChangedExternallyDuringDrag = false;
+         }
+ 
+         void markExtentsDirty() {
+diff --git a/tests/auto/quick/qquickflickable/tst_qquickflickable.cpp b/tests/auto/quick/qquickflickable/tst_qquickflickable.cpp
+index d092cd0170..62f7c67dd4 100644
+--- a/tests/auto/quick/qquickflickable/tst_qquickflickable.cpp
++++ b/tests/auto/quick/qquickflickable/tst_qquickflickable.cpp
+@@ -2642,7 +2642,12 @@ void tst_qquickflickable::setContentPositionWhileDragging() // QTBUG-104966
+     } else if (newExtent >= 0) {
+         // ...or reduce the content size be be less than current (contentX, contentY) position
+         // This forces the content item to move.
+-        expectedContentPos = moveDelta;
++        // contentY: 150
++        // 320 - 150 = 170 pixels down to bottom
++        // Now reduce contentHeight to 200
++        // since we are at the bottom, and the flickable is 100 pixels tall, contentY must land
++        // at newExtent - 100.
++
+         if (isHorizontal) {
+             flickable->setContentWidth(newExtent);
+         } else {
+@@ -2652,6 +2657,7 @@ void tst_qquickflickable::setContentPositionWhileDragging() // QTBUG-104966
+         // We therefore cannot scroll/flick it further down. Drag it up towards the top instead
+         // (by moving mouse down).
+         pos += moveDelta;
++        expectedContentPos = unitDelta * (newExtent - (isHorizontal ? flickable->width() : flickable->height()));
+     }
+ 
+     QTest::mouseMove(window.data(), pos);
+-- 
+2.41.0
+

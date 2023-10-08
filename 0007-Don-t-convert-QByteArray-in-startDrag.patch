@@ -1,7 +1,7 @@
-From 70a38e3c897e3ba72b50413d0f994c9f5ebaffd8 Mon Sep 17 00:00:00 2001
+From c416839e41ac65cd559176617525a3fb26ca6e2a Mon Sep 17 00:00:00 2001
 From: Fushan Wen <qydwhotmail@gmail.com>
 Date: Tue, 1 Nov 2022 22:35:24 +0800
-Subject: [PATCH 07/26] Don't convert QByteArray in `startDrag`
+Subject: [PATCH 07/30] Don't convert QByteArray in `startDrag`
 
 QMimeData::setData expects the provided data to contain the correctly
 encoded QByteArray, so if the variant contains a QByteArray, then take
@@ -56,5 +56,5 @@ index 8321fcfeed..3b50370355 100644
      drag->setMimeData(mimeData);
      if (pixmapLoader.isReady()) {
 -- 
-2.40.1
+2.41.0
 

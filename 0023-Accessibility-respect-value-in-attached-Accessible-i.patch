@@ -1,7 +1,7 @@
-From a9f99d945e23b915502ddbd56e20a2af9f33296e Mon Sep 17 00:00:00 2001
+From be69e9b1443cff30d241100bafc91d447cc0b2f5 Mon Sep 17 00:00:00 2001
 From: Volker Hilsheimer <volker.hilsheimer@qt.io>
 Date: Tue, 18 Apr 2023 22:05:36 +0200
-Subject: [PATCH 25/26] Accessibility: respect value in attached Accessible in
+Subject: [PATCH 23/30] Accessibility: respect value in attached Accessible in
  controls
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -107,5 +107,5 @@ index ade8fb61f2..6f329bd119 100644
  
      void setImplicitAntialiasing(bool antialiasing);
 -- 
-2.40.1
+2.41.0
 

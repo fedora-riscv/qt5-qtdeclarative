@@ -1,7 +1,7 @@
-From 0d217b88c6bf5673464e350e3a62773e69555f98 Mon Sep 17 00:00:00 2001
+From 752b5bfa37c0b059883f52fcec4a41efc78521ad Mon Sep 17 00:00:00 2001
 From: Jaeyoon Jung <jaeyoon.jung@lge.com>
 Date: Fri, 19 Feb 2021 08:11:57 +0900
-Subject: [PATCH 17/26] QQmlImportDatabase: Make sure the newly added import
+Subject: [PATCH 15/30] QQmlImportDatabase: Make sure the newly added import
  path be first
 
 If it already exists in the import list, move it to the first place.
@@ -17,10 +17,10 @@ Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
  2 files changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/src/qml/qml/qqmlimport.cpp b/src/qml/qml/qqmlimport.cpp
-index 10c6c41338..39bfcdc999 100644
+index e7263d1850..289f11d006 100644
 --- a/src/qml/qml/qqmlimport.cpp
 +++ b/src/qml/qml/qqmlimport.cpp
-@@ -2120,9 +2120,12 @@ void QQmlImportDatabase::addImportPath(const QString& path)
+@@ -2119,9 +2119,12 @@ void QQmlImportDatabase::addImportPath(const QString& path)
          cPath.replace(Backslash, Slash);
      }
  
@@ -53,5 +53,5 @@ index 9c865b3f73..1f788f7a7f 100644
  
  Q_DECLARE_METATYPE(QQmlImports::ImportVersion)
 -- 
-2.40.1
+2.41.0
 

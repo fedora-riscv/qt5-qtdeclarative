@@ -1,7 +1,7 @@
-From 3366947eb58c0c5ad8a7e714a6b9667e1c3ff7b8 Mon Sep 17 00:00:00 2001
+From 3e199737af8faee64cb940aef904537b658fe375 Mon Sep 17 00:00:00 2001
 From: Joni Poikelin <joni.poikelin@qt.io>
 Date: Thu, 3 Sep 2020 14:22:26 +0300
-Subject: [PATCH 22/26] Prevent crash when destroying asynchronous Loader
+Subject: [PATCH 20/30] Prevent crash when destroying asynchronous Loader
 
 Fixes: QTBUG-86255
 Pick-to: 5.15
@@ -20,10 +20,10 @@ Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
  create mode 100644 tests/auto/quick/qquickgridview/data/qtbug86255.qml
 
 diff --git a/src/qml/qml/qqmlvmemetaobject.cpp b/src/qml/qml/qqmlvmemetaobject.cpp
-index aa9f4bc1bd..09503a7e99 100644
+index 1e0e4e419f..a0532d1794 100644
 --- a/src/qml/qml/qqmlvmemetaobject.cpp
 +++ b/src/qml/qml/qqmlvmemetaobject.cpp
-@@ -254,7 +254,7 @@ void QQmlVMEMetaObjectEndpoint::tryConnect()
+@@ -251,7 +251,7 @@ void QQmlVMEMetaObjectEndpoint::tryConnect()
              if (!pd)
                  return;
  
@@ -125,5 +125,5 @@ index 94ec4f44d5..7d0d9fa7a7 100644
  {
      QScopedPointer<QQuickView> view(createView());
 -- 
-2.40.1
+2.41.0
 
