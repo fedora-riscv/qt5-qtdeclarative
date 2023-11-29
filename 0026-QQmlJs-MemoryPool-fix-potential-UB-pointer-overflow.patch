@@ -1,0 +1,45 @@
+From 7368a55a926719577c36e5978d67c008474a85a0 Mon Sep 17 00:00:00 2001
+From: Marc Mutz <marc.mutz@qt.io>
+Date: Tue, 27 Jun 2023 13:02:45 +0200
+Subject: [PATCH 26/30] QQmlJs::MemoryPool: fix potential UB (pointer overflow)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A check like (p1 + s op p2) is dangerous, because p1 + s may overflow,
+and that would be UB, so the compiler can assume it doesn't happen and
+break the check.
+
+Reformulate the expression by subtracting p1 from both sides. Cast the
+ptrdiff_t to size_t to avoid -Wsign-compare. This is safe because _end
+is always ≥ _ptr.
+
+As a drive-by, remove extra parentheses.
+
+Pick-to: 6.6 6.5 6.2 5.15
+Change-Id: If240d685fe48196ab5ceb7ff39736b73c8997e30
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+(cherry picked from commit 8a39f7655f4cfbc35c1886b49e2f3a9ada263e39)
+
+* asturmlechner 2023-06-29: Resolve conflict with dev branch commit
+  1b10ce6a08edbc2ac7e8fd7e97e3fc691f2081df by dropping unrelated bits
+---
+ src/qml/common/qqmljsmemorypool_p.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/qml/common/qqmljsmemorypool_p.h b/src/qml/common/qqmljsmemorypool_p.h
+index 0cf7ea84e6..1b81a87a2c 100644
+--- a/src/qml/common/qqmljsmemorypool_p.h
++++ b/src/qml/common/qqmljsmemorypool_p.h
+@@ -87,7 +87,7 @@ public:
+     inline void *allocate(size_t size)
+     {
+         size = (size + 7) & ~size_t(7);
+-        if (Q_LIKELY(_ptr && (_ptr + size < _end))) {
++        if (Q_LIKELY(_ptr && size < size_t(_end - _ptr))) {
+             void *addr = _ptr;
+             _ptr += size;
+             return addr;
+-- 
+2.41.0
+

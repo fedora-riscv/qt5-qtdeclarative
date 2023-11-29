@@ -1,7 +1,7 @@
-From e61200ff7222c31e73dbc779ba4a70073775cc0c Mon Sep 17 00:00:00 2001
+From 51b5565f2647e4c0f298c75e7566252d230e1ba6 Mon Sep 17 00:00:00 2001
 From: Aleix Pol <aleixpol@kde.org>
 Date: Thu, 23 Sep 2021 03:43:04 +0200
-Subject: [PATCH 04/21] QQmlDelegateModel: Refresh the view when a column is
+Subject: [PATCH 02/30] QQmlDelegateModel: Refresh the view when a column is
  added at 0
 
 It can happen that a model reports n>0 rows but columns=0 (See
@@ -22,7 +22,7 @@ Signed-off-by: Aleix Pol <aleixpol@kde.org>
  create mode 100644 tests/auto/qml/qqmldelegatemodel/data/redrawUponColumnChange.qml
 
 diff --git a/src/qmlmodels/qqmldelegatemodel.cpp b/src/qmlmodels/qqmldelegatemodel.cpp
-index 2079a8ed04..a577cb2351 100644
+index 4fcff70de6..4157899aa6 100644
 --- a/src/qmlmodels/qqmldelegatemodel.cpp
 +++ b/src/qmlmodels/qqmldelegatemodel.cpp
 @@ -389,6 +389,12 @@ void QQmlDelegateModelPrivate::connectToAbstractItemModel()
@@ -51,7 +51,7 @@ index 2079a8ed04..a577cb2351 100644
      QObject::disconnect(aim, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)),
                          q, SLOT(_q_dataChanged(QModelIndex,QModelIndex,QVector<int>)));
      QObject::disconnect(aim, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)),
-@@ -1973,6 +1985,38 @@ void QQmlDelegateModel::_q_rowsMoved(
+@@ -1974,6 +1986,38 @@ void QQmlDelegateModel::_q_rowsMoved(
      }
  }
  
@@ -174,5 +174,5 @@ index 35f1e2c94d..1722447830 100644
  
  #include "tst_qqmldelegatemodel.moc"
 -- 
-2.39.0
+2.41.0
 

@@ -1,7 +1,7 @@
-From 1fb12800a8907680b821a8e8e29c5b428cbb64b6 Mon Sep 17 00:00:00 2001
+From 3fcbf3c50d392401060d4ea65e9bc2f4760ebda3 Mon Sep 17 00:00:00 2001
 From: Harald Sitter <sitter@kde.org>
 Date: Mon, 28 Nov 2022 14:59:33 +0100
-Subject: [PATCH 20/21] a11y: track item enabled state
+Subject: [PATCH 12/30] a11y: track item enabled state
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -18,10 +18,10 @@ Reviewed-by: Jan Arve Sæther <jan-arve.saether@qt.io>
  2 files changed, 13 insertions(+)
 
 diff --git a/src/quick/accessible/qaccessiblequickitem.cpp b/src/quick/accessible/qaccessiblequickitem.cpp
-index eb3df4d4cd..78e2ab302c 100644
+index 0692ce634d..a8df58d450 100644
 --- a/src/quick/accessible/qaccessiblequickitem.cpp
 +++ b/src/quick/accessible/qaccessiblequickitem.cpp
-@@ -210,6 +210,10 @@ QAccessible::State QAccessibleQuickItem::state() const
+@@ -215,6 +215,10 @@ QAccessible::State QAccessibleQuickItem::state() const
      if (role() == QAccessible::EditableText)
          if (auto ti = qobject_cast<QQuickTextInput *>(item()))
              state.passwordEdit = ti->echoMode() != QQuickTextInput::Normal;
@@ -33,7 +33,7 @@ index eb3df4d4cd..78e2ab302c 100644
  }
  
 diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
-index 4cf73ff73d..dec0ae19ae 100644
+index 5ee2a440a3..c370d6e5c3 100644
 --- a/src/quick/items/qquickitem.cpp
 +++ b/src/quick/items/qquickitem.cpp
 @@ -6174,6 +6174,15 @@ void QQuickItemPrivate::setEffectiveEnableRecur(QQuickItem *scope, bool newEffec
@@ -53,5 +53,5 @@ index 4cf73ff73d..dec0ae19ae 100644
  }
  
 -- 
-2.39.0
+2.41.0
 

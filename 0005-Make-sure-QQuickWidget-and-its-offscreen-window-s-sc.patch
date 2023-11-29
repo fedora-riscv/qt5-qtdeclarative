@@ -1,7 +1,7 @@
-From d8808a609a81660e9de9abc6b1b71ea01f0d6f40 Mon Sep 17 00:00:00 2001
+From 1a7956f606047d4ec669f5759f88d7f34a912589 Mon Sep 17 00:00:00 2001
 From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
 Date: Sat, 29 Jan 2022 21:59:33 +0200
-Subject: [PATCH 10/21] Make sure QQuickWidget and its offscreen window's
+Subject: [PATCH 05/30] Make sure QQuickWidget and its offscreen window's
  screens are always in sync
 
 By default, the offscreen window is placed on the primary screen.
@@ -20,7 +20,7 @@ Reviewed-by: Laszlo Agocs <laszlo.agocs@qt.io>
  1 file changed, 11 insertions(+), 15 deletions(-)
 
 diff --git a/src/quickwidgets/qquickwidget.cpp b/src/quickwidgets/qquickwidget.cpp
-index 39780f8de3..223d91f579 100644
+index cf021d9a7c..c791f209cf 100644
 --- a/src/quickwidgets/qquickwidget.cpp
 +++ b/src/quickwidgets/qquickwidget.cpp
 @@ -106,6 +106,7 @@ void QQuickWidgetPrivate::init(QQmlEngine* e)
@@ -42,7 +42,7 @@ index 39780f8de3..223d91f579 100644
          QOpenGLContext *shareContext = qt_gl_global_share_context();
          if (!shareContext)
              shareContext = QWidgetPrivate::get(q->window())->shareContext();
-@@ -1520,19 +1519,16 @@ bool QQuickWidget::event(QEvent *e)
+@@ -1527,19 +1526,16 @@ bool QQuickWidget::event(QEvent *e)
          d->handleWindowChange();
          break;
  
@@ -70,7 +70,7 @@ index 39780f8de3..223d91f579 100644
  
          if (d->useSoftwareRenderer
  #if QT_CONFIG(opengl)
-@@ -1545,7 +1541,7 @@ bool QQuickWidget::event(QEvent *e)
+@@ -1552,7 +1548,7 @@ bool QQuickWidget::event(QEvent *e)
              d->render(true);
          }
          break;
@@ -80,5 +80,5 @@ index 39780f8de3..223d91f579 100644
      case QEvent::Move:
          d->updatePosition();
 -- 
-2.39.0
+2.41.0
 

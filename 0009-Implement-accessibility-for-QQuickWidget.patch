@@ -1,7 +1,7 @@
-From 6d1dd8925f160d6ad02ea646eac638675bdf9f1c Mon Sep 17 00:00:00 2001
+From e88fbf0d32d56eea40c8aec75e81b40f21c581a5 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Morten=20Johan=20S=C3=B8rvig?= <morten.sorvig@qt.io>
 Date: Fri, 7 May 2021 10:07:50 +0200
-Subject: [PATCH 17/21] Implement accessibility for QQuickWidget
+Subject: [PATCH 09/30] Implement accessibility for QQuickWidget
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -46,7 +46,7 @@ Reviewed-by: Volker Hilsheimer <volker.hilsheimer@qt.io>
  create mode 100644 src/quickwidgets/qaccessiblequickwidgetfactory_p.h
 
 diff --git a/src/quick/accessible/qaccessiblequickitem.cpp b/src/quick/accessible/qaccessiblequickitem.cpp
-index 85719fdc80..eb3df4d4cd 100644
+index ae1954ae8d..0692ce634d 100644
 --- a/src/quick/accessible/qaccessiblequickitem.cpp
 +++ b/src/quick/accessible/qaccessiblequickitem.cpp
 @@ -46,6 +46,7 @@
@@ -102,7 +102,7 @@ index 85719fdc80..eb3df4d4cd 100644
          } else {
              while (parent && !parent->d_func()->isAccessible)
                  parent = parent->parentItem();
-@@ -188,7 +197,7 @@ QAccessible::State QAccessibleQuickItem::state() const
+@@ -193,7 +202,7 @@ QAccessible::State QAccessibleQuickItem::state() const
      QRect viewRect_ = viewRect();
      QRect itemRect = rect();
  
@@ -469,7 +469,7 @@ index 0000000000..8c63b09f81
 +
 +#endif
 diff --git a/src/quickwidgets/qquickwidget.cpp b/src/quickwidgets/qquickwidget.cpp
-index 223d91f579..9c97b43518 100644
+index c791f209cf..b0117683f7 100644
 --- a/src/quickwidgets/qquickwidget.cpp
 +++ b/src/quickwidgets/qquickwidget.cpp
 @@ -39,6 +39,7 @@
@@ -561,5 +561,5 @@ index 2438e577ae..f46deb54ac 100644
  
  load(qt_module)
 -- 
-2.39.0
+2.41.0
 
